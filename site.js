@@ -36,22 +36,22 @@
       document.title = lang === "zh" ? titleZh : titleEn;
     }
 
-    // Toggle button states
-    var btns = document.querySelectorAll(".lang-toggle button");
-    for (var j = 0; j < btns.length; j++) {
-      btns[j].classList.toggle("is-active", btns[j].getAttribute("data-lang") === lang);
+    // Toggle segment states
+    var segs = document.querySelectorAll(".lang-toggle .lang-seg");
+    for (var j = 0; j < segs.length; j++) {
+      segs[j].classList.toggle("is-active", segs[j].getAttribute("data-lang") === lang);
     }
 
     try { localStorage.setItem(STORE_KEY, lang); } catch (e) {}
   }
 
   function initToggle() {
-    var btns = document.querySelectorAll(".lang-toggle button");
-    for (var i = 0; i < btns.length; i++) {
-      btns[i].addEventListener("click", function () {
-        applyLang(this.getAttribute("data-lang"));
-      });
-    }
+    var toggle = document.querySelector(".lang-toggle");
+    if (!toggle) return;
+    // Clicking anywhere on the toggle flips between EN and 中
+    toggle.addEventListener("click", function () {
+      applyLang(getLang() === "zh" ? "en" : "zh");
+    });
   }
 
   // Scroll-spy for in-page nav links

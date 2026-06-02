@@ -145,24 +145,27 @@ html[lang="zh"] .nav__link--caps {
 .lang-toggle {
   margin-left: 10px;
   display: inline-flex;
-  align-items: center;
+  align-items: stretch;
+  padding: 0;
   border: 1px solid var(--border-strong);
   border-radius: 999px;
   overflow: hidden;
+  font-family: inherit;
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   background: var(--surface);
-}
-.lang-toggle button {
-  font-family: inherit;
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  padding: 5px 12px;
   cursor: pointer;
+}
+.lang-seg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  padding: 5px 10px;
+  color: var(--muted);
   transition: background .18s, color .18s;
 }
-.lang-toggle button.is-active {
+.lang-seg.is-active {
   background: var(--accent);
   color: #fff;
 }
