@@ -183,7 +183,6 @@ html[lang="zh"] .nav__link--caps {
 
 .portrait {
   width: 64%;
-  margin: 0 auto;
   aspect-ratio: 3 / 4;
   object-fit: cover;
   border-radius: 14px;
@@ -275,7 +274,7 @@ html[lang="zh"] .nav__link--caps {
 .section + .section { margin-top: 52px; }
 
 .section__title {
-  font-size: 0.82rem;
+  font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--accent);
