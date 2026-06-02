@@ -1,22 +1,216 @@
-<html>
+<!DOCTYPE html>
+<html lang="en" data-theme="green">
 <head>
-<title>
-我的家乡扬州
-</title>
-<style>
-body
-{
-background-image:url("wutingqiao.jpg");
-background-repeat:no-repeat;
-background-position:center center;
-}
-</style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Peiwen (Lucas) Zhou</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-<h1>我的家乡扬州</h1>
-<a href="garden.html">风景园林</a>
-<a href="celebrity.html">历史名人</a>
-<a href="cuisine.html">特色美食</a>
-<a href="art.html">艺术文化</a>
-<p>扬州市历史悠久，是全国首批24座历史文化名城之一。自吴夫差十年（前486年），吴王夫差开邗沟、筑邗城始，已有2500多年建城史。扬州市是南京都市圈紧密圈城市和长三角城市群城市，国家重点工程南水北调东线水源地。有着“淮左名都，竹西佳处”之称；又有着“中国运河第一城”的美誉。在中国历史上，扬州因其独特的地理位置和优越的自然环境，自汉代至清代几乎经历了通史式的繁荣，并伴随着文化的兴盛。中国大运河扬州段入选世界遗产名录；扬州列入中国海上丝绸之路。</p>
+<body data-title-en="Peiwen (Lucas) Zhou" data-title-zh="周培文 · 个人主页">
+
+<!-- ===================== NAV ===================== -->
+<header class="nav">
+  <div class="nav__inner">
+    <div class="nav__brand">
+      <a href="#top" data-en="Peiwen Zhou" data-zh="周培文">Peiwen Zhou</a>
+    </div>
+    <nav class="nav__links" aria-label="Primary">
+      <a class="nav__link nav__link--caps" href="#about" data-spy data-en="About" data-zh="关于">About</a>
+      <a class="nav__link nav__link--caps" href="#cv" data-spy data-en="Curriculum Vitae" data-zh="简历">Curriculum Vitae</a>
+      <a class="nav__link nav__link--caps" href="#publications" data-spy data-en="Publications" data-zh="学术发表">Publications</a>
+      <a class="nav__link nav__link--caps" href="gallery.html" data-en="Gallery" data-zh="相册">Gallery</a>
+    </nav>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button type="button" data-lang="en" class="is-active">EN</button>
+      <button type="button" data-lang="zh">中</button>
+    </div>
+  </div>
+</header>
+
+<span id="top"></span>
+
+<!-- ===================== SHELL ===================== -->
+<div class="shell">
+
+  <!-- ---------- LEFT: sticky profile ---------- -->
+  <aside class="side">
+    <img class="portrait" src="assets/portrait.jpg"
+         alt="Portrait of Peiwen (Lucas) Zhou" />
+
+    <h1 class="side__name" data-en="Peiwen (Lucas) Zhou" data-zh="周培文">Peiwen (Lucas) Zhou</h1>
+    <div class="side__name-sub" data-en="周培文" data-zh="Peiwen (Lucas) Zhou">周培文</div>
+
+    <div class="side__role" data-en="Undergraduate Student" data-zh="本科生">Undergraduate Student</div>
+    <div class="side__affil" data-en="China Agricultural University" data-zh="中国农业大学">China Agricultural University</div>
+    <div class="side__affil-addr" data-en="17 E Tsinghua Rd, Haidian District, Beijing, China, 100083" data-zh="中国北京市海淀区清华东路 17 号">17 E Tsinghua Rd, Haidian District, Beijing, China, 100083</div>
+
+    <hr class="side__rule" />
+
+    <ul class="side__contact">
+      <li>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <span class="email-text">zhoupwyz [at] outlook [dot] com</span>
+      </li>
+      <li>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8h18z"/><path d="M4 21h16M5 21V10m4 11V10m6 11V10m4 11V10"/></svg>
+        <span class="email-text">zhoupeiwen [at] cau [dot] edu [dot] cn</span>
+      </li>
+      <li>
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24zM7.7 7.4a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm.9 3.2H6.8v6.8h1.8v-6.8zm2 0h1.7v.93h.02c.24-.45.83-.93 1.7-.93 1.82 0 2.16 1.2 2.16 2.76v3.97h-1.8v-3.5c0-.84-.02-1.92-1.17-1.92-1.17 0-1.35.92-1.35 1.86v3.56h-1.8v-6.8z"/></svg>
+        <span><a href="https://orcid.org/0009-0000-6270-7122" target="_blank" rel="noopener">ORCID — 0009-0000-6270-7122</a></span>
+      </li>
+    </ul>
+
+    <div class="side__social">
+      <a href="#" aria-label="GitHub" title="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.19 1.82 1.19 3.08 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5z"/></svg>
+      </a>
+      <a href="#" aria-label="LinkedIn" title="LinkedIn">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.79 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ---------- RIGHT: content ---------- -->
+  <main class="main">
+
+    <!-- About -->
+    <section class="section" id="about">
+      <p class="section__title" data-en="About" data-zh="关于我">About</p>
+      <hr class="section__rule" />
+      <div class="lede">
+        <p data-en="I am a Mathematics undergraduate at China Agricultural University, and my hometown is Yangzhou, Jiangsu. My work spans two directions: with Prof. Dallas Albritton, I study the anisotropic Kepler problem and its numerical simulation; with Prof. Feifan Zhang, I work on a dual-fractional vegetation-sand model, exploring pattern formation in arid ecosystems."
+           data-zh="我是中国农业大学数学与应用数学专业的本科生，来自江苏省扬州市。我的研究包括两个方向：在 Dallas Albritton 教授的指导下，研究各向异性开普勒问题及其数值模拟；在张非凡教授的指导下，研究双分数阶植被-沙模型，探索干旱生态系统中的斑图形成。">I am a Mathematics undergraduate at China Agricultural University, and my hometown is Yangzhou, Jiangsu. My work spans two directions: with Prof. Dallas Albritton, I study the anisotropic Kepler problem and its numerical simulation; with Prof. Feifan Zhang, I work on a dual-fractional vegetation-sand model, exploring pattern formation in arid ecosystems.</p>
+      </div>
+    </section>
+
+    <!-- Curriculum Vitae -->
+    <section class="section" id="cv">
+      <p class="section__title">Curriculum Vitae</p>
+      <hr class="section__rule" />
+
+      <!-- Education -->
+      <div class="cv-group">
+        <h3 class="cv-group__head" data-en="Education" data-zh="教育经历">Education</h3>
+        <div class="entry">
+          <div class="entry__line1" data-en="Yangzhou High School of Jiangsu Province" data-zh="江苏省扬州中学">Yangzhou High School of Jiangsu Province</div>
+          <div class="entry__addr" data-en="20 Huaihai Rd, Yangzhou, China, 225000" data-zh="中国扬州市淮海路 20 号">20 Huaihai Rd, Yangzhou, China, 225000</div>
+          <div class="entry__meta" data-en="2020 – 2023" data-zh="2020 – 2023">2020 – 2023</div>
+          <div class="entry__line3" data-en="Gaokao 641 / 750" data-zh="高考 641 / 750">Gaokao 641 / 750</div>
+        </div>
+        <div class="entry">
+          <div class="entry__line1" data-en="China Agricultural University" data-zh="中国农业大学">China Agricultural University</div>
+          <div class="entry__addr" data-en="17 E Tsinghua Rd, Beijing, China, 100083" data-zh="中国北京市清华东路 17 号">17 E Tsinghua Rd, Beijing, China, 100083</div>
+          <div class="entry__meta" data-en="2023 – 2024, 2025 – Present" data-zh="2023 – 2024、2025 – 至今">2023 – 2024, 2025 – Present</div>
+          <div class="entry__line3" data-en="GPA 3.69 / 4.00" data-zh="绩点 3.69 / 4.00">GPA 3.69 / 4.00</div>
+        </div>
+        <div class="entry">
+          <div class="entry__line1" data-en="University of Wisconsin–Madison" data-zh="威斯康星大学麦迪逊分校">University of Wisconsin–Madison</div>
+          <div class="entry__addr" data-en="500 Lincoln Dr, Madison, USA, 53706" data-zh="美国麦迪逊市林肯路 500 号">500 Lincoln Dr, Madison, USA, 53706</div>
+          <div class="entry__meta" data-en="2024 – 2025 · Visiting Student" data-zh="2024 – 2025 · 访问学生">2024 – 2025 · Visiting Student</div>
+          <div class="entry__line3" data-en="GPA 3.90 / 4.00" data-zh="绩点 3.90 / 4.00">GPA 3.90 / 4.00</div>
+        </div>
+      </div>
+
+      <!-- Certifications and Achievements -->
+      <div class="cv-group">
+        <h3 class="cv-group__head" data-en="Certifications and Achievements" data-zh="获奖与证书">Certifications and Achievements</h3>
+        <div class="entry">
+          <div class="entry__line1" data-en="First Prize, 36th Beijing College Mathematics Competition (Mathematics Major, Group A)" data-zh="北京市第 36 届大学生数学竞赛（数学专业甲组）一等奖">First Prize, 36th Beijing College Mathematics Competition (Mathematics Major, Group A)</div>
+          <div class="entry__line3" data-en="Beijing Mathematical Society" data-zh="北京数学会">Beijing Mathematical Society</div>
+          <div class="entry__meta" data-en="November 2025" data-zh="2025 年 11 月">November 2025</div>
+        </div>
+        <div class="entry">
+          <div class="entry__line1" data-en="Third Prize, 17th China College Mathematics Competition (Mathematics, Category A)" data-zh="第 17 届全国大学生数学竞赛（数学 A 类）三等奖">Third Prize, 17th China College Mathematics Competition (Mathematics, Category A)</div>
+          <div class="entry__line3" data-en="Chinese Mathematical Society" data-zh="中国数学会">Chinese Mathematical Society</div>
+          <div class="entry__meta" data-en="November 2025" data-zh="2025 年 11 月">November 2025</div>
+        </div>
+        <div class="entry">
+          <div class="entry__line1" data-en="Dean&#39;s List" data-zh="Dean&#39;s List">Dean&#39;s List</div>
+          <div class="entry__line3" data-en="UW–Madison" data-zh="UW–Madison">UW–Madison</div>
+          <div class="entry__meta" data-en="December 2024 &amp; May 2025" data-zh="2024 年 12 月 &amp; 2025 年 5 月">December 2024 &amp; May 2025</div>
+        </div>
+      </div>
+
+      <!-- Research Experience -->
+      <div class="cv-group">
+        <h3 class="cv-group__head" data-en="Research Experience" data-zh="研究经历">Research Experience</h3>
+        <div class="entry">
+          <div class="entry__line1" data-en="Regularization and Collapse in the Two-Body Problem" data-zh="二体问题中的正则化与碰撞坍塌">Regularization and Collapse in the Two-Body Problem</div>
+          <div class="entry__line2" data-en="Advised by Prof. Dallas Albritton" data-zh="指导老师 Dallas Albritton 教授">Advised by Prof. Dallas Albritton</div>
+          <div class="entry__meta" data-en="Summer 2025" data-zh="2025 年夏">Summer 2025</div>
+          <div class="entry__line3" data-en="Supported by NSF DMS-2406947 and DMS-2037851 grants." data-zh="由美国国家科学基金 NSF DMS-2406947 与 DMS-2037851 资助。">Supported by NSF DMS-2406947 and DMS-2037851 grants.</div>
+        </div>
+        <div class="entry">
+          <div class="entry__line1" data-en="Exit-Angle Selection and Collision-Manifold Routing in the Anisotropic Kepler Problem" data-zh="各向异性开普勒问题中的出射角选择与碰撞流形">Exit-Angle Selection and Collision-Manifold Routing in the Anisotropic Kepler Problem</div>
+          <div class="entry__line2" data-en="Advised by Prof. Dallas Albritton" data-zh="指导老师 Dallas Albritton 教授">Advised by Prof. Dallas Albritton</div>
+          <div class="entry__line2" data-en="With Andrew R. Kulik and Gaorui Yan" data-zh="合作者 Andrew R. Kulik、颜高睿">With Andrew R. Kulik and Gaorui Yan</div>
+          <div class="entry__meta" data-en="2025 – Present" data-zh="2025 – 至今">2025 – Present</div>
+        </div>
+        <div class="entry">
+          <div class="entry__line1" data-en="Pattern Formation in a Dual-Fractional Vegetation–Sand Model" data-zh="双分数阶植被–沙模型中的斑图形成">Pattern Formation in a Dual-Fractional Vegetation–Sand Model</div>
+          <div class="entry__line2" data-en="Advised by Prof. Feifan Zhang" data-zh="指导老师 张非凡 教授">Advised by Prof. Feifan Zhang</div>
+          <div class="entry__meta" data-en="2025 – Present" data-zh="2025 – 至今">2025 – Present</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Publications -->
+    <section class="section" id="publications">
+      <p class="section__title" data-en="Publications" data-zh="学术发表">Publications</p>
+      <hr class="section__rule" />
+      <div class="pub">
+        <div class="pub__title" data-en="A Study on the Effects of Riesz Fractional Diffusion on Pattern Formation in a Toxic-Phytoplankton–Zooplankton Model" data-zh="A Study on the Effects of Riesz Fractional Diffusion on Pattern Formation in a Toxic-Phytoplankton–Zooplankton Model">A Study on the Effects of Riesz Fractional Diffusion on Pattern Formation in a Toxic-Phytoplankton–Zooplankton Model</div>
+        <div class="pub__venue" data-en="Mathematics · 2026-02" data-zh="Mathematics · 2026-02">Mathematics · 2026-02</div>
+        <div class="pub__authors" data-html data-en="Ying Gong, Yuhan Yan, <span class=&quot;me&quot;>Peiwen Zhou</span>, Lei Zhao, Feifan Zhang" data-zh="Ying Gong, Yuhan Yan, <span class=&quot;me&quot;>Peiwen Zhou</span>, Lei Zhao, Feifan Zhang">Ying Gong, Yuhan Yan, <span class="me">Peiwen Zhou</span>, Lei Zhao, Feifan Zhang</div>
+        <div class="pub__doi"><a href="https://doi.org/10.3390/math14050756" target="_blank" rel="noopener">DOI: 10.3390/math14050756</a></div>
+      </div>
+      <p class="empty-note" data-en="More publications to come."
+         data-zh="更多发表，敬请期待。">More publications to come.</p>
+    </section>
+
+    <!-- Skills -->
+    <section class="section" id="skills">
+      <p class="section__title" data-en="Skills" data-zh="技能">Skills</p>
+      <hr class="section__rule" />
+
+      <div class="skill-block">
+        <p class="skill-block__label" data-en="Courses" data-zh="课程">Courses</p>
+        <div class="pills">
+          <span class="pill" data-en="Ordinary Differential Equations" data-zh="常微分方程">Ordinary Differential Equations</span>
+          <span class="pill" data-en="Partial Differential Equations" data-zh="偏微分方程">Partial Differential Equations</span>
+          <span class="pill" data-en="Modern Algebra" data-zh="抽象代数">Modern Algebra</span>
+          <span class="pill" data-en="Probability Theory" data-zh="概率论">Probability Theory</span>
+          <span class="pill" data-en="Complex Analysis" data-zh="复变函数">Complex Analysis</span>
+        </div>
+      </div>
+
+      <div class="skill-block">
+        <p class="skill-block__label" data-en="Languages" data-zh="语言">Languages</p>
+        <div class="pills">
+          <span class="pill" data-en="Chinese (Mother tongue)" data-zh="中文（母语）">Chinese (Mother tongue)</span>
+          <span class="pill pill--wide" data-en="English (Fluent) · Duolingo 130 · CET-6 558" data-zh="英语（流利）· Duolingo 130 · CET-6 558">English (Fluent) · Duolingo 130 · CET-6 558</span>
+        </div>
+      </div>
+
+      <div class="skill-block">
+        <p class="skill-block__label" data-en="Skills / Tools" data-zh="技能 / 工具">Skills / Tools</p>
+        <div class="pills">
+          <span class="pill pill--wide" data-en="Python — COMP SCI 220 Data Science Programming, UW-Madison" data-zh="Python — COMP SCI 220 Data Science Programming, UW-Madison">Python — COMP SCI 220 Data Science Programming, UW-Madison</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer class="foot">
+  <span data-en="© 2026 Peiwen (Lucas) Zhou" data-zh="© 2026 周培文">© 2026 Peiwen (Lucas) Zhou</span>
+</footer>
+
+<script src="site.js"></script>
 </body>
+</html>
