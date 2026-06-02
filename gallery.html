@@ -3,12 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<!-- Pick a random color theme (green / red / blue) on every visit -->
+<!-- Pick a random color theme (green / red / blue), kept consistent within a visit -->
 <script>
   (function () {
+    var KEY = "plz-theme";
     var themes = ["green", "red", "blue"];
-    var pick = themes[Math.floor(Math.random() * themes.length)];
-    document.documentElement.setAttribute("data-theme", pick);
+    var t = null;
+    try { t = sessionStorage.getItem(KEY); } catch (e) {}
+    if (themes.indexOf(t) === -1) {
+      t = themes[Math.floor(Math.random() * themes.length)];
+      try { sessionStorage.setItem(KEY, t); } catch (e) {}
+    }
+    document.documentElement.setAttribute("data-theme", t);
   })();
 </script>
 <title>Gallery — Peiwen (Lucas) Zhou</title>

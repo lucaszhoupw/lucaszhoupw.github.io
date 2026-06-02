@@ -182,10 +182,11 @@ html[lang="zh"] .nav__link--caps {
 .side { position: sticky; top: 104px; }
 
 .portrait {
-  width: 80%;
+  width: 64%;
+  margin: 0 auto;
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 14px;
   border: 1px solid var(--border);
   box-shadow: 0 1px 0 var(--border), 0 16px 36px -24px rgba(20,30,25,.35);
 }
@@ -194,7 +195,7 @@ html[lang="zh"] .nav__link--caps {
   font-size: 1.62rem;
   line-height: 1.18;
   font-weight: 700;
-  margin: 22px 0 2px;
+  margin: 50px 0 2px;
   letter-spacing: -0.01em;
 }
 .side__name-sub {
