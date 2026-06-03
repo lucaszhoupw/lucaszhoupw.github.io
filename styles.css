@@ -10,24 +10,19 @@
    ============================================================= */
 
 /* =============================================================
-   Self-hosted Chinese serif (subset of Noto Serif SC).
-   Stored in the repo so visitors in mainland China — who cannot
-   reach Google Fonts — still see the intended song typeface.
-   Only Chinese glyphs are included; Latin text uses Georgia.
+   Self-hosted Chinese serif: the full Noto Serif SC (variable font,
+   weights 200–900, all ~31k glyphs). Bundled in the repo so visitors
+   in mainland China — who cannot reach Google Fonts — see the intended
+   song typeface, with full glyph coverage for any future content.
+   Latin text uses Georgia, so this file only downloads when Chinese
+   is actually displayed.
    ============================================================= */
 @font-face {
   font-family: "Noto Serif SC";
   font-style: normal;
-  font-weight: 400;
+  font-weight: 200 900;
   font-display: swap;
-  src: url("fonts/NotoSerifSC-subset-400.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Noto Serif SC";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("fonts/NotoSerifSC-subset-700.woff2") format("woff2");
+  src: url("fonts/NotoSerifSC.woff2") format("woff2");
 }
 
 /* ---- Green (default) ---- */
@@ -303,21 +298,17 @@ html[lang="zh"] .nav__link--caps {
 .swatch {
   flex: 1;
   display: flex;
-  height: 30px;
+  height: 15px;
   padding: 0;
-  border: 1.5px solid var(--border-strong);
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
   overflow: hidden;
   cursor: pointer;
   background: none;
-  transition: transform .15s, border-color .15s, box-shadow .15s;
+  transition: transform .15s;
 }
 .swatch span { flex: 1; display: block; }
 .swatch:hover { transform: translateY(-1px); }
-.swatch.is-active {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-tint);
-}
 
 /* ---------------- Right content ---------------- */
 .main { min-width: 0; }
@@ -437,9 +428,11 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
 .links {
   list-style: none;
   margin: 0; padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: grid;
+  /* Two columns when wide; collapses to one when the window is narrow
+     (or on mobile), since each track needs at least 300px. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 14px 24px;
 }
 .link-entry {
   position: relative;
