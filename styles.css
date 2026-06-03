@@ -565,8 +565,10 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
     gap: 38px;
     padding: 92px 22px 72px;
   }
-  .side { position: static; }
-  .portrait { max-width: 260px; }
+  .side { position: static; text-align: center; }
+  .portrait { max-width: 260px; margin-left: auto; margin-right: auto; }
+  .side__contact li { justify-content: center; }
+  .side__social { justify-content: center; }
   .side__name { font-size: 1.5rem; }
   .nav__inner { padding: 0 18px; gap: 2px; }
   .nav__brand { font-size: 0.92rem; }
