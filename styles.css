@@ -270,6 +270,37 @@ html[lang="zh"] .nav__link--caps {
 }
 .side__social svg { width: 19px; height: 19px; }
 
+/* Color theme swatches (palette card) */
+.palette { margin-top: 22px; }
+.palette__hint {
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
+  color: var(--faint);
+  margin: 0 0 9px;
+}
+.palette__set {
+  display: flex;
+  gap: 10px;
+}
+.swatch {
+  flex: 1;
+  display: flex;
+  height: 30px;
+  padding: 0;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+  transition: transform .15s, border-color .15s, box-shadow .15s;
+}
+.swatch span { flex: 1; display: block; }
+.swatch:hover { transform: translateY(-1px); }
+.swatch.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-tint);
+}
+
 /* ---------------- Right content ---------------- */
 .main { min-width: 0; }
 
