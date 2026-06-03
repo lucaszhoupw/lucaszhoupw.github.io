@@ -214,13 +214,28 @@ html[lang="zh"] .nav__link--caps {
 /* ---------------- Left sidebar ---------------- */
 .side { position: sticky; top: 104px; }
 
-.portrait {
+.portrait-wrap {
+  position: relative;
   width: 64%;
+  line-height: 0;
+}
+.portrait {
+  width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
   border-radius: 14px;
   border: 1px solid var(--border);
   box-shadow: 0 1px 0 var(--border), 0 16px 36px -24px rgba(20,30,25,.35);
+}
+.portrait-date {
+  position: absolute;
+  right: 9px;
+  bottom: 8px;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .side__name {
@@ -594,7 +609,7 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
     padding: 92px 22px 72px;
   }
   .side { position: static; text-align: center; }
-  .portrait { max-width: 260px; margin-left: auto; margin-right: auto; }
+  .portrait-wrap { max-width: 260px; margin-left: auto; margin-right: auto; }
   .side__contact li { justify-content: center; }
   .side__social { justify-content: center; }
   .side__name { font-size: 1.5rem; }
@@ -614,5 +629,5 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
   .lang-toggle { margin-left: 4px; }
   .shell { padding: 80px 18px 64px; }
   .gallery-wrap { padding: 84px 18px 72px; }
-  .portrait { max-width: 100%; }
+  .portrait-wrap { max-width: 100%; }
 }
