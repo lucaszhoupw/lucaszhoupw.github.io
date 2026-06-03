@@ -110,10 +110,43 @@
     markActive();
   }
 
+  // Easter egg: click the portrait to swap to an alternate photo.
+  function initPortraitEgg() {
+    var wrap = document.querySelector(".portrait-wrap");
+    if (!wrap) return;
+    var img = wrap.querySelector(".portrait");
+    var date = wrap.querySelector(".portrait-date");
+    var primary = img.getAttribute("src");
+    var alt = img.getAttribute("data-alt-src");
+    if (!alt) return;
+    var pre = new Image(); pre.src = alt;            // preload for an instant swap
+    img.addEventListener("click", function () {
+      var showingAlt = img.getAttribute("src") === alt;
+      img.setAttribute("src", showingAlt ? primary : alt);
+      // The date caption belongs to the primary photo; hide it on the alt.
+      if (date) date.style.visibility = showingAlt ? "" : "hidden";
+    });
+  }
+
+  // Easter egg: in English, click the name to toggle an alternate spelling.
+  function initNameEgg() {
+    var name = document.querySelector(".side__name");
+    if (!name) return;
+    var alt = name.getAttribute("data-en-alt");
+    if (!alt) return;
+    name.addEventListener("click", function () {
+      if (document.documentElement.getAttribute("lang") === "zh") return;
+      var primary = name.getAttribute("data-en");
+      name.textContent = name.textContent.trim() === alt ? primary : alt;
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     applyLang(getLang());
     initToggle();
     initScrollSpy();
     initPalette();
+    initPortraitEgg();
+    initNameEgg();
   });
 })();
