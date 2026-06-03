@@ -82,9 +82,38 @@
     sections.forEach(function (s) { obs.observe(s); });
   }
 
+  // Color-theme swatches: click a palette to switch the site theme
+  function initPalette() {
+    var THEME_KEY = "plz-theme";
+    var swatches = document.querySelectorAll("[data-theme-pick]");
+    if (!swatches.length) return;
+
+    function markActive() {
+      var cur = document.documentElement.getAttribute("data-theme") || "green";
+      for (var i = 0; i < swatches.length; i++) {
+        swatches[i].classList.toggle(
+          "is-active",
+          swatches[i].getAttribute("data-theme-pick") === cur
+        );
+      }
+    }
+
+    for (var i = 0; i < swatches.length; i++) {
+      swatches[i].addEventListener("click", function () {
+        var t = this.getAttribute("data-theme-pick");
+        document.documentElement.setAttribute("data-theme", t);
+        try { sessionStorage.setItem(THEME_KEY, t); } catch (e) {}
+        markActive();
+      });
+    }
+
+    markActive();
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     applyLang(getLang());
     initToggle();
     initScrollSpy();
+    initPalette();
   });
 })();
