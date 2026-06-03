@@ -172,6 +172,9 @@ html[lang="zh"] .nav__link--caps {
   font-size: 0.84rem;
 }
 
+/* Full vs. short nav labels — short forms (CV, Pub) show on narrow screens */
+.nav__link .lbl-short { display: none; }
+
 .lang-toggle {
   margin-left: 10px;
   display: inline-flex;
@@ -616,8 +619,10 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
   .nav__inner { padding: 0 18px; gap: 2px; }
   .nav__brand { font-size: 0.92rem; }
   .nav__links { gap: 0; }
-  .nav__link { padding: 8px 9px; font-size: 0.8rem; }
-  .nav__link--caps { font-size: 0.66rem; letter-spacing: 0.08em; }
+  .nav__link { padding: 8px 11px; font-size: 0.82rem; }
+  .nav__link--caps { font-size: 0.74rem; letter-spacing: 0.1em; }
+  .nav__link .lbl-full { display: none; }
+  .nav__link .lbl-short { display: inline; }
 }
 
 @media (max-width: 600px) {
