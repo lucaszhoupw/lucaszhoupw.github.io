@@ -177,6 +177,39 @@
     posts.forEach(function (p) { obs.observe(p); });
   }
 
+  // Score modals: a [data-modal] trigger opens the matching .modal.
+  function initModals() {
+    var triggers = document.querySelectorAll("[data-modal]");
+    if (!triggers.length) return;
+    var openEl = null;
+
+    function close() {
+      if (!openEl) return;
+      openEl.classList.remove("is-open");
+      document.body.classList.remove("modal-open");
+      openEl = null;
+    }
+    function open(m) {
+      m.classList.add("is-open");
+      document.body.classList.add("modal-open");
+      openEl = m;
+    }
+
+    Array.prototype.forEach.call(triggers, function (t) {
+      t.addEventListener("click", function () {
+        var m = document.getElementById(t.getAttribute("data-modal"));
+        if (m) open(m);
+      });
+    });
+    Array.prototype.forEach.call(
+      document.querySelectorAll(".modal [data-close]"),
+      function (b) { b.addEventListener("click", close); }
+    );
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" || e.key === "Esc") close();
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     applyLang(getLang());
     initToggle();
@@ -185,5 +218,6 @@
     initPortrait();
     initNameEgg();
     initYearNav();
+    initModals();
   });
 })();
