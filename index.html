@@ -145,12 +145,6 @@
       <div class="cv-group">
         <h3 class="cv-group__head" data-en="Education" data-zh="教育经历">Education</h3>
         <div class="entry">
-          <div class="entry__line1" data-en="Yangzhou High School of Jiangsu Province" data-zh="江苏省扬州中学">Yangzhou High School of Jiangsu Province</div>
-          <div class="entry__addr" data-en="20 Huaihai Rd, Yangzhou, China, 225000" data-zh="中国江苏省扬州市广陵区淮海路 20 号">20 Huaihai Rd, Yangzhou, China, 225000</div>
-          <div class="entry__meta" data-en="September 2020 – June 2023" data-zh="2020年9月 – 2023年6月">September 2020 – June 2023</div>
-          <div class="entry__line3" data-en="Gaokao 641 / 750" data-zh="高考 641 / 750">Gaokao 641 / 750</div>
-        </div>
-        <div class="entry">
           <div class="entry__line1" data-en="China Agricultural University" data-zh="中国农业大学">China Agricultural University</div>
           <div class="entry__addr" data-en="17 E Tsinghua Rd, Beijing, China, 100083" data-zh="中国北京市海淀区清华东路 17 号">17 E Tsinghua Rd, Beijing, China, 100083</div>
           <div class="entry__meta" data-en="August 2023 – July 2024, September 2025 – Present" data-zh="2023年8月 – 2024年7月、2025年9月至今">August 2023 – July 2024, September 2025 – Present</div>
@@ -161,6 +155,12 @@
           <div class="entry__addr" data-en="500 Lincoln Dr, Madison, USA, 53706" data-zh="美国威斯康星州戴恩县麦迪逊市林肯路 500 号">500 Lincoln Dr, Madison, USA, 53706</div>
           <div class="entry__meta" data-en="August 2024 – July 2025 · Visiting Student" data-zh="2024年8月 – 2025年7月 · 访问学生">August 2024 – July 2025 · Visiting Student</div>
           <div class="entry__line3" data-en="GPA 3.90 / 4.00" data-zh="GPA 3.90 / 4.00">GPA 3.90 / 4.00</div>
+        </div>
+        <div class="entry">
+          <div class="entry__line1" data-en="Yangzhou High School of Jiangsu Province" data-zh="江苏省扬州中学">Yangzhou High School of Jiangsu Province</div>
+          <div class="entry__addr" data-en="20 Huaihai Rd, Yangzhou, China, 225000" data-zh="中国江苏省扬州市广陵区淮海路 20 号">20 Huaihai Rd, Yangzhou, China, 225000</div>
+          <div class="entry__meta" data-en="September 2020 – June 2023" data-zh="2020年9月 – 2023年6月">September 2020 – June 2023</div>
+          <div class="entry__line3 modal-trigger" data-modal="modal-gaokao" data-en="Gaokao 641 / 750" data-zh="高考 641 / 750">Gaokao 641 / 750</div>
         </div>
       </div>
 
@@ -242,7 +242,9 @@
         <p class="skill-block__label" data-en="Languages" data-zh="语言">Languages</p>
         <div class="pills">
           <span class="pill" data-en="Chinese (Mother tongue)" data-zh="中文（母语）">Chinese (Mother tongue)</span>
-          <span class="pill pill--wide" data-en="English (Fluent) · Duolingo 130 · CET-6 558" data-zh="英语（流利）· Duolingo 130 · CET-6 558">English (Fluent) · Duolingo 130 · CET-6 558</span>
+          <span class="pill" data-en="English (Fluent)" data-zh="英语（流利）">English (Fluent)</span>
+          <span class="pill modal-trigger" data-modal="modal-duolingo" data-en="Duolingo 130" data-zh="Duolingo 130">Duolingo 130</span>
+          <span class="pill modal-trigger" data-modal="modal-cet6" data-en="CET-6 558" data-zh="CET-6 558">CET-6 558</span>
           <span class="pill" data-en="Japanese (Beginner)" data-zh="日语（入门）">Japanese (Beginner)</span>
         </div>
       </div>
@@ -285,6 +287,54 @@
 <footer class="foot">
   <span data-en="© 2026 Peiwen (Lucas) Zhou" data-zh="© 2026 周培文">© 2026 Peiwen (Lucas) Zhou</span>
 </footer>
+
+<!-- ===================== SCORE MODALS ===================== -->
+<div class="modal" id="modal-gaokao">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="gaokao-title">
+    <button class="modal__close" type="button" data-close aria-label="Close">&times;</button>
+    <h3 class="modal__title" id="gaokao-title" data-en="2023 College Entrance Exam of Jiangsu Province" data-zh="江苏省 2023 年高考">2023 College Entrance Exam of Jiangsu Province</h3>
+    <dl class="score-list">
+      <div class="score-row"><dt data-en="Chinese" data-zh="语文">Chinese</dt><dd>110</dd></div>
+      <div class="score-row"><dt data-en="Mathematics" data-zh="数学">Mathematics</dt><dd>121</dd></div>
+      <div class="score-row"><dt data-en="English" data-zh="英语">English</dt><dd>136</dd></div>
+      <div class="score-row"><dt data-en="Physics" data-zh="物理">Physics</dt><dd>93</dd></div>
+      <div class="score-row"><dt data-en="Chemistry" data-zh="化学">Chemistry</dt><dd>89</dd></div>
+      <div class="score-row"><dt data-en="Biology" data-zh="生物">Biology</dt><dd>92</dd></div>
+      <div class="score-row score-row--total"><dt data-en="Total" data-zh="总分">Total</dt><dd>641</dd></div>
+      <div class="score-row"><dt data-en="Jiangsu Province Rank" data-zh="江苏省排名">Jiangsu Province Rank</dt><dd>8031</dd></div>
+    </dl>
+  </div>
+</div>
+
+<div class="modal" id="modal-duolingo">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="duolingo-title">
+    <button class="modal__close" type="button" data-close aria-label="Close">&times;</button>
+    <h3 class="modal__title" id="duolingo-title" data-en="Duolingo English Test" data-zh="多邻国英语测试">Duolingo English Test</h3>
+    <dl class="score-list">
+      <div class="score-row"><dt data-en="Literacy" data-zh="读写">Literacy</dt><dd>135</dd></div>
+      <div class="score-row"><dt data-en="Comprehension" data-zh="理解">Comprehension</dt><dd>140</dd></div>
+      <div class="score-row"><dt data-en="Conversation" data-zh="对话">Conversation</dt><dd>125</dd></div>
+      <div class="score-row"><dt data-en="Production" data-zh="表达">Production</dt><dd>115</dd></div>
+      <div class="score-row score-row--total"><dt data-en="Overall" data-zh="总分">Overall</dt><dd>130</dd></div>
+    </dl>
+  </div>
+</div>
+
+<div class="modal" id="modal-cet6">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="cet6-title">
+    <button class="modal__close" type="button" data-close aria-label="Close">&times;</button>
+    <h3 class="modal__title" id="cet6-title" data-en="College English Test Band 6" data-zh="全国大学英语六级考试">College English Test Band 6</h3>
+    <dl class="score-list">
+      <div class="score-row"><dt data-en="Listening" data-zh="听力">Listening</dt><dd>194</dd></div>
+      <div class="score-row"><dt data-en="Reading" data-zh="阅读">Reading</dt><dd>201</dd></div>
+      <div class="score-row"><dt data-en="Writing &amp; Translation" data-zh="写作与翻译">Writing &amp; Translation</dt><dd>163</dd></div>
+      <div class="score-row score-row--total"><dt data-en="Total" data-zh="总分">Total</dt><dd>558</dd></div>
+    </dl>
+  </div>
+</div>
 
 <script src="site.js"></script>
 </body>
