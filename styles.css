@@ -696,7 +696,7 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
   .portrait-wrap { max-width: 260px; margin-left: auto; margin-right: auto; }
   .side__contact li { justify-content: center; }
   .side__social { justify-content: center; }
-  .side__name { font-size: 1.5rem; }
+  .side__name { font-size: 1.5rem; justify-content: center; }
   .nav__inner { padding: 0 18px; gap: 2px; }
   .nav__brand { font-size: 0.92rem; }
   .nav__links { gap: 0; }
