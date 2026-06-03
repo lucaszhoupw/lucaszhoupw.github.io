@@ -9,6 +9,27 @@
         data-theme="blue"    (deep blue)
    ============================================================= */
 
+/* =============================================================
+   Self-hosted Chinese serif (subset of Noto Serif SC).
+   Stored in the repo so visitors in mainland China — who cannot
+   reach Google Fonts — still see the intended song typeface.
+   Only Chinese glyphs are included; Latin text uses Georgia.
+   ============================================================= */
+@font-face {
+  font-family: "Noto Serif SC";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/NotoSerifSC-subset-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Noto Serif SC";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/NotoSerifSC-subset-700.woff2") format("woff2");
+}
+
 /* ---- Green (default) ---- */
 :root,
 [data-theme="green"] {
@@ -67,16 +88,13 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: Georgia, "Source Han Serif SC", "Noto Serif SC", "Songti SC", serif;
+  /* Georgia renders Latin in both languages; CJK falls through to the
+     self-hosted "Noto Serif SC", then to any local song serif. */
+  font-family: Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", "宋体", serif;
   font-size: 17px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-}
-
-/* Chinese text gets the song serif as primary */
-html[lang="zh"] body {
-  font-family: "Source Han Serif SC", "Noto Serif SC", "Songti SC", Georgia, serif;
 }
 
 a { color: var(--accent); text-decoration: none; }
