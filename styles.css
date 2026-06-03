@@ -10,15 +10,31 @@
    ============================================================= */
 
 /* =============================================================
-   Self-hosted Chinese serif: the full Noto Serif SC (variable font,
-   weights 200–900, all ~31k glyphs). Bundled in the repo so visitors
-   in mainland China — who cannot reach Google Fonts — see the intended
-   song typeface, with full glyph coverage for any future content.
-   Latin text uses Georgia, so this file only downloads when Chinese
-   is actually displayed.
+   Self-hosted Chinese serif (Noto Serif SC), two-stage loading:
+   1) A small "common" subset (~3,800 everyday characters, GB2312
+      level-1) loads fast and covers virtually all text.
+   2) The full library (variable font, all ~31k glyphs) is fetched
+      ONLY if a rare character outside the common set appears.
+   Bundled in the repo so mainland-China visitors (who cannot reach
+   Google Fonts) get the song typeface. Latin text uses Georgia, so
+   these files only download when Chinese is actually displayed.
    ============================================================= */
 @font-face {
   font-family: "Noto Serif SC";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/NotoSerifSC-common-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Noto Serif SC";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/NotoSerifSC-common-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Noto Serif SC Full";
   font-style: normal;
   font-weight: 200 900;
   font-display: swap;
@@ -83,9 +99,10 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  /* Georgia renders Latin in both languages; CJK falls through to the
-     self-hosted "Noto Serif SC", then to any local song serif. */
-  font-family: Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", "宋体", serif;
+  /* Georgia renders Latin in both languages; CJK uses the small common
+     subset first, then the full self-hosted library for rare glyphs,
+     then any local song serif. */
+  font-family: Georgia, "Noto Serif SC", "Noto Serif SC Full", "Source Han Serif SC", "Songti SC", "SimSun", "宋体", serif;
   font-size: 17px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
