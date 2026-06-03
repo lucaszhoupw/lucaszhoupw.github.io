@@ -708,14 +708,8 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
 }
 
 /* =============================================================
-   SCORE MODALS (click a result to see the breakdown)
+   SCORE MODALS (a hidden click opens the score breakdown)
    ============================================================= */
-.modal-trigger {
-  cursor: pointer;
-  text-decoration: underline dotted;
-  text-underline-offset: 2px;
-}
-
 .modal {
   display: none;
   position: fixed;
