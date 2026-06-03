@@ -144,16 +144,27 @@
     });
   }
 
-  // Easter egg: in English, click the name to toggle an alternate spelling.
+  // Easter egg: in English, click the name to toggle the given-name spelling.
   function initNameEgg() {
     var name = document.querySelector(".side__name");
     if (!name) return;
-    var alt = name.getAttribute("data-en-alt");
+    var given = name.querySelector(".nm-given");
+    if (!given) return;
+    var alt = given.getAttribute("data-en-alt");
     if (!alt) return;
     name.addEventListener("click", function () {
       if (document.documentElement.getAttribute("lang") === "zh") return;
-      var primary = name.getAttribute("data-en");
-      name.textContent = name.textContent.trim() === alt ? primary : alt;
+      var primary = given.getAttribute("data-en");
+      given.textContent = given.textContent.trim() === alt ? primary : alt;
+    });
+  }
+
+  // Easter egg: footer "Hide" button blurs identifying details on the page.
+  function initPrivacy() {
+    var btn = document.querySelector(".hide-btn");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      document.body.classList.toggle("privacy");
     });
   }
 
@@ -219,5 +230,6 @@
     initNameEgg();
     initYearNav();
     initModals();
+    initPrivacy();
   });
 })();
