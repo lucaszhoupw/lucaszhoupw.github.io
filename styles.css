@@ -188,6 +188,7 @@ html[lang="zh"] .nav__link--caps {
   letter-spacing: 0.04em;
   background: var(--surface);
   cursor: pointer;
+  flex-shrink: 0;
 }
 .lang-seg {
   display: inline-flex;
@@ -629,9 +630,9 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
   body { font-size: 16px; }
   .nav__inner { height: 56px; }
   .nav__brand { display: none; }
-  .nav__links { width: 100%; justify-content: space-between; }
-  .nav__link { padding: 7px 6px; }
-  .lang-toggle { margin-left: 4px; }
+  .nav__links { gap: 2px; }
+  .nav__link { padding: 7px 7px; }
+  .lang-toggle { margin-left: auto; }
   .shell { padding: 80px 18px 64px; }
   .gallery-wrap { padding: 84px 18px 72px; }
   .portrait-wrap { max-width: 100%; }
