@@ -253,7 +253,20 @@ html[lang="zh"] .nav__link--caps {
   letter-spacing: -0.01em;
   cursor: pointer;
   user-select: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3em;
 }
+html[lang="zh"] .side__name { gap: 0; }
+
+/* Given/surname split — English shows given+surname, Chinese surname+given */
+.nm-given { order: 1; }
+.nm-sur { order: 2; }
+html[lang="zh"] .nm-given { order: 2; }
+html[lang="zh"] .nm-sur { order: 1; }
+.nav__brand a { display: inline-flex; gap: 0.28em; }
+html[lang="zh"] .nav__brand a { gap: 0; }
 .side__name-sub {
   font-size: 1rem;
   color: var(--muted);
@@ -782,3 +795,49 @@ body.modal-open { overflow: hidden; }
 .score-row dd { margin: 0; font-weight: 700; color: var(--text); }
 .score-row--total dt,
 .score-row--total dd { color: var(--accent); }
+
+/* =============================================================
+   PRIVACY ("Hide") MODE — a footer toggle blurs identifying details
+   while leaving headings, the photo, icons, swatches, skills, the
+   surname and the nav intact.
+   ============================================================= */
+.hide-btn {
+  margin-left: auto;
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  padding: 4px 14px;
+  cursor: pointer;
+  transition: background .18s, color .18s, border-color .18s;
+}
+.hide-btn:hover { color: var(--text); background: var(--accent-tint); border-color: var(--accent); }
+.hide-btn__on { display: none; }
+body.privacy .hide-btn__off { display: none; }
+body.privacy .hide-btn__on { display: inline; }
+
+/* Smooth the blur transition both ways */
+.lede, .entry, .pub, .empty-note, .link-entry,
+.side__name-sub, .side__role, .side__college, .side__affil,
+.side__affil-addr, .email-text, .foot__copy, .orcid-tail,
+.side__name .nm-given { transition: filter .25s ease; }
+
+body.privacy .lede,
+body.privacy .entry,
+body.privacy .pub,
+body.privacy .empty-note,
+body.privacy .link-entry,
+body.privacy .side__name-sub,
+body.privacy .side__role,
+body.privacy .side__college,
+body.privacy .side__affil,
+body.privacy .side__affil-addr,
+body.privacy .email-text,
+body.privacy .foot__copy,
+body.privacy .orcid-tail,
+body.privacy .side__name .nm-given {
+  filter: blur(6px);
+}
+body.privacy .nav__brand .nm-given { display: none; }
