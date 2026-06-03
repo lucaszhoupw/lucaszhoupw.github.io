@@ -110,21 +110,37 @@
     markActive();
   }
 
-  // Easter egg: click the portrait to swap to an alternate photo.
-  function initPortraitEgg() {
+  // Pick one of two portraits at random per visit (kept for the session),
+  // and let clicking the photo swap between them.
+  function initPortrait() {
     var wrap = document.querySelector(".portrait-wrap");
     if (!wrap) return;
     var img = wrap.querySelector(".portrait");
-    var date = wrap.querySelector(".portrait-date");
     var primary = img.getAttribute("src");
     var alt = img.getAttribute("data-alt-src");
     if (!alt) return;
-    var pre = new Image(); pre.src = alt;            // preload for an instant swap
+    var KEY = "plz-portrait";
+    var pa = new Image(); pa.src = primary;          // preload both for instant swaps
+    var pb = new Image(); pb.src = alt;
+
+    function apply(which) {
+      var isAlt = which === "alt";
+      img.setAttribute("src", isAlt ? alt : primary);
+      wrap.classList.toggle("show-alt", isAlt);      // switches the date colour
+    }
+
+    var stored = null;
+    try { stored = sessionStorage.getItem(KEY); } catch (e) {}
+    if (stored !== "primary" && stored !== "alt") {
+      stored = Math.random() < 0.5 ? "primary" : "alt";
+      try { sessionStorage.setItem(KEY, stored); } catch (e) {}
+    }
+    apply(stored);
+
     img.addEventListener("click", function () {
-      var showingAlt = img.getAttribute("src") === alt;
-      img.setAttribute("src", showingAlt ? primary : alt);
-      // The date caption belongs to the primary photo; hide it on the alt.
-      if (date) date.style.visibility = showingAlt ? "" : "hidden";
+      var next = img.getAttribute("src") === alt ? "primary" : "alt";
+      apply(next);
+      try { sessionStorage.setItem(KEY, next); } catch (e) {}
     });
   }
 
@@ -146,7 +162,7 @@
     initToggle();
     initScrollSpy();
     initPalette();
-    initPortraitEgg();
+    initPortrait();
     initNameEgg();
   });
 })();
