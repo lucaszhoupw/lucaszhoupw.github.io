@@ -157,6 +157,26 @@
     });
   }
 
+  // Gallery: highlight the year chip matching the posts currently in view.
+  function initYearNav() {
+    var chips = Array.prototype.slice.call(document.querySelectorAll(".year-chip"));
+    if (!chips.length || !("IntersectionObserver" in window)) return;
+    var map = {};
+    chips.forEach(function (c) { map[c.getAttribute("data-year")] = c; });
+    var posts = document.querySelectorAll(".post[data-year]");
+    if (!posts.length) return;
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) {
+          var y = en.target.getAttribute("data-year");
+          chips.forEach(function (c) { c.classList.remove("is-active"); });
+          if (map[y]) map[y].classList.add("is-active");
+        }
+      });
+    }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
+    posts.forEach(function (p) { obs.observe(p); });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     applyLang(getLang());
     initToggle();
@@ -164,5 +184,6 @@
     initPalette();
     initPortrait();
     initNameEgg();
+    initYearNav();
   });
 })();

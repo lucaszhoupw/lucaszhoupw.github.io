@@ -534,6 +534,61 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
 }
 .gallery-head p { color: var(--muted); margin: 0; }
 
+/* Sticky year selector — jumps to the year and highlights as you scroll */
+.year-nav {
+  position: sticky;
+  top: 64px;
+  z-index: 50;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 0;
+  margin-bottom: 30px;
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  backdrop-filter: saturate(140%) blur(8px);
+  -webkit-backdrop-filter: saturate(140%) blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.year-chip {
+  font-size: 0.84rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  padding: 5px 15px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  transition: background .18s, color .18s, border-color .18s;
+}
+.year-chip:hover { color: var(--text); background: var(--accent-tint); }
+.year-chip.is-active {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Year marker on the timeline */
+.year-divider {
+  position: relative;
+  padding-left: 38px;
+  margin: 0 0 24px;
+  scroll-margin-top: 128px;
+}
+.year-divider span {
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+.year-divider::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 4px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--surface);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
 .feed { position: relative; }
 .feed::before {
   content: "";
@@ -647,5 +702,7 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
   .lang-toggle { margin-left: auto; }
   .shell { padding: 80px 18px 64px; }
   .gallery-wrap { padding: 84px 18px 72px; }
+  .year-nav { top: 56px; }
+  .year-divider { scroll-margin-top: 116px; }
   .portrait-wrap { max-width: 100%; }
 }
