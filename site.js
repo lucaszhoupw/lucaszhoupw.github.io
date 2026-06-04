@@ -229,73 +229,22 @@
     function rain() {
       var layer = document.createElement("div");
       layer.className = "formula-rain";
-      for (var i = 0; i < 28; i++) {
+      for (var i = 0; i < 20; i++) {
         var s = document.createElement("span");
         s.textContent = syms[Math.floor(Math.random() * syms.length)];
         s.style.left = (Math.random() * 100).toFixed(1) + "vw";
         s.style.fontSize = (1 + Math.random() * 1.7).toFixed(2) + "rem";
-        s.style.animationDuration = (2.6 + Math.random() * 2.8).toFixed(2) + "s";
-        s.style.animationDelay = (Math.random() * 0.8).toFixed(2) + "s";
+        s.style.animationDuration = (4.5 + Math.random() * 4).toFixed(2) + "s";
+        s.style.animationDelay = (Math.random() * 1.4).toFixed(2) + "s";
         s.style.setProperty("--rot", Math.round(Math.random() * 720 - 360) + "deg");
         layer.appendChild(s);
       }
       document.body.appendChild(layer);
-      setTimeout(function () { layer.remove(); }, 7000);
+      setTimeout(function () { layer.remove(); }, 11000);
     }
     Array.prototype.forEach.call(heads, function (h) {
       h.addEventListener("click", rain);
     });
-  }
-
-  // Easter egg: after 15s of inactivity, a particle orbits the sidebar name.
-  function initIdleOrbit() {
-    var name = document.querySelector(".side__name");
-    if (!name) return;
-    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    var IDLE = 15000, timer = null, raf = null, layer = null;
-
-    function stop() {
-      if (raf) { cancelAnimationFrame(raf); raf = null; }
-      if (layer) { layer.remove(); layer = null; }
-    }
-    function start() {
-      var r = name.getBoundingClientRect();
-      if (!r.width || !r.height) return;
-      var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-      var rx = r.width / 2 + 28, ry = r.height / 2 + 24;
-      layer = document.createElement("div");
-      layer.className = "orbit-layer";
-      var N = 10, dots = [];
-      for (var i = 0; i < N; i++) {
-        var d = document.createElement("span");
-        d.className = "orbit-dot";
-        layer.appendChild(d);
-        dots.push(d);
-      }
-      document.body.appendChild(layer);
-      var t0 = performance.now();
-      (function frame(now) {
-        var a = (now - t0) / 1000 * 1.5;
-        for (var i = 0; i < N; i++) {
-          var ai = a - i * 0.15;
-          var x = cx + rx * Math.cos(ai);
-          var y = cy + ry * Math.sin(ai);
-          var sc = 1 - i / (N + 3);
-          dots[i].style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) scale(" + sc.toFixed(2) + ")";
-          dots[i].style.opacity = ((1 - i / N) * 0.9).toFixed(2);
-        }
-        raf = requestAnimationFrame(frame);
-      })(performance.now());
-    }
-    function reset() {
-      stop();
-      clearTimeout(timer);
-      timer = setTimeout(start, IDLE);
-    }
-    ["mousemove", "mousedown", "keydown", "scroll", "touchstart", "wheel", "resize"].forEach(function (ev) {
-      window.addEventListener(ev, reset, { passive: true });
-    });
-    reset();
   }
 
   // Gallery: click a photo to view it large; navigate with arrows.
@@ -440,7 +389,6 @@
     initModals();
     initPrivacy();
     initFormulaRain();
-    initIdleOrbit();
     initLightbox();
     initTilt();
     initDropdown();
