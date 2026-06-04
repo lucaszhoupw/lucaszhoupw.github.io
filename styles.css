@@ -969,21 +969,6 @@ body.privacy .nav__brand .nm-given { display: none; }
   100% { transform: translateY(112vh) rotate(var(--rot, 180deg)); opacity: 0; }
 }
 
-.orbit-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 150;
-  pointer-events: none;
-}
-.orbit-dot {
-  position: absolute;
-  left: 0; top: 0;
-  width: 9px; height: 9px;
-  margin: -4.5px 0 0 -4.5px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent);
-}
 
 /* =============================================================
    GALLERY: hover tilt, lightbox, end-of-feed note
@@ -1090,7 +1075,19 @@ body.privacy .nav__brand .nm-given { display: none; }
 /* =============================================================
    TRAVELS MAP MODAL
    ============================================================= */
-.modal__dialog--map { max-width: 600px; max-height: 88vh; overflow-y: auto; }
+.modal__dialog--map { max-width: 760px; max-height: 90vh; overflow-y: auto; }
+.map-stage-wrap { position: relative; }
+.map-note {
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  margin: 0;
+  max-width: 52%;
+  text-align: right;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
 .map-tabs { display: flex; gap: 6px; margin: 2px 0 14px; }
 .map-tab {
   font-family: inherit;
@@ -1122,12 +1119,6 @@ body.privacy .nav__brand .nm-given { display: none; }
   fill: var(--accent);
   stroke: var(--accent);
   stroke-width: 1.1;
-  vector-effect: non-scaling-stroke;
-}
-.travel-map .inset-box {
-  fill: none;
-  stroke: var(--border-strong);
-  stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
 
