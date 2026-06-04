@@ -175,6 +175,50 @@ html[lang="zh"] .nav__link--caps {
 /* Full vs. short nav labels — short forms (CV, Pub) show on narrow screens */
 .nav__link .lbl-short { display: none; }
 
+/* Nav "Personal" dropdown */
+.nav__dropdown { position: relative; display: flex; align-items: center; }
+.nav__dropbtn { font-family: inherit; background: transparent; border: 0; cursor: pointer; }
+.nav__menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  min-width: 168px;
+  display: none;
+  flex-direction: column;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 18px 44px -18px rgba(20, 30, 25, .4);
+}
+.nav__menu::before {
+  content: "";
+  position: absolute;
+  top: -10px; left: 0; right: 0;
+  height: 10px;
+}
+.nav__dropdown.is-open .nav__menu { display: flex; }
+@media (hover: hover) {
+  .nav__dropdown:hover .nav__menu { display: flex; }
+}
+.nav__menu-item {
+  font-family: inherit;
+  text-align: left;
+  font-size: 0.86rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  padding: 9px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+}
+.nav__menu-item:hover { background: var(--accent-tint); color: var(--text); }
+.nav__menu-item.is-active { color: var(--accent); }
+
 .lang-toggle {
   margin-left: 10px;
   display: inline-flex;
@@ -795,6 +839,37 @@ body.modal-open { overflow: hidden; }
 .score-row dd { margin: 0; font-weight: 700; color: var(--text); }
 .score-row--total dt,
 .score-row--total dd { color: var(--accent); }
+
+/* Schedule modal — a small accent-coloured timeline */
+.modal__dialog--wide { max-width: 384px; }
+.sched { list-style: none; margin: 2px 0 0; padding: 0; }
+.sched__item {
+  position: relative;
+  padding: 0 0 16px 20px;
+  border-left: 2px solid var(--accent-tint-2);
+}
+.sched__item:last-child { padding-bottom: 2px; }
+.sched__item::before {
+  content: "";
+  position: absolute;
+  left: -6px; top: 3px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+}
+.sched__date {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 3px;
+}
+.sched__desc {
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
 
 /* =============================================================
    PRIVACY ("Hide") MODE — a footer toggle blurs identifying details

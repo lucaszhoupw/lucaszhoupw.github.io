@@ -373,6 +373,28 @@
     obs.observe(el);
   }
 
+  // Nav "Personal" dropdown — click to toggle, close on outside click.
+  function initDropdown() {
+    var dds = document.querySelectorAll(".nav__dropdown");
+    if (!dds.length) return;
+    Array.prototype.forEach.call(dds, function (dd) {
+      var btn = dd.querySelector(".nav__dropbtn");
+      if (!btn) return;
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var open = dd.classList.toggle("is-open");
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    });
+    document.addEventListener("click", function () {
+      Array.prototype.forEach.call(document.querySelectorAll(".nav__dropdown.is-open"), function (dd) {
+        dd.classList.remove("is-open");
+        var b = dd.querySelector(".nav__dropbtn");
+        if (b) b.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     applyLang(getLang());
     initToggle();
@@ -387,6 +409,7 @@
     initIdleOrbit();
     initLightbox();
     initTilt();
+    initDropdown();
     initFeedEnd();
   });
 })();
