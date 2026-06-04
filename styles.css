@@ -765,8 +765,11 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
 }
 
 /* =============================================================
-   SCORE MODALS (a hidden click opens the score breakdown)
+   SCORE MODALS — click a result to see the breakdown
    ============================================================= */
+.modal-trigger { cursor: pointer; transition: color .15s ease; }
+.modal-trigger:hover { color: var(--accent); }
+
 .modal {
   display: none;
   position: fixed;
@@ -869,6 +872,26 @@ body.modal-open { overflow: hidden; }
   color: var(--text);
   font-size: 0.95rem;
   line-height: 1.55;
+}
+
+/* Language-variety list (Chinese modal) */
+.lang-list { list-style: none; margin: 2px 0 0; padding: 0; }
+.lang-list li {
+  position: relative;
+  padding: 8px 0 8px 18px;
+  font-size: 0.95rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+.lang-list li:last-child { border-bottom: 0; }
+.lang-list li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
 /* =============================================================
