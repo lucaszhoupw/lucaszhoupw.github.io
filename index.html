@@ -18,7 +18,7 @@
   })();
 </script>
 <title>Peiwen (Lucas) Zhou</title>
-<link rel="stylesheet" href="styles.css?v=7" />
+<link rel="stylesheet" href="styles.css?v=8" />
 </head>
 <body data-title-en="Peiwen (Lucas) Zhou" data-title-zh="周培文 · 个人主页">
 
@@ -36,6 +36,7 @@
         <button type="button" class="nav__link nav__link--caps nav__dropbtn" aria-haspopup="true" aria-expanded="false" data-en="Personal" data-zh="个人">Personal</button>
         <div class="nav__menu" role="menu">
           <button type="button" class="nav__menu-item" role="menuitem" data-modal="modal-schedule" data-en="Schedule" data-zh="日程">Schedule</button>
+          <button type="button" class="nav__menu-item" role="menuitem" data-modal="modal-travels" data-en="Travels" data-zh="足迹">Travels</button>
           <a class="nav__menu-item" role="menuitem" href="gallery.html" data-en="Gallery" data-zh="相册">Gallery</a>
         </div>
       </div>
@@ -354,6 +355,43 @@
   </div>
 </div>
 
+<div class="modal" id="modal-travels">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__dialog modal__dialog--map" role="dialog" aria-modal="true" aria-labelledby="travels-title">
+    <button class="modal__close" type="button" data-close aria-label="Close">&times;</button>
+    <h3 class="modal__title" id="travels-title" data-en="Travels" data-zh="足迹">Travels</h3>
+    <div class="map-tabs" role="tablist">
+      <button type="button" class="map-tab is-active" data-map="world" data-en="World" data-zh="世界">World</button>
+      <button type="button" class="map-tab" data-map="china" data-en="China" data-zh="中国">China</button>
+      <button type="button" class="map-tab" data-map="usa" data-en="USA" data-zh="美国">USA</button>
+    </div>
+    <div class="map-panel" data-panel="world">
+      <div class="map-stage" data-svg="assets/maps/world.svg"></div>
+      <ul class="map-legend">
+        <li><div class="lg-head"><span class="lg-sw lg-sw--lived"></span><b data-en="Lived" data-zh="居住">Lived</b></div><div class="lg-names" data-en="China · United States" data-zh="中国 · 美国">China · United States</div></li>
+        <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Japan · South Korea · Singapore" data-zh="日本 · 韩国 · 新加坡">Japan · South Korea · Singapore</div></li>
+        <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Türkiye · Germany · Malaysia" data-zh="土耳其 · 德国 · 马来西亚">Türkiye · Germany · Malaysia</div></li>
+      </ul>
+    </div>
+    <div class="map-panel" data-panel="china" hidden>
+      <div class="map-stage" data-svg="assets/maps/china.svg"></div>
+      <ul class="map-legend">
+        <li><div class="lg-head"><span class="lg-sw lg-sw--lived"></span><b data-en="Lived" data-zh="居住">Lived</b></div><div class="lg-names" data-en="Beijing · Jiangsu" data-zh="北京 · 江苏">Beijing · Jiangsu</div></li>
+        <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Tianjin · Hebei · Shanxi · Inner Mongolia · Jilin · Shanghai · Zhejiang · Anhui · Fujian · Jiangxi · Shandong · Hunan · Guangdong · Chongqing · Sichuan · Guizhou · Shaanxi · Hong Kong · Macau" data-zh="天津 · 河北 · 山西 · 内蒙古 · 吉林 · 上海 · 浙江 · 安徽 · 福建 · 江西 · 山东 · 湖南 · 广东 · 重庆 · 四川 · 贵州 · 陕西 · 香港 · 澳门">Tianjin · Hebei · Shanxi · Inner Mongolia · Jilin · Shanghai · Zhejiang · Anhui · Fujian · Jiangxi · Shandong · Hunan · Guangdong · Chongqing · Sichuan · Guizhou · Shaanxi · Hong Kong · Macau</div></li>
+        <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Hubei" data-zh="湖北">Hubei</div></li>
+      </ul>
+    </div>
+    <div class="map-panel" data-panel="usa" hidden>
+      <div class="map-stage" data-svg="assets/maps/usa.svg"></div>
+      <ul class="map-legend">
+        <li><div class="lg-head"><span class="lg-sw lg-sw--lived"></span><b data-en="Lived" data-zh="居住">Lived</b></div><div class="lg-names" data-en="Wisconsin · New Jersey" data-zh="威斯康星 · 新泽西">Wisconsin · New Jersey</div></li>
+        <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Arizona · Utah · Illinois · Nevada · Maryland · Virginia · Washington D.C. · Massachusetts · New York · Pennsylvania · Rhode Island" data-zh="亚利桑那 · 犹他 · 伊利诺伊 · 内华达 · 马里兰 · 弗吉尼亚 · 华盛顿特区 · 马萨诸塞 · 纽约 · 宾夕法尼亚 · 罗德岛">Arizona · Utah · Illinois · Nevada · Maryland · Virginia · Washington D.C. · Massachusetts · New York · Pennsylvania · Rhode Island</div></li>
+        <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="California · Michigan · Delaware · Connecticut" data-zh="加利福尼亚 · 密歇根 · 特拉华 · 康涅狄格">California · Michigan · Delaware · Connecticut</div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="modal-schedule">
   <div class="modal__backdrop" data-close></div>
   <div class="modal__dialog modal__dialog--wide" role="dialog" aria-modal="true" aria-labelledby="schedule-title">
@@ -376,6 +414,6 @@
   </div>
 </div>
 
-<script src="site.js?v=7"></script>
+<script src="site.js?v=8"></script>
 </body>
 </html>

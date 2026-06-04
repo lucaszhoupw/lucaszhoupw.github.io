@@ -395,6 +395,40 @@
     });
   }
 
+  // Travels modal — tab between maps; lazy-load each SVG on first view.
+  function initTravels() {
+    var modal = document.getElementById("modal-travels");
+    if (!modal) return;
+    var tabs = modal.querySelectorAll(".map-tab");
+    var panels = modal.querySelectorAll(".map-panel");
+
+    function ensureSvg(panel) {
+      var stage = panel.querySelector(".map-stage");
+      if (!stage || stage.getAttribute("data-loaded")) return;
+      var url = stage.getAttribute("data-svg");
+      stage.setAttribute("data-loaded", "1");
+      fetch(url).then(function (r) { return r.text(); })
+        .then(function (t) { stage.innerHTML = t; })
+        .catch(function () { stage.setAttribute("data-loaded", ""); });
+    }
+    function show(map) {
+      Array.prototype.forEach.call(tabs, function (t) {
+        t.classList.toggle("is-active", t.getAttribute("data-map") === map);
+      });
+      Array.prototype.forEach.call(panels, function (p) {
+        var on = p.getAttribute("data-panel") === map;
+        p.hidden = !on;
+        if (on) ensureSvg(p);
+      });
+    }
+    Array.prototype.forEach.call(tabs, function (t) {
+      t.addEventListener("click", function () { show(t.getAttribute("data-map")); });
+    });
+    // Load the default (world) map when the modal is opened.
+    var trigger = document.querySelector('[data-modal="modal-travels"]');
+    if (trigger) trigger.addEventListener("click", function () { show("world"); });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     applyLang(getLang());
     initToggle();
@@ -411,5 +445,6 @@
     initTilt();
     initDropdown();
     initFeedEnd();
+    initTravels();
   });
 })();

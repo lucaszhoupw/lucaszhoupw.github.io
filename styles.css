@@ -1086,3 +1086,54 @@ body.privacy .nav__brand .nm-given { display: none; }
   .lightbox__nav--next { right: 6px; }
   .lightbox__close { top: 10px; right: 10px; }
 }
+
+/* =============================================================
+   TRAVELS MAP MODAL
+   ============================================================= */
+.modal__dialog--map { max-width: 600px; max-height: 88vh; overflow-y: auto; }
+.map-tabs { display: flex; gap: 6px; margin: 2px 0 14px; }
+.map-tab {
+  font-family: inherit;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  padding: 4px 14px;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.map-tab:hover { background: var(--accent-tint); color: var(--text); }
+.map-tab.is-active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.map-stage { margin-bottom: 14px; min-height: 40px; }
+.travel-map { width: 100%; height: auto; display: block; }
+.travel-map .rg {
+  fill: var(--accent-tint-2);
+  stroke: var(--surface);
+  stroke-width: 0.5;
+  vector-effect: non-scaling-stroke;
+}
+.travel-map .rg--lived { fill: var(--accent-strong); }
+.travel-map .rg--travel { fill: var(--accent); }
+.travel-map .rg--pass { fill: color-mix(in srgb, var(--accent) 42%, var(--accent-tint)); }
+.travel-map .rg--sea-line {
+  fill: var(--accent);
+  stroke: var(--accent);
+  stroke-width: 1.1;
+  vector-effect: non-scaling-stroke;
+}
+
+.map-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.map-legend .lg-head { display: flex; align-items: center; gap: 8px; }
+.map-legend b { color: var(--text); font-weight: 700; font-size: 0.9rem; }
+.map-legend .lg-names { color: var(--muted); font-size: 0.85rem; line-height: 1.5; padding-left: 20px; margin-top: 1px; }
+.lg-sw { width: 13px; height: 13px; border-radius: 3px; flex: none; }
+.lg-sw--lived { background: var(--accent-strong); }
+.lg-sw--travel { background: var(--accent); }
+.lg-sw--pass { background: color-mix(in srgb, var(--accent) 42%, var(--accent-tint)); }
+
+@media (max-width: 600px) {
+  .modal__dialog--map { max-width: 94vw; }
+}
