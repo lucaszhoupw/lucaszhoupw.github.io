@@ -797,7 +797,7 @@ body.modal-open { overflow: hidden; }
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 14px;
-  padding: 22px 24px 20px;
+  padding: 30px 34px 28px;
   box-shadow: 0 24px 60px -20px rgba(0, 0, 0, .45);
 }
 
@@ -1122,6 +1122,12 @@ body.privacy .nav__brand .nm-given { display: none; }
   fill: var(--accent);
   stroke: var(--accent);
   stroke-width: 1.1;
+  vector-effect: non-scaling-stroke;
+}
+.travel-map .inset-box {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
 
