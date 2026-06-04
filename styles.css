@@ -841,3 +841,48 @@ body.privacy .side__name .nm-given {
   filter: blur(6px);
 }
 body.privacy .nav__brand .nm-given { display: none; }
+
+/* =============================================================
+   EASTER EGGS — formula rain (click a heading) & idle orbit
+   ============================================================= */
+.formula-rain {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  pointer-events: none;
+  overflow: hidden;
+}
+.formula-rain span {
+  position: absolute;
+  top: 0;
+  color: var(--accent);
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation-name: formula-fall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+@keyframes formula-fall {
+  0%   { transform: translateY(-12vh) rotate(0deg); opacity: 0; }
+  12%  { opacity: .85; }
+  88%  { opacity: .85; }
+  100% { transform: translateY(112vh) rotate(var(--rot, 180deg)); opacity: 0; }
+}
+
+.orbit-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  pointer-events: none;
+}
+.orbit-dot {
+  position: absolute;
+  left: 0; top: 0;
+  width: 9px; height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
