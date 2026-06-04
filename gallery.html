@@ -18,7 +18,7 @@
   })();
 </script>
 <title>Gallery — Peiwen (Lucas) Zhou</title>
-<link rel="stylesheet" href="styles.css?v=4" />
+<link rel="stylesheet" href="styles.css?v=5" />
 </head>
 <body data-title-en="Gallery — Peiwen (Lucas) Zhou" data-title-zh="相册 — 周培文">
 
@@ -263,6 +263,10 @@
       </div>
     </article>
 
+    <div class="feed-end">
+      <span data-en="The journey continues…" data-zh="旅程未完待续……">The journey continues…</span>
+    </div>
+
   </div>
 </div>
 
@@ -271,6 +275,21 @@
   <a href="index.html" data-en="← Back to homepage" data-zh="← 返回主页">← Back to homepage</a>
 </footer>
 
-<script src="site.js?v=4"></script>
+<!-- ===================== LIGHTBOX ===================== -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox__backdrop" data-lb-close></div>
+  <button class="lightbox__close" type="button" data-lb-close aria-label="Close">&times;</button>
+  <button class="lightbox__nav lightbox__nav--prev" type="button" data-lb-prev aria-label="Previous">&lsaquo;</button>
+  <button class="lightbox__nav lightbox__nav--next" type="button" data-lb-next aria-label="Next">&rsaquo;</button>
+  <figure class="lightbox__fig">
+    <img class="lightbox__img" src="" alt="" />
+    <figcaption class="lightbox__cap">
+      <span class="lightbox__meta"></span>
+      <span class="lightbox__count"></span>
+    </figcaption>
+  </figure>
+</div>
+
+<script src="site.js?v=5"></script>
 </body>
 </html>
