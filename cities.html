@@ -57,6 +57,8 @@
   </div>
   <nav class="prov-nav" aria-label="Province">
       <button type="button" class="prov-btn" data-prov="340000" data-en="Anhui" data-zh="安徽">Anhui</button>
+      <button type="button" class="prov-btn" data-prov="110000" data-en="Beijing" data-zh="北京">Beijing</button>
+      <button type="button" class="prov-btn" data-prov="500000" data-en="Chongqing" data-zh="重庆">Chongqing</button>
       <button type="button" class="prov-btn" data-prov="350000" data-en="Fujian" data-zh="福建">Fujian</button>
       <button type="button" class="prov-btn" data-prov="440000" data-en="Guangdong" data-zh="广东">Guangdong</button>
       <button type="button" class="prov-btn" data-prov="520000" data-en="Guizhou" data-zh="贵州">Guizhou</button>
@@ -67,9 +69,11 @@
       <button type="button" class="prov-btn" data-prov="220000" data-en="Jilin" data-zh="吉林">Jilin</button>
       <button type="button" class="prov-btn" data-prov="150000" data-en="Inner Mongolia" data-zh="内蒙古">Inner Mongolia</button>
       <button type="button" class="prov-btn" data-prov="370000" data-en="Shandong" data-zh="山东">Shandong</button>
+      <button type="button" class="prov-btn" data-prov="310000" data-en="Shanghai" data-zh="上海">Shanghai</button>
       <button type="button" class="prov-btn" data-prov="140000" data-en="Shanxi" data-zh="山西">Shanxi</button>
       <button type="button" class="prov-btn" data-prov="610000" data-en="Shaanxi" data-zh="陕西">Shaanxi</button>
       <button type="button" class="prov-btn" data-prov="510000" data-en="Sichuan" data-zh="四川">Sichuan</button>
+      <button type="button" class="prov-btn" data-prov="120000" data-en="Tianjin" data-zh="天津">Tianjin</button>
       <button type="button" class="prov-btn" data-prov="330000" data-en="Zhejiang" data-zh="浙江">Zhejiang</button>
   </nav>
     <div class="prov-panel" data-panel="340000" hidden>
@@ -77,6 +81,20 @@
       <ul class="map-legend">
           <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Anqing · Chuzhou · Huangshan" data-zh="安庆 · 滁州 · 黄山">Anqing · Chuzhou · Huangshan</div></li>
           <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Hefei" data-zh="合肥">Hefei</div></li>
+      </ul>
+    </div>
+    <div class="prov-panel" data-panel="110000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/110000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--lived"></span><b data-en="Lived" data-zh="居住">Lived</b></div><div class="lg-names" data-en="Haidian" data-zh="海淀">Haidian</div></li>
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Changping · Daxing · Dongcheng · Fengtai · Mentougou · Shijingshan · Shunyi · Tongzhou · Xicheng · Zhaoyang" data-zh="昌平 · 大兴 · 东城 · 丰台 · 门头沟 · 石景山 · 顺义 · 通州 · 西城 · 朝阳">Changping · Daxing · Dongcheng · Fengtai · Mentougou · Shijingshan · Shunyi · Tongzhou · Xicheng · Zhaoyang</div></li>
+          <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Yanqing" data-zh="延庆">Yanqing</div></li>
+      </ul>
+    </div>
+    <div class="prov-panel" data-panel="500000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/500000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Jiulongpo · Shapingba · Yubei · Yuzhong" data-zh="九龙坡 · 沙坪坝 · 渝北 · 渝中">Jiulongpo · Shapingba · Yubei · Yuzhong</div></li>
       </ul>
     </div>
     <div class="prov-panel" data-panel="350000" hidden>
@@ -146,6 +164,13 @@
           <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Jinan" data-zh="济南">Jinan</div></li>
       </ul>
     </div>
+    <div class="prov-panel" data-panel="310000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/310000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Huangpu · Jing&#x27;an · Pudong · Qingpu · Xuhui · Yangpu · Zhangning" data-zh="黄浦 · 静安 · 浦东 · 青浦 · 徐汇 · 杨浦 · 长宁">Huangpu · Jing&#x27;an · Pudong · Qingpu · Xuhui · Yangpu · Zhangning</div></li>
+          <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Hongkou · Jiading · Putuo" data-zh="虹口 · 嘉定 · 普陀">Hongkou · Jiading · Putuo</div></li>
+      </ul>
+    </div>
     <div class="prov-panel" data-panel="140000" hidden>
       <div class="map-stage" data-svg="assets/maps/cities/140000.svg?v=15"></div>
       <ul class="map-legend">
@@ -164,6 +189,13 @@
       <ul class="map-legend">
           <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Chengdu · Leshan" data-zh="成都 · 乐山">Chengdu · Leshan</div></li>
           <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Meishan" data-zh="眉山">Meishan</div></li>
+      </ul>
+    </div>
+    <div class="prov-panel" data-panel="120000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/120000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Hebei · Hedong · Heping · Hexi" data-zh="河北 · 河东 · 和平 · 河西">Hebei · Hedong · Heping · Hexi</div></li>
+          <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Nankai · Xiqing" data-zh="南开 · 西青">Nankai · Xiqing</div></li>
       </ul>
     </div>
     <div class="prov-panel" data-panel="330000" hidden>
