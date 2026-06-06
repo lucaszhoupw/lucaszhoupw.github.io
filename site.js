@@ -378,6 +378,42 @@
     if (trigger) trigger.addEventListener("click", function () { show("world"); });
   }
 
+  // Cities page: province buttons swap prefecture/district maps (lazy-loaded).
+  function initCities() {
+    var nav = document.querySelector(".prov-nav");
+    if (!nav) return;
+    var btns = document.querySelectorAll(".prov-btn");
+    var panels = document.querySelectorAll(".prov-panel");
+
+    function ensure(p) {
+      var st = p.querySelector(".map-stage");
+      if (!st || st.getAttribute("data-loaded")) return;
+      var u = st.getAttribute("data-svg");
+      st.setAttribute("data-loaded", "1");
+      fetch(u).then(function (r) { return r.text(); })
+        .then(function (t) { st.innerHTML = t; })
+        .catch(function () { st.setAttribute("data-loaded", ""); });
+    }
+    function show(code) {
+      Array.prototype.forEach.call(btns, function (b) {
+        b.classList.toggle("is-active", b.getAttribute("data-prov") === code);
+      });
+      Array.prototype.forEach.call(panels, function (p) {
+        var on = p.getAttribute("data-panel") === code;
+        p.hidden = !on;
+        if (on) ensure(p);
+      });
+    }
+    Array.prototype.forEach.call(btns, function (b) {
+      b.addEventListener("click", function () { show(b.getAttribute("data-prov")); });
+    });
+    var def = document.querySelector(".prov-btn.is-active");
+    if (def) {
+      var p = document.querySelector('.prov-panel[data-panel="' + def.getAttribute("data-prov") + '"]');
+      if (p) ensure(p);
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     applyLang(getLang());
     initToggle();
@@ -394,5 +430,6 @@
     initDropdown();
     initFeedEnd();
     initTravels();
+    initCities();
   });
 })();

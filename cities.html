@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="green">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- Pick a random color theme (green / red / blue), kept consistent within a visit -->
+<script>
+  (function () {
+    var KEY = "plz-theme";
+    var themes = ["green", "red", "blue"];
+    var t = null;
+    try { t = sessionStorage.getItem(KEY); } catch (e) {}
+    if (themes.indexOf(t) === -1) {
+      t = themes[Math.floor(Math.random() * themes.length)];
+      try { sessionStorage.setItem(KEY, t); } catch (e) {}
+    }
+    document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
+<title>Cities — Peiwen (Lucas) Zhou</title>
+<link rel="stylesheet" href="styles.css?v=15" />
+</head>
+<body data-title-en="Cities — Peiwen (Lucas) Zhou" data-title-zh="城市 — 周培文">
+
+<!-- ===================== NAV ===================== -->
+<header class="nav">
+  <div class="nav__inner">
+    <div class="nav__brand">
+      <a href="index.html" data-en="Peiwen Zhou" data-zh="周培文">Peiwen Zhou</a>
+    </div>
+    <nav class="nav__links" aria-label="Primary">
+      <a class="nav__link" href="index.html#about" data-en="About" data-zh="关于">About</a>
+      <a class="nav__link nav__link--caps" href="index.html#cv"><span class="lbl-full">Curriculum Vitae</span><span class="lbl-short">CV</span></a>
+      <a class="nav__link" href="index.html#publications"><span class="lbl-full" data-en="Publications" data-zh="学术发表">Publications</span><span class="lbl-short" data-en="Pub" data-zh="发表">Pub</span></a>
+      <div class="nav__dropdown">
+        <button type="button" class="nav__link nav__link--caps nav__dropbtn is-active" aria-haspopup="true" aria-expanded="false" data-en="Personal" data-zh="个人">Personal</button>
+        <div class="nav__menu" role="menu">
+          <button type="button" class="nav__menu-item" role="menuitem" data-modal="modal-schedule" data-en="Schedule" data-zh="日程">Schedule</button>
+          <button type="button" class="nav__menu-item" role="menuitem" data-modal="modal-travels" data-en="Travels" data-zh="足迹">Travels</button>
+          <a class="nav__menu-item is-active" role="menuitem" href="cities.html" data-en="Cities" data-zh="城市">Cities</a>
+          <a class="nav__menu-item" role="menuitem" href="gallery.html" data-en="Gallery" data-zh="相册">Gallery</a>
+        </div>
+      </div>
+    </nav>
+    <button type="button" class="lang-toggle" aria-label="Switch language" title="Switch language">
+      <span class="lang-seg is-active" data-lang="en">EN</span>
+      <span class="lang-seg" data-lang="zh">中</span>
+    </button>
+  </div>
+</header>
+
+<div class="cities-wrap">
+  <div class="gallery-head">
+    <h1 data-en="Cities" data-zh="城市">Cities</h1>
+    <p data-en="Prefecture-level regions I have set foot in — pick a province."
+       data-zh="我踏足过的市级行政区——选择一个省级行政区。">Prefecture-level regions I have set foot in — pick a province.</p>
+  </div>
+  <nav class="prov-nav" aria-label="Province">
+      <button type="button" class="prov-btn" data-prov="430000" data-en="Hunan" data-zh="湖南">Hunan</button>
+      <button type="button" class="prov-btn is-active" data-prov="320000" data-en="Jiangsu" data-zh="江苏">Jiangsu</button>
+      <button type="button" class="prov-btn" data-prov="360000" data-en="Jiangxi" data-zh="江西">Jiangxi</button>
+      <button type="button" class="prov-btn" data-prov="220000" data-en="Jilin" data-zh="吉林">Jilin</button>
+      <button type="button" class="prov-btn" data-prov="150000" data-en="Inner Mongolia" data-zh="内蒙古">Inner Mongolia</button>
+      <button type="button" class="prov-btn" data-prov="370000" data-en="Shandong" data-zh="山东">Shandong</button>
+      <button type="button" class="prov-btn" data-prov="140000" data-en="Shanxi" data-zh="山西">Shanxi</button>
+      <button type="button" class="prov-btn" data-prov="610000" data-en="Shaanxi" data-zh="陕西">Shaanxi</button>
+      <button type="button" class="prov-btn" data-prov="510000" data-en="Sichuan" data-zh="四川">Sichuan</button>
+      <button type="button" class="prov-btn" data-prov="330000" data-en="Zhejiang" data-zh="浙江">Zhejiang</button>
+  </nav>
+    <div class="prov-panel" data-panel="430000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/430000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Changsha · Hengyang · Zhangjiajie" data-zh="长沙 · 衡阳 · 张家界">Changsha · Hengyang · Zhangjiajie</div></li>
+          <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Xiangtan · Zhuzhou" data-zh="湘潭 · 株洲">Xiangtan · Zhuzhou</div></li>
+      </ul>
+    </div>
+    <div class="prov-panel" data-panel="320000">
+      <div class="map-stage" data-svg="assets/maps/cities/320000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--lived"></span><b data-en="Lived" data-zh="居住">Lived</b></div><div class="lg-names" data-en="Yangzhou" data-zh="扬州">Yangzhou</div></li>
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Changzhou · Huai&#x27;an · Nanjing · Suzhou · Taizhou · Wuxi · Zhenjiang" data-zh="常州 · 淮安 · 南京 · 苏州 · 泰州 · 无锡 · 镇江">Changzhou · Huai&#x27;an · Nanjing · Suzhou · Taizhou · Wuxi · Zhenjiang</div></li>
+          <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Xuzhou" data-zh="徐州">Xuzhou</div></li>
+      </ul>
+    </div>
+    <div class="prov-panel" data-panel="360000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/360000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Jiujiang" data-zh="九江">Jiujiang</div></li>
+      </ul>
+    </div>
+    <div class="prov-panel" data-panel="220000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/220000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Yanbian" data-zh="延边">Yanbian</div></li>
+          <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Changchun · Jilin" data-zh="长春 · 吉林">Changchun · Jilin</div></li>
+      </ul>
+    </div>
+    <div class="prov-panel" data-panel="150000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/150000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Wulanchabu" data-zh="乌兰察布">Wulanchabu</div></li>
+      </ul>
+    </div>
+    <div class="prov-panel" data-panel="370000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/370000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Rizhao" data-zh="日照">Rizhao</div></li>
+          <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Jinan" data-zh="济南">Jinan</div></li>
+      </ul>
+    </div>
+    <div class="prov-panel" data-panel="140000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/140000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Zhangzhi" data-zh="长治">Zhangzhi</div></li>
+          <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Taiyuan" data-zh="太原">Taiyuan</div></li>
+      </ul>
+    </div>
+    <div class="prov-panel" data-panel="610000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/610000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Xi&#x27;an · Xianyang" data-zh="西安 · 咸阳">Xi&#x27;an · Xianyang</div></li>
+      </ul>
+    </div>
+    <div class="prov-panel" data-panel="510000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/510000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Chengdu · Leshan" data-zh="成都 · 乐山">Chengdu · Leshan</div></li>
+          <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Meishan" data-zh="眉山">Meishan</div></li>
+      </ul>
+    </div>
+    <div class="prov-panel" data-panel="330000" hidden>
+      <div class="map-stage" data-svg="assets/maps/cities/330000.svg?v=15"></div>
+      <ul class="map-legend">
+          <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Hangzhou · Huzhou" data-zh="杭州 · 湖州">Hangzhou · Huzhou</div></li>
+      </ul>
+    </div>
+</div>
+
+<footer class="foot">
+  <span data-en="© 2026 Peiwen (Lucas) Zhou" data-zh="© 2026 周培文">© 2026 Peiwen (Lucas) Zhou</span>
+  <a href="index.html" data-en="← Back to homepage" data-zh="← 返回主页">← Back to homepage</a>
+</footer>
+
+<div class="modal" id="modal-travels">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__dialog modal__dialog--map" role="dialog" aria-modal="true" aria-labelledby="travels-title">
+    <button class="modal__close" type="button" data-close aria-label="Close">&times;</button>
+    <h3 class="modal__title" id="travels-title" data-en="Travels" data-zh="足迹">Travels</h3>
+    <div class="map-tabs" role="tablist">
+      <button type="button" class="map-tab is-active" data-map="world" data-en="World" data-zh="世界">World</button>
+      <button type="button" class="map-tab" data-map="china" data-en="China" data-zh="中国">China</button>
+      <button type="button" class="map-tab" data-map="usa" data-en="USA" data-zh="美国">USA</button>
+    </div>
+    <div class="map-panel" data-panel="world">
+      <div class="map-stage" data-svg="assets/maps/world.svg?v=14"></div>
+      <ul class="map-legend">
+        <li><div class="lg-head"><span class="lg-sw lg-sw--lived"></span><b data-en="Lived" data-zh="居住">Lived</b></div><div class="lg-names" data-en="China · United States" data-zh="美国 · 中国">China · United States</div></li>
+        <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Japan · Singapore · South Korea" data-zh="韩国 · 日本 · 新加坡">Japan · Singapore · South Korea</div></li>
+        <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Germany · Malaysia · Türkiye" data-zh="德国 · 马来西亚 · 土耳其">Germany · Malaysia · Türkiye</div></li>
+      </ul>
+    </div>
+    <div class="map-panel" data-panel="china" hidden>
+      <div class="map-stage-wrap">
+        <div class="map-stage" data-svg="assets/maps/china.svg?v=14"></div>
+        <p class="map-note" data-en="The South China Sea and its islands are China&#39;s territory." data-zh="中国南海及群岛是中国领土">The South China Sea and its islands are China&#39;s territory.</p>
+      </div>
+      <ul class="map-legend">
+        <li><div class="lg-head"><span class="lg-sw lg-sw--lived"></span><b data-en="Lived" data-zh="居住">Lived</b></div><div class="lg-names" data-en="Beijing · Jiangsu" data-zh="北京 · 江苏">Beijing · Jiangsu</div></li>
+        <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Anhui · Chongqing · Fujian · Guangdong · Guizhou · Hebei · Hong Kong · Hunan · Inner Mongolia · Jiangxi · Jilin · Macau · Shaanxi · Shandong · Shanghai · Shanxi · Sichuan · Tianjin · Zhejiang" data-zh="安徽 · 澳门 · 重庆 · 福建 · 广东 · 贵州 · 河北 · 湖南 · 江西 · 吉林 · 内蒙古 · 山东 · 上海 · 山西 · 陕西 · 四川 · 天津 · 香港 · 浙江">Anhui · Chongqing · Fujian · Guangdong · Guizhou · Hebei · Hong Kong · Hunan · Inner Mongolia · Jiangxi · Jilin · Macau · Shaanxi · Shandong · Shanghai · Shanxi · Sichuan · Tianjin · Zhejiang</div></li>
+        <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="Hubei" data-zh="湖北">Hubei</div></li>
+      </ul>
+    </div>
+    <div class="map-panel" data-panel="usa" hidden>
+      <div class="map-stage-wrap">
+        <div class="map-stage" data-svg="assets/maps/usa.svg?v=14"></div>
+        <p class="map-note" data-en="Some U.S. overseas territories are not shown." data-zh="部分美国海外领地未在图中展示。">Some U.S. overseas territories are not shown.</p>
+      </div>
+      <ul class="map-legend">
+        <li><div class="lg-head"><span class="lg-sw lg-sw--lived"></span><b data-en="Lived" data-zh="居住">Lived</b></div><div class="lg-names" data-en="New Jersey · Wisconsin" data-zh="威斯康星 · 新泽西">New Jersey · Wisconsin</div></li>
+        <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Arizona · Illinois · Maryland · Massachusetts · Nevada · New York · Pennsylvania · Rhode Island · Utah · Virginia · Washington D.C." data-zh="宾夕法尼亚 · 弗吉尼亚 · 华盛顿特区 · 罗德岛 · 马里兰 · 马萨诸塞 · 内华达 · 纽约 · 亚利桑那 · 伊利诺伊 · 犹他">Arizona · Illinois · Maryland · Massachusetts · Nevada · New York · Pennsylvania · Rhode Island · Utah · Virginia · Washington D.C.</div></li>
+        <li><div class="lg-head"><span class="lg-sw lg-sw--pass"></span><b data-en="Passed through" data-zh="路过">Passed through</b></div><div class="lg-names" data-en="California · Connecticut · Delaware · Michigan" data-zh="加利福尼亚 · 康涅狄格 · 密歇根 · 特拉华">California · Connecticut · Delaware · Michigan</div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-schedule">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__dialog modal__dialog--wide" role="dialog" aria-modal="true" aria-labelledby="schedule-title">
+    <button class="modal__close" type="button" data-close aria-label="Close">&times;</button>
+    <h3 class="modal__title" id="schedule-title" data-en="Peiwen's Recent Schedule" data-zh="周培文的近期日程">Peiwen's Recent Schedule</h3>
+    <ul class="sched">
+      <li class="sched__item">
+        <div class="sched__date" data-en="Jul 11 – 14" data-zh="7 月 11 日 – 14 日">Jul 11 – 14</div>
+        <div class="sched__desc" data-en="Farm work at the Zhuozhou farm." data-zh="前往涿州农场种地。">Farm work at the Zhuozhou farm.</div>
+      </li>
+      <li class="sched__item">
+        <div class="sched__date" data-en="Jul 15 – 24" data-zh="7 月 15 日 – 24 日">Jul 15 – 24</div>
+        <div class="sched__desc" data-en="Summer term." data-zh="暑期学期。">Summer term.</div>
+      </li>
+      <li class="sched__item">
+        <div class="sched__date" data-en="Aug 1 – 10" data-zh="8 月 1 日 – 10 日">Aug 1 – 10</div>
+        <div class="sched__desc" data-en="Traveling in Vietnam — Hà Nội, Đà Nẵng, and Hồ Chí Minh City." data-zh="前往越南河内、岘港、胡志明市旅行。">Traveling in Vietnam — Hà Nội, Đà Nẵng, and Hồ Chí Minh City.</div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script src="site.js?v=15"></script>
+</body>
+</html>
