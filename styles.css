@@ -1185,3 +1185,6 @@ body.privacy .nav__brand .nm-given { display: none; }
   .cities-wrap { padding: 84px 18px 72px; }
   .prov-nav { top: 56px; }
 }
+
+/* CV "coming soon" modal note */
+.cv-note { margin: 0; color: var(--muted); font-size: 0.95rem; line-height: 1.55; }

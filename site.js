@@ -4,14 +4,8 @@
    text swapped on toggle. Default language is English.
    ============================================================= */
 (function () {
-  var STORE_KEY = "plz-lang";
-
-  function getLang() {
-    var saved = null;
-    try { saved = localStorage.getItem(STORE_KEY); } catch (e) {}
-    return saved === "zh" ? "zh" : "en";
-  }
-
+  // Language is NOT persisted: every page load starts in English (the HTML
+  // default), so there is no flash and every visitor enters in English.
   function applyLang(lang) {
     document.documentElement.setAttribute("lang", lang === "zh" ? "zh" : "en");
 
@@ -29,7 +23,6 @@
     }
 
     // Document title
-    var t = document.querySelector('meta[name="title-en"]');
     var titleEn = document.body.getAttribute("data-title-en");
     var titleZh = document.body.getAttribute("data-title-zh");
     if (titleEn && titleZh) {
@@ -41,8 +34,6 @@
     for (var j = 0; j < segs.length; j++) {
       segs[j].classList.toggle("is-active", segs[j].getAttribute("data-lang") === lang);
     }
-
-    try { localStorage.setItem(STORE_KEY, lang); } catch (e) {}
   }
 
   function initToggle() {
@@ -50,7 +41,8 @@
     if (!toggle) return;
     // Clicking anywhere on the toggle flips between EN and 中
     toggle.addEventListener("click", function () {
-      applyLang(getLang() === "zh" ? "en" : "zh");
+      var cur = document.documentElement.getAttribute("lang") === "zh" ? "zh" : "en";
+      applyLang(cur === "zh" ? "en" : "zh");
     });
   }
 
@@ -414,8 +406,38 @@
     }
   }
 
+  // Nav "CV" dropdown: download the CV PDF, or show a modal if it isn't up yet.
+  function initCvDownload() {
+    var trigs = document.querySelectorAll("[data-cv-download]");
+    if (!trigs.length) return;
+    var PDF = "assets/cv.pdf";          // upload this file to enable the download
+    var modal = document.getElementById("modal-cv");
+    function openM() { if (modal) { modal.classList.add("is-open"); document.body.classList.add("modal-open"); } }
+    function closeM() { if (modal) { modal.classList.remove("is-open"); document.body.classList.remove("modal-open"); } }
+    if (modal) {
+      Array.prototype.forEach.call(modal.querySelectorAll("[data-close]"), function (b) {
+        b.addEventListener("click", closeM);
+      });
+      document.addEventListener("keydown", function (e) {
+        if ((e.key === "Escape" || e.key === "Esc") && modal.classList.contains("is-open")) closeM();
+      });
+    }
+    Array.prototype.forEach.call(trigs, function (b) {
+      b.addEventListener("click", function () {
+        fetch(PDF, { method: "HEAD" }).then(function (r) {
+          if (r.ok) {
+            var a = document.createElement("a");
+            a.href = PDF;
+            a.setAttribute("download", "Peiwen_Zhou_CV.pdf");
+            document.body.appendChild(a); a.click(); a.remove();
+          } else { openM(); }
+        }).catch(openM);
+      });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
-    applyLang(getLang());
+    applyLang("en");
     initToggle();
     initScrollSpy();
     initPalette();
@@ -431,5 +453,6 @@
     initFeedEnd();
     initTravels();
     initCities();
+    initCvDownload();
   });
 })();

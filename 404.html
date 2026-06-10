@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="green">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>
+  (function () {
+    var themes = ["green", "red", "blue"];
+    document.documentElement.setAttribute("data-theme", themes[Math.floor(Math.random() * 3)]);
+  })();
+</script>
+<title>404 — Peiwen (Lucas) Zhou</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" href="/assets/favicon.svg" />
+<link rel="stylesheet" href="/styles.css?v=16" />
+<style>
+  .nf { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; gap: 8px; }
+  .nf__code { font-size: 5rem; line-height: 1; color: var(--accent); font-weight: 700; margin: 0; letter-spacing: -0.02em; }
+  .nf p { color: var(--muted); margin: 0; }
+  .nf a { margin-top: 16px; color: var(--accent); }
+</style>
+</head>
+<body>
+  <div class="nf">
+    <p class="nf__code">404</p>
+    <p>Page not found · 页面不存在</p>
+    <a href="/">← Back to homepage · 返回主页</a>
+  </div>
+</body>
+</html>
