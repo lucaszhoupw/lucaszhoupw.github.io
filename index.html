@@ -18,7 +18,17 @@
   })();
 </script>
 <title>Peiwen (Lucas) Zhou</title>
-<link rel="stylesheet" href="styles.css?v=15" />
+<meta name="description" content="Peiwen (Lucas) Zhou — a mathematics undergraduate at China Agricultural University, studying the anisotropic Kepler problem and pattern formation in arid ecosystems." />
+<meta name="author" content="Peiwen (Lucas) Zhou" />
+<link rel="canonical" href="https://lucaszhoupw.github.io/" />
+<link rel="icon" href="assets/favicon.svg" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Peiwen (Lucas) Zhou" />
+<meta property="og:description" content="Peiwen (Lucas) Zhou — a mathematics undergraduate at China Agricultural University, studying the anisotropic Kepler problem and pattern formation in arid ecosystems." />
+<meta property="og:url" content="https://lucaszhoupw.github.io/" />
+<meta property="og:image" content="https://lucaszhoupw.github.io/assets/portrait.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="stylesheet" href="styles.css?v=16" />
 </head>
 <body data-title-en="Peiwen (Lucas) Zhou" data-title-zh="周培文 · 个人主页">
 
@@ -30,7 +40,12 @@
     </div>
     <nav class="nav__links" aria-label="Primary">
       <a class="nav__link nav__link--caps" href="#about" data-spy data-en="About" data-zh="关于">About</a>
-      <a class="nav__link nav__link--caps" href="#cv" data-spy><span class="lbl-full" data-en="Curriculum Vitae" data-zh="简历">Curriculum Vitae</span><span class="lbl-short" data-en="CV" data-zh="简历">CV</span></a>
+      <div class="nav__dropdown">
+        <button type="button" class="nav__link nav__link--caps nav__dropbtn" aria-haspopup="true" aria-expanded="false"><span class="lbl-full" data-en="Curriculum Vitae" data-zh="简历">Curriculum Vitae</span><span class="lbl-short" data-en="CV" data-zh="简历">CV</span></button>
+        <div class="nav__menu" role="menu">
+          <button type="button" class="nav__menu-item" data-cv-download data-en="Download" data-zh="下载">Download</button>
+        </div>
+      </div>
       <a class="nav__link nav__link--caps" href="#publications" data-spy><span class="lbl-full" data-en="Publications" data-zh="学术发表">Publications</span><span class="lbl-short" data-en="Pub" data-zh="发表">Pub</span></a>
       <div class="nav__dropdown">
         <button type="button" class="nav__link nav__link--caps nav__dropbtn" aria-haspopup="true" aria-expanded="false" data-en="Personal" data-zh="个人">Personal</button>
@@ -154,6 +169,7 @@
         <h3 class="cv-group__head" data-en="Education" data-zh="教育经历">Education</h3>
         <div class="entry">
           <div class="entry__line1" data-en="China Agricultural University" data-zh="中国农业大学">China Agricultural University</div>
+          <div class="entry__line2" data-en="B.S. in Mathematics and Applied Mathematics, expected June 2028" data-zh="数学与应用数学专业（理学学士），预计 2028 年 6 月毕业">B.S. in Mathematics and Applied Mathematics, expected June 2028</div>
           <div class="entry__addr" data-en="17 E Tsinghua Rd, Beijing, China, 100083" data-zh="中国北京市海淀区清华东路 17 号">17 E Tsinghua Rd, Beijing, China, 100083</div>
           <div class="entry__meta" data-en="August 2023 – July 2024, September 2025 – Present" data-zh="2023年8月 – 2024年7月、2025年9月至今">August 2023 – July 2024, September 2025 – Present</div>
           <div class="entry__line3" data-en="GPA 3.69 / 4.00" data-zh="GPA 3.69 / 4.00">GPA 3.69 / 4.00</div>
@@ -259,6 +275,8 @@
         <p class="skill-block__label" data-en="Skills / Tools" data-zh="技能 / 工具">Skills / Tools</p>
         <div class="pills">
           <span class="pill pill--wide" data-en="Python — COMP SCI 220 Data Science Programming, UW-Madison" data-zh="Python — COMP SCI 220 Data Science Programming, UW-Madison">Python — COMP SCI 220 Data Science Programming, UW-Madison</span>
+          <span class="pill" data-en="LaTeX" data-zh="LaTeX">LaTeX</span>
+          <span class="pill" data-en="MATLAB" data-zh="MATLAB">MATLAB</span>
         </div>
       </div>
     </section>
@@ -367,7 +385,7 @@
       <button type="button" class="map-tab" data-map="usa" data-en="USA" data-zh="美国">USA</button>
     </div>
     <div class="map-panel" data-panel="world">
-      <div class="map-stage" data-svg="assets/maps/world.svg?v=14"></div>
+      <div class="map-stage" data-svg="assets/maps/world.svg?v=16"></div>
       <ul class="map-legend">
         <li><div class="lg-head"><span class="lg-sw lg-sw--lived"></span><b data-en="Lived" data-zh="居住">Lived</b></div><div class="lg-names" data-en="China · United States" data-zh="美国 · 中国">China · United States</div></li>
         <li><div class="lg-head"><span class="lg-sw lg-sw--travel"></span><b data-en="Traveled" data-zh="旅游">Traveled</b></div><div class="lg-names" data-en="Japan · Singapore · South Korea" data-zh="韩国 · 日本 · 新加坡">Japan · Singapore · South Korea</div></li>
@@ -376,7 +394,7 @@
     </div>
     <div class="map-panel" data-panel="china" hidden>
       <div class="map-stage-wrap">
-        <div class="map-stage" data-svg="assets/maps/china.svg?v=14"></div>
+        <div class="map-stage" data-svg="assets/maps/china.svg?v=16"></div>
         <p class="map-note" data-en="The South China Sea and its islands are China&#39;s territory." data-zh="中国南海及群岛是中国领土">The South China Sea and its islands are China&#39;s territory.</p>
       </div>
       <ul class="map-legend">
@@ -387,7 +405,7 @@
     </div>
     <div class="map-panel" data-panel="usa" hidden>
       <div class="map-stage-wrap">
-        <div class="map-stage" data-svg="assets/maps/usa.svg?v=14"></div>
+        <div class="map-stage" data-svg="assets/maps/usa.svg?v=16"></div>
         <p class="map-note" data-en="Some U.S. overseas territories are not shown." data-zh="部分美国海外领地未在图中展示。">Some U.S. overseas territories are not shown.</p>
       </div>
       <ul class="map-legend">
@@ -421,6 +439,15 @@
   </div>
 </div>
 
-<script src="site.js?v=15"></script>
+<div class="modal" id="modal-cv">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="cv-title">
+    <button class="modal__close" type="button" data-close aria-label="Close">&times;</button>
+    <h3 class="modal__title" id="cv-title" data-en="CV coming soon" data-zh="简历即将上线">CV coming soon</h3>
+    <p class="cv-note" data-en="The CV PDF has not been uploaded yet — please check back later." data-zh="简历 PDF 暂未上传，请稍后再来。">The CV PDF has not been uploaded yet — please check back later.</p>
+  </div>
+</div>
+
+<script src="site.js?v=16"></script>
 </body>
 </html>
