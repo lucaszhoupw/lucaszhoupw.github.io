@@ -61,12 +61,12 @@
 
   /* ---- entry form ---- */
   .form { border: 1px solid var(--border-strong); border-radius: 14px; padding: 18px; margin: 16px 0 26px; background: var(--surface); }
-  .form__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-  .field { display: flex; flex-direction: column; gap: 4px; }
-  .field label { font-size: 0.72rem; font-weight: 700; color: var(--muted); }
+  .form__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 8px; }
+  .field { display: flex; flex-direction: column; gap: 3px; }
+  .field label { font-size: 0.68rem; font-weight: 700; color: var(--muted); }
   .field input, .field select, .field textarea {
-    font-family: inherit; font-size: 0.92rem; padding: 8px 10px;
-    border: 1px solid var(--border-strong); border-radius: 8px;
+    font-family: inherit; font-size: 0.86rem; padding: 6px 8px;
+    border: 1px solid var(--border-strong); border-radius: 7px;
     background: var(--bg); color: var(--text);
   }
   .field input[readonly] { background: var(--accent-tint); color: var(--muted); }
@@ -78,10 +78,10 @@
   /* trades */
   .trades { display: flex; flex-direction: column; gap: 12px; }
   .trade {
-    border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+    border: 1px solid var(--border); border-radius: 12px; padding: 11px;
     background: var(--bg); position: relative;
   }
-  .trade__hd { display: flex; align-items: center; justify-content: space-between; margin: 0 0 10px; }
+  .trade__hd { display: flex; align-items: center; justify-content: space-between; margin: 0 0 8px; }
   .trade__no { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
   .trade__btns { display: flex; gap: 6px; }
   .signal-row { display: flex; gap: 6px; align-items: flex-end; }
@@ -129,10 +129,7 @@
   .card__tools { display: flex; gap: 6px; margin-left: 8px; }
   .card__body { margin-top: 4px; }
   .card__bodywrap { position: relative; }
-  .card--collapsed .card__bodywrap { max-height: 180px; overflow: hidden; }
-  .card__fade { display: none; position: absolute; left: 0; right: 0; bottom: 0; height: 70px; cursor: pointer;
-    background: linear-gradient(to bottom, transparent, var(--surface)); }
-  .card--collapsed .card__fade { display: block; }
+  .card--collapsed .card__bodywrap { height: 132px; overflow: hidden; }
   .card__toggle { display: block; margin-left: auto; margin-top: 10px; }
 
   .trow { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px; }
@@ -142,7 +139,8 @@
   .grade { font-weight: 700; }
   .grade-A { color: #1f8f4e; } .grade-B { color: #b8860b; } .grade-C { color: #b3392f; }
   .trow__nums { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; font-size: 0.82rem; color: var(--muted); }
-  .subrow { font-size: 0.76rem; color: var(--faint); margin-top: 6px; padding-left: 12px; border-left: 2px solid var(--border); display: flex; flex-wrap: wrap; gap: 10px; }
+  .subrow { font-size: 0.76rem; color: var(--muted); margin-top: 5px; padding: 3px 0 3px 18px; display: flex; flex-wrap: wrap; gap: 10px; position: relative; }
+  .subrow::before { content: "↳"; position: absolute; left: 3px; top: 3px; color: var(--faint); }
   .up { color: #1f8f4e; font-weight: 700; } .down { color: #b3392f; font-weight: 700; }
 
   .block { margin-top: 12px; }
@@ -192,6 +190,15 @@
   .chart__note { color: var(--faint); font-style: italic; font-size: 0.84rem; padding: 26px 0; text-align: center; }
   .chart__legend { display: flex; gap: 18px; justify-content: center; font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
   .chart__legend i { display: inline-block; width: 16px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 5px; }
+  .hist { margin-top: 24px; }
+  .hist__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .hist__title { font-weight: 700; color: var(--accent-strong); font-size: 0.9rem; }
+  .hist select { font-family: inherit; font-size: 0.84rem; padding: 5px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
+  .histrow { display: grid; grid-template-columns: 100px 1fr 36px; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 0.8rem; }
+  .histrow__lab { color: var(--muted); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .histrow__bar { background: var(--accent-tint); border-radius: 5px; height: 16px; overflow: hidden; }
+  .histrow__bar i { display: block; height: 100%; background: var(--accent); border-radius: 5px; }
+  .histrow__n { font-weight: 700; color: var(--text); text-align: left; }
   .dash__bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 6px 0 18px; }
   .dash__bar select { font-family: inherit; font-size: 0.9rem; padding: 7px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
   .dash__acctline { font-size: 0.8rem; color: var(--muted); }
@@ -208,10 +215,8 @@
 
   .dtable { overflow-x: auto; margin-top: 22px; }
   .dtable table { border-collapse: collapse; width: 100%; font-size: 0.78rem; }
-  .dtable th, .dtable td { border: 1px solid var(--border); padding: 6px 9px; text-align: right; white-space: nowrap; }
+  .dtable th, .dtable td { border: 1px solid var(--border); padding: 6px 9px; text-align: center; white-space: nowrap; }
   .dtable th { background: var(--accent-tint); color: var(--accent-strong); font-weight: 700; }
-  .dtable td:first-child, .dtable th:first-child,
-  .dtable td.l, .dtable th.l { text-align: left; }
   .dtable tr.daystart td { border-top: 2px solid var(--border-strong); }
   .dtable .empty { color: var(--faint); font-style: italic; padding: 20px; text-align: center; }
 
@@ -324,6 +329,7 @@
       <div id="dash-stats" class="dstats"></div>
       <div id="dash-chart"></div>
       <div id="dash-cal"></div>
+      <div id="dash-hist" class="hist"></div>
       <div id="dash-table" class="dtable"></div>
     </section>
   </main>
@@ -380,7 +386,7 @@
     var SECS = {};     // open-form image sections
 
     var ACCOUNT_SIZES = [25000, 50000, 100000, 150000];
-    var DEFAULT_ACCT = { size: 50000, initialBalance: 0, maxDrawdown: 2000, drawdownMode: "Intraday" };
+    var DEFAULT_ACCT = { size: 50000, initialBalance: 0, maxDrawdown: 2000, drawdownMode: "Intraday", stage: "Evaluation" };
 
     function signals() { return (journal.config && journal.config.signals) || DEFAULT_SIGNALS; }
     function orders() { return DEFAULT_ORDERS; } // fixed order types: stop / limit / market
@@ -402,7 +408,8 @@
           size: a.size != null ? a.size : DEFAULT_ACCT.size,
           initialBalance: a.initialBalance != null ? a.initialBalance : DEFAULT_ACCT.initialBalance,
           maxDrawdown: a.maxDrawdown != null ? a.maxDrawdown : DEFAULT_ACCT.maxDrawdown,
-          drawdownMode: a.drawdownMode || DEFAULT_ACCT.drawdownMode
+          drawdownMode: a.drawdownMode || DEFAULT_ACCT.drawdownMode,
+          stage: a.stage || DEFAULT_ACCT.stage
         };
       });
     }
@@ -1181,22 +1188,18 @@
 
         var bodywrap = document.createElement("div"); bodywrap.className = "card__bodywrap";
         bodywrap.appendChild(body);
-        var fade = document.createElement("div"); fade.className = "card__fade";
-        bodywrap.appendChild(fade);
         card.appendChild(bodywrap);
 
-        // --- expand / collapse (faded preview when collapsed) ---
+        // --- expand / collapse (fixed height when collapsed) ---
         if (body.children.length) {
           card.classList.add("card--collapsed");
           var toggle = document.createElement("button");
           toggle.className = "btn btn--sm card__toggle";
           toggle.textContent = "展开 ▾";
-          var toggleCard = function () {
+          toggle.addEventListener("click", function () {
             var collapsed = card.classList.toggle("card--collapsed");
             toggle.textContent = collapsed ? "展开 ▾" : "收起 ▴";
-          };
-          toggle.addEventListener("click", toggleCard);
-          fade.addEventListener("click", toggleCard);
+          });
           card.appendChild(toggle);
         }
 
@@ -1244,6 +1247,8 @@
             '<div><label>最大回撤 Max DD</label><input class="a-dd" type="text" inputmode="decimal" /></div>' +
             '<div><label>回撤模式 Mode</label><select class="a-mode">' +
               ['Intraday', 'EOD'].map(function (m) { return '<option' + (m === acc.drawdownMode ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select></div>' +
+            '<div><label>阶段 Stage</label><select class="a-stage">' +
+              ['Evaluation', 'Funded'].map(function (m) { return '<option' + (m === acc.stage ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select></div>' +
           '</div>';
         var q = function (c) { return row.querySelector(c); };
         q(".a-name").value = acc.name;
@@ -1255,6 +1260,7 @@
         attachMoney(q(".a-init"), function () { acc.initialBalance = num(q(".a-init").value) || 0; });
         attachMoney(q(".a-dd"), function () { acc.maxDrawdown = num(q(".a-dd").value) || 0; });
         q(".a-mode").addEventListener("change", function () { acc.drawdownMode = q(".a-mode").value; });
+        q(".a-stage").addEventListener("change", function () { acc.stage = q(".a-stage").value; });
         q(".a-del").addEventListener("click", function () {
           journal.config.accounts.splice(idx, 1); renderAccounts(); refreshAccountSelects();
         });
@@ -1291,7 +1297,7 @@
       var n = journal.config.accounts.length + 1;
       journal.config.accounts.push({
         name: "账户" + n, size: DEFAULT_ACCT.size, initialBalance: DEFAULT_ACCT.initialBalance,
-        maxDrawdown: DEFAULT_ACCT.maxDrawdown, drawdownMode: DEFAULT_ACCT.drawdownMode
+        maxDrawdown: DEFAULT_ACCT.maxDrawdown, drawdownMode: DEFAULT_ACCT.drawdownMode, stage: DEFAULT_ACCT.stage
       });
       renderAccounts(); refreshAccountSelects();
     });
@@ -1315,7 +1321,14 @@
     var dashCal = document.getElementById("dash-cal");
     var dashTable = document.getElementById("dash-table");
     var dashAcctLine = document.getElementById("dash-acctline");
-    var dashYear, dashMonth;
+    var dashMonthKey = null, dashMonthsCache = [], dashEx = [], histDim = "instr";
+    var HIST_DIMS = [
+      { k: "instr", label: "商品 Instrument" },
+      { k: "dir", label: "方向 Direction" },
+      { k: "order", label: "入场方式 Order" },
+      { k: "signal", label: "信号 Signal" },
+      { k: "grade", label: "评分 Grade" }
+    ];
 
     document.getElementById("dash-btn").addEventListener("click", openDashboard);
     document.getElementById("dash-back").addEventListener("click", closeDashboard);
@@ -1338,19 +1351,22 @@
     }
 
     function pad2(n) { return (n < 10 ? "0" : "") + n; }
-    function mkExec(en, instr, size, pnl, comm, risk) {
-      var sz = num(size), p = num(pnl), cm = num(comm), rk = num(risk), pv = pointValue(instr);
+    function mkExec(en, src) {
+      var sz = num(src.size), p = num(src.pnl), cm = num(src.comm), rk = num(src.risk), pv = pointValue(src.instr);
       var pts = (p === null || !pv || !sz) ? null : (p + (cm || 0)) / pv / sz;
       var r = (p === null || rk === null || rk === 0) ? null : p / rk;
-      return { date: en.date, ts: en.ts, instr: instr, size: sz, pnl: p, comm: cm, risk: rk, r: r, points: pts };
+      return {
+        date: en.date, ts: en.ts, instr: src.instr, size: sz, pnl: p, comm: cm, risk: rk, r: r, points: pts,
+        signal: src.signal, order: src.order, dir: src.dir, grade: src.grade
+      };
     }
     function executionsFor(name) {
       var ex = [];
       journal.entries.forEach(function (en) {
         (en.trades || []).forEach(function (t) {
-          if (en.account === name) ex.push(mkExec(en, t.instr, t.size, t.pnl, t.comm, t.risk));
+          if (en.account === name) ex.push(mkExec(en, t));
           (t.subs || []).forEach(function (s) {
-            if (s.account === name) ex.push(mkExec(en, s.instr, s.size, s.pnl, s.comm, s.risk));
+            if (s.account === name) ex.push(mkExec(en, s));
           });
         });
       });
@@ -1391,28 +1407,33 @@
       });
       return rows;
     }
+    function dataMonths(ex) {
+      var set = {};
+      ex.forEach(function (e) { if (e.date) set[e.date.slice(0, 7)] = true; });
+      return Object.keys(set).sort();
+    }
     function initMonthForAccount() {
-      var ex = executionsFor(dashAcctSel.value);
-      var ref = ex.length ? ex[ex.length - 1].date : new Date().toISOString().slice(0, 10);
-      var p = ref.split("-");
-      dashYear = parseInt(p[0], 10); dashMonth = parseInt(p[1], 10) - 1;
+      var ms = dataMonths(executionsFor(dashAcctSel.value));
+      dashMonthKey = ms.length ? ms[ms.length - 1] : null;
     }
     function shiftMonth(d) {
-      dashMonth += d;
-      if (dashMonth < 0) { dashMonth = 11; dashYear--; }
-      else if (dashMonth > 11) { dashMonth = 0; dashYear++; }
-      renderDash();
+      var idx = dashMonthsCache.indexOf(dashMonthKey), ni = idx + d;
+      if (ni < 0 || ni >= dashMonthsCache.length) return;
+      dashMonthKey = dashMonthsCache[ni];
+      renderCalendar(dashEx);
     }
     function renderDash() {
       var acc = accountByName(dashAcctSel.value);
       var ex = executionsFor(dashAcctSel.value);
+      dashEx = ex;
       var rows = computeRows(ex, acc);
       dashAcctLine.textContent = acc
-        ? (acc.size / 1000) + "k · 初始 " + money(acc.initialBalance) + " · 最大回撤 " + money(acc.maxDrawdown) + " · " + acc.drawdownMode
+        ? (acc.size / 1000) + "k · " + (acc.stage || "") + " · 初始 " + money(acc.initialBalance) + " · 最大回撤 " + money(acc.maxDrawdown) + " · " + acc.drawdownMode
         : "";
       renderStats(ex, rows, acc);
       renderChart(rows);
       renderCalendar(ex);
+      renderHistogram();
       renderTable(rows);
     }
 
@@ -1420,6 +1441,7 @@
       return '<div class="stat"><div class="stat__label">' + label + '</div><div class="stat__value">' + value + '</div></div>';
     }
     function signed(n) { return '<span class="' + (n >= 0 ? "up" : "down") + '">' + (n >= 0 ? "+" : "−") + money(n) + '</span>'; }
+    function plainSigned(n) { return (n >= 0 ? "+" : "−") + money(n); } // black, no colour
     function renderStats(ex, rows, acc) {
       var box = document.getElementById("dash-stats");
       var n = ex.length;
@@ -1430,30 +1452,25 @@
         if (p > 0) { wins++; gw += p; } else if (p < 0) { gl += Math.abs(p); }
         if (e.r != null) rs.push(e.r);
       });
+      var initBal = num(acc && acc.initialBalance) || 0;
+      var equity = initBal + tot; // 总累计盈亏 = 所有净盈亏之和 + 初始余额
       var winRate = wins / n;
       var pf = gl ? gw / gl : (gw > 0 ? Infinity : null);
       var avgR = rs.length ? rs.reduce(function (a, v) { return a + v; }, 0) / rs.length : null;
       var last = rows[rows.length - 1];
-      var D = num(acc && acc.maxDrawdown) || 0;
-      var safety = last ? last.safety : null, curTotal = last ? last.total : null;
-      var safetyPct = (safety != null && D) ? safety / D * 100 : null;
+      var safety = last ? last.safety : null;
       box.innerHTML =
         statCard("笔数 Trades", n) +
         statCard("胜率 Win rate", (winRate * 100).toFixed(1) + "%") +
-        statCard("总盈亏 Net P&L", signed(tot)) +
         statCard("平均每笔 Avg", signed(tot / n)) +
         statCard("平均R Avg R", avgR == null ? "—" : (avgR >= 0 ? "+" : "−") + Math.abs(avgR).toFixed(2)) +
         statCard("盈亏比 PF", pf == null ? "—" : (pf === Infinity ? "∞" : pf.toFixed(2))) +
         statCard("总手续费 Comm.", money(comm)) +
-        statCard("总累计盈亏 Equity", curTotal == null ? "—" : signed(curTotal)) +
-        statCard("安全距离 Safety", safety == null ? "—" : signed(safety)) +
-        statCard("距爆仓 %DD", safetyPct == null ? "—" : safetyPct.toFixed(0) + "%");
+        statCard("总累计盈亏 Equity", plainSigned(equity)) +
+        statCard("安全距离 Safety", safety == null ? "—" : plainSigned(safety));
     }
 
-    function fmtAxis(v) {
-      var a = Math.abs(v), t = a >= 1000 ? (a / 1000).toFixed(1) + "k" : a.toFixed(0);
-      return (v < 0 ? "-$" : "$") + t;
-    }
+    function fmtAxis(v) { return (v < 0 ? "-$" : "$") + Math.round(Math.abs(v)).toLocaleString(); }
     function renderChart(rows) {
       var box = document.getElementById("dash-chart");
       box.className = "chart";
@@ -1461,20 +1478,23 @@
         box.innerHTML = '<div class="chart__note">该账户交易满 6 笔后显示曲线（当前 ' + rows.length + ' 笔）</div>';
         return;
       }
-      var W = 640, H = 260, mL = 56, mR = 14, mT = 14, mB = 30;
+      var W = 640, H = 260, mL = 78, mR = 14, mT = 14, mB = 30;
       var pw = W - mL - mR, ph = H - mT - mB, n = rows.length;
       var ys = []; rows.forEach(function (r) { ys.push(r.total); ys.push(r.limit); });
-      var ymin = Math.min.apply(null, ys), ymax = Math.max.apply(null, ys);
-      if (ymin === ymax) ymax = ymin + 1;
-      var pad = (ymax - ymin) * 0.08; ymin -= pad; ymax += pad;
+      var dataMin = Math.min.apply(null, ys), dataMax = Math.max.apply(null, ys);
+      // snap range to whole-thousand ticks
+      var range = (dataMax - dataMin) || 1;
+      var step = Math.max(1000, Math.ceil((range / 4) / 1000) * 1000);
+      var ymin = Math.floor(dataMin / step) * step, ymax = Math.ceil(dataMax / step) * step;
+      if (ymin === ymax) ymax = ymin + step;
       var X = function (i) { return mL + (n === 1 ? 0 : (i / (n - 1)) * pw); };
       var Y = function (v) { return mT + (1 - (v - ymin) / (ymax - ymin)) * ph; };
       var d = function (key) { return rows.map(function (r, i) { return (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(r[key]).toFixed(1); }).join(" "); };
-      var grid = "", labels = "", T = 4;
-      for (var g = 0; g <= T; g++) {
-        var val = ymin + (ymax - ymin) * g / T, yy = Y(val);
+      var grid = "", labels = "";
+      for (var val = ymin; val <= ymax + 1e-6; val += step) {
+        var yy = Y(val);
         grid += '<line x1="' + mL + '" y1="' + yy.toFixed(1) + '" x2="' + (W - mR) + '" y2="' + yy.toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
-        labels += '<text x="' + (mL - 6) + '" y="' + (yy + 3).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--faint)">' + fmtAxis(val) + '</text>';
+        labels += '<text x="' + (mL - 8) + '" y="' + (yy + 3).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--faint)">' + fmtAxis(val) + '</text>';
       }
       var zero = "";
       if (ymin < 0 && ymax > 0) { var yz = Y(0); zero = '<line x1="' + mL + '" y1="' + yz.toFixed(1) + '" x2="' + (W - mR) + '" y2="' + yz.toFixed(1) + '" stroke="var(--border-strong)" stroke-width="1" stroke-dasharray="2 2"/>'; }
@@ -1494,18 +1514,25 @@
         '<span><i style="border-color:#b3392f"></i>最大亏损限制</span></div>';
     }
     function renderCalendar(ex) {
+      var months = dataMonths(ex);
+      dashMonthsCache = months;
+      if (!months.length) { dashCal.innerHTML = ""; return; } // no data -> no calendar
+      if (months.indexOf(dashMonthKey) < 0) dashMonthKey = months[months.length - 1];
+      var idx = months.indexOf(dashMonthKey);
+      var year = parseInt(dashMonthKey.slice(0, 4), 10), month = parseInt(dashMonthKey.slice(5, 7), 10) - 1;
       var byDate = {};
       ex.forEach(function (e) { var m = byDate[e.date] || (byDate[e.date] = { pnl: 0, count: 0 }); m.pnl += (e.pnl || 0); m.count++; });
       var mn = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
-      var html = '<div class="cal__nav"><button class="btn btn--sm" id="cal-prev" type="button">‹</button>' +
-        '<span class="cal__label">' + dashYear + " 年 " + mn[dashMonth] + '</span>' +
-        '<button class="btn btn--sm" id="cal-next" type="button">›</button></div><div class="cal__grid">';
+      var prevDis = idx === 0 ? " disabled" : "", nextDis = idx === months.length - 1 ? " disabled" : "";
+      var html = '<div class="cal__nav"><button class="btn btn--sm" id="cal-prev" type="button"' + prevDis + '>‹</button>' +
+        '<span class="cal__label">' + year + " 年 " + mn[month] + '</span>' +
+        '<button class="btn btn--sm" id="cal-next" type="button"' + nextDis + '>›</button></div><div class="cal__grid">';
       ["日","一","二","三","四","五","六"].forEach(function (d) { html += '<div class="cal__dow">' + d + '</div>'; });
-      var startDow = new Date(dashYear, dashMonth, 1).getDay();
-      var daysInMonth = new Date(dashYear, dashMonth + 1, 0).getDate();
+      var startDow = new Date(year, month, 1).getDay();
+      var daysInMonth = new Date(year, month + 1, 0).getDate();
       for (var i = 0; i < startDow; i++) html += '<div class="cal__cell empty"></div>';
       for (var dnum = 1; dnum <= daysInMonth; dnum++) {
-        var ds = dashYear + "-" + pad2(dashMonth + 1) + "-" + pad2(dnum);
+        var ds = year + "-" + pad2(month + 1) + "-" + pad2(dnum);
         var m = byDate[ds];
         if (m) {
           html += '<div class="cal__cell has"><div class="cal__day">' + dnum + '</div>' +
@@ -1520,29 +1547,54 @@
       document.getElementById("cal-prev").addEventListener("click", function () { shiftMonth(-1); });
       document.getElementById("cal-next").addEventListener("click", function () { shiftMonth(1); });
     }
-    function cellMoney(n) {
+    function cellMoney(n) { // coloured (used for net P&L)
       if (n === null || n === undefined) return "";
       return '<span class="' + (n >= 0 ? "up" : "down") + '">' + (n >= 0 ? "+" : "−") + money(n) + '</span>';
     }
+    function cellPlain(n) { // black (cumulative / safety columns)
+      if (n === null || n === undefined) return "";
+      return (n >= 0 ? "+" : "−") + money(n);
+    }
     function renderTable(rows) {
       if (!rows.length) { dashTable.innerHTML = '<div class="empty">该账户暂无交易记录</div>'; return; }
-      var head = '<tr><th class="l">日期</th><th>商品</th><th>手数</th><th>净盈亏</th><th>点数</th>' +
+      var head = '<tr><th>日期</th><th>商品</th><th>手数</th><th>净盈亏</th><th>点数</th>' +
         '<th>当日累计</th><th>总累计盈亏</th><th>最大亏损限制</th><th>安全距离</th></tr>';
       var body = "";
       rows.slice().reverse().forEach(function (r) {
         body += '<tr' + (r.dayStart ? ' class="daystart"' : '') + '>' +
-          '<td class="l">' + (r.date || "") + '</td>' +
+          '<td>' + (r.date || "") + '</td>' +
           '<td>' + (r.instr || "") + '</td>' +
           '<td>' + (r.size == null ? "" : r.size) + '</td>' +
           '<td>' + cellMoney(r.pnl) + '</td>' +
           '<td>' + (r.points == null ? "" : (r.points >= 0 ? "+" : "") + r.points.toFixed(2)) + '</td>' +
-          '<td>' + cellMoney(r.dayCum) + '</td>' +
-          '<td>' + cellMoney(r.total) + '</td>' +
+          '<td>' + cellPlain(r.dayCum) + '</td>' +
+          '<td>' + cellPlain(r.total) + '</td>' +
           '<td>' + moneySigned(r.limit) + '</td>' +
-          '<td>' + cellMoney(r.safety) + '</td>' +
+          '<td>' + cellPlain(r.safety) + '</td>' +
           '</tr>';
       });
       dashTable.innerHTML = '<table>' + head + body + '</table>';
+    }
+    function renderHistogram() {
+      var box = document.getElementById("dash-hist");
+      var ex = dashEx || [];
+      var sel = '<div class="hist__head"><span class="hist__title">分类统计 · Breakdown</span>' +
+        '<select id="hist-dim">' + HIST_DIMS.map(function (d) {
+          return '<option value="' + d.k + '"' + (d.k === histDim ? ' selected' : '') + '>' + d.label + '</option>';
+        }).join('') + '</select></div>';
+      var counts = {};
+      ex.forEach(function (e) { var v = e[histDim] || "—"; counts[v] = (counts[v] || 0) + 1; });
+      var keys = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; });
+      var max = keys.length ? Math.max.apply(null, keys.map(function (k) { return counts[k]; })) : 0;
+      var bars = keys.map(function (k) {
+        var w = max ? Math.round(counts[k] / max * 100) : 0;
+        return '<div class="histrow"><span class="histrow__lab">' + k + '</span>' +
+          '<span class="histrow__bar"><i style="width:' + w + '%"></i></span>' +
+          '<span class="histrow__n">' + counts[k] + '</span></div>';
+      }).join('');
+      if (!keys.length) bars = '<div class="empty">无数据</div>';
+      box.innerHTML = sel + '<div class="histbars">' + bars + '</div>';
+      document.getElementById("hist-dim").addEventListener("change", function () { histDim = this.value; renderHistogram(); });
     }
 
     // ---------- lightbox ----------
