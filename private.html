@@ -112,6 +112,7 @@
   .card__acct { font-size: 0.8rem; color: var(--muted); }
   .card__bal { margin-left: auto; font-size: 0.86rem; color: var(--muted); }
   .card__bal b { color: var(--text); }
+  .card__tools { display: flex; gap: 6px; margin-left: 8px; }
 
   .trow { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px; }
   .trow__top { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; font-size: 0.84rem; }
@@ -349,13 +350,15 @@
     }
 
     // ---------- image section component ----------
-    function makeImageSection(mount, withImages) {
+    function makeImageSection(mount, withImages, text0, existing) {
       var wrap = document.createElement("div");
       wrap.className = "isec";
       var ta = document.createElement("textarea");
       ta.placeholder = "文字…";
+      ta.value = text0 || "";
       wrap.appendChild(ta);
-      var pending = []; // {file,url}
+      var pending = [];                       // newly added files {file,url}
+      var kept = (existing || []).slice();    // already-committed refs {id,mime}
       var thumbs;
       if (withImages) {
         var zone = document.createElement("div");
@@ -377,6 +380,15 @@
         }
         function drawThumbs() {
           thumbs.innerHTML = "";
+          // existing (already committed) screenshots — decrypt to preview
+          kept.forEach(function (rec, idx) {
+            var img = document.createElement("img");
+            img.hidden = true; img.title = "点击移除 · click to remove";
+            img.addEventListener("click", function () { kept.splice(idx, 1); drawThumbs(); });
+            thumbs.appendChild(img);
+            decryptThumb(rec, img);
+          });
+          // newly added screenshots
           pending.forEach(function (p, idx) {
             var img = document.createElement("img");
             img.src = p.url; img.title = "点击移除 · click to remove";
@@ -408,12 +420,12 @@
         zone.addEventListener("drop", function (e) {
           if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
         });
+        drawThumbs(); // show existing screenshots up front
       }
       mount.innerHTML = "";
       mount.appendChild(wrap);
       return {
-        read: function () { return { text: ta.value, pending: pending }; },
-        reset: function () { ta.value = ""; pending.forEach(function (p) { URL.revokeObjectURL(p.url); }); pending.length = 0; if (thumbs) thumbs.innerHTML = ""; }
+        read: function () { return { text: ta.value, pending: pending, kept: kept }; }
       };
     }
 
@@ -422,7 +434,8 @@
     var countInput = document.getElementById("f_count");
 
     function signalOptions(sel) {
-      var s = signals();
+      var s = signals().slice();
+      if (sel && s.indexOf(sel) < 0) s.unshift(sel); // keep a custom/legacy signal selectable
       return s.map(function (x) { return '<option value="' + x + '"' + (x === sel ? " selected" : "") + ">" + x + "</option>"; }).join("");
     }
     function addTrade(data) {
@@ -526,24 +539,30 @@
     var form = document.getElementById("form");
     var msg = document.getElementById("msg");
 
-    document.getElementById("new-btn").addEventListener("click", function () {
-      openForm();
-    });
-    function openForm() {
+    var editing = null; // entry being edited, or null for a fresh one
+    document.getElementById("new-btn").addEventListener("click", function () { openForm(null); });
+    function openForm(entry) {
+      editing = entry || null;
       form.hidden = false;
-      document.getElementById("f_date").value = new Date().toISOString().slice(0, 10);
-      document.getElementById("f_daytype").value = "趋势日";
-      document.getElementById("f_account").value = "";
-      document.getElementById("f_balance").value = "";
+      var today = new Date().toISOString().slice(0, 10);
+      document.getElementById("f_date").value = entry ? (entry.date || today) : today;
+      document.getElementById("f_daytype").value = entry ? (entry.dayType || "趋势日") : "趋势日";
+      document.getElementById("f_account").value = entry ? (entry.account || "") : "";
+      document.getElementById("f_balance").value = entry ? (entry.balance || "") : "";
       TRADES.forEach(function (b) { b.el.remove(); }); TRADES = [];
-      setCount(0);
-      SECS.plan = makeImageSection(document.getElementById("sec-plan"), true);
-      SECS.analysis = makeImageSection(document.getElementById("sec-analysis"), true);
-      SECS.psych = makeImageSection(document.getElementById("sec-psych"), false);
+      if (entry && entry.trades && entry.trades.length) {
+        entry.trades.forEach(function (t) { addTrade(t); });
+        countInput.value = TRADES.length; reindex();
+      } else { setCount(0); }
+      var pl = (entry && entry.plan) || {}, an = (entry && entry.analysis) || {}, ps = (entry && entry.psych) || {};
+      SECS.plan = makeImageSection(document.getElementById("sec-plan"), true, pl.text || "", pl.images || []);
+      SECS.analysis = makeImageSection(document.getElementById("sec-analysis"), true, an.text || "", an.images || []);
+      SECS.psych = makeImageSection(document.getElementById("sec-psych"), false, ps.text || "", []);
+      document.getElementById("save-btn").textContent = entry ? "Update & commit" : "Save & commit";
       msg.textContent = ""; msg.className = "";
       form.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    document.getElementById("cancel-btn").addEventListener("click", function () { form.hidden = true; });
+    document.getElementById("cancel-btn").addEventListener("click", function () { editing = null; form.hidden = true; });
 
     async function commitImages(pending, token) {
       var out = [], localMap = {};
@@ -570,29 +589,33 @@
         var anaImg = await commitImages(analysis.pending, token);
 
         var entry = {
-          id: uid(),
+          id: editing ? editing.id : uid(),
           date: document.getElementById("f_date").value,
           dayType: document.getElementById("f_daytype").value,
           tradeCount: TRADES.length,
           account: document.getElementById("f_account").value.trim(),
           balance: document.getElementById("f_balance").value.trim(),
           trades: TRADES.map(function (b) { return b.read(); }),
-          plan: { text: plan.text, images: planImg.refs },
-          analysis: { text: analysis.text, images: anaImg.refs },
+          plan: { text: plan.text, images: (plan.kept || []).concat(planImg.refs) },
+          analysis: { text: analysis.text, images: (analysis.kept || []).concat(anaImg.refs) },
           psych: { text: psych.text },
-          ts: Date.now()
+          ts: (editing && editing.ts) ? editing.ts : Date.now()
         };
-        journal.entries.push(entry);
+        if (editing) entry.edited = Date.now();
+
+        var idx = editing ? journal.entries.findIndex(function (x) { return x.id === editing.id; }) : -1;
+        if (idx >= 0) journal.entries[idx] = entry; else journal.entries.push(entry);
 
         var encJ = await encStr(JSON.stringify({ entries: journal.entries, config: journal.config }));
         var sha = await ghSha(JOURNAL, token);
-        await ghPut(JOURNAL, bytesToB64(encJ), "journal: " + entry.date, token, sha);
+        await ghPut(JOURNAL, bytesToB64(encJ), "journal: " + (editing ? "update " : "") + entry.date, token, sha);
 
-        // attach freshly-uploaded urls for instant display
+        // attach freshly-uploaded urls for instant display (not serialized — set after commit)
         entry._local = {};
         Object.keys(planImg.local).forEach(function (k) { entry._local[k] = planImg.local[k]; });
         Object.keys(anaImg.local).forEach(function (k) { entry._local[k] = anaImg.local[k]; });
 
+        editing = null;
         msg.className = "ok"; msg.textContent = "Saved.";
         form.hidden = true;
         render();
@@ -649,6 +672,34 @@
         imgEl.src = url; imgEl.hidden = false; if (ph) ph.remove();
       } catch (e) { if (ph) ph.textContent = "image unavailable"; }
     }
+    // used by the editor to preview already-committed screenshots
+    async function decryptThumb(rec, img) {
+      try {
+        var bytes = await rawGet(IMGDIR + rec.id + ".enc");
+        if (!bytes) throw new Error("missing");
+        var plain = await decBytes(bytes, PASSWORD);
+        img.src = URL.createObjectURL(new Blob([plain], { type: rec.mime || "image/png" }));
+        img.hidden = false;
+      } catch (e) { img.alt = "(image)"; img.hidden = false; }
+    }
+    async function deleteEntry(en) {
+      if (!window.confirm("删除「" + (en.date || "") + "」这一天的记录？此操作不可撤销。")) return;
+      var token = currentPat();
+      if (!token) { document.getElementById("tok").open = true; window.alert("需要 GitHub token 才能删除（请在上方 ⚙ 填写）。"); return; }
+      var idx = journal.entries.findIndex(function (x) { return x.id === en.id; });
+      if (idx < 0) return;
+      var backup = journal.entries.slice();
+      journal.entries.splice(idx, 1);
+      try {
+        var encJ = await encStr(JSON.stringify({ entries: journal.entries, config: journal.config }));
+        var sha = await ghSha(JOURNAL, token);
+        await ghPut(JOURNAL, bytesToB64(encJ), "journal: delete " + (en.date || ""), token, sha);
+        render();
+      } catch (e) {
+        journal.entries = backup;
+        window.alert("删除失败：" + (e && e.message ? e.message : "error"));
+      }
+    }
 
     function imgBlock(title, sec, local) {
       if ((!sec || !sec.text) && (!sec || !sec.images || !sec.images.length)) return null;
@@ -693,6 +744,13 @@
         head.querySelector(".card__acct").textContent = (en.account ? en.account + " · " : "") + (en.tradeCount || 0) + " 笔";
         var balN = num(en.balance);
         head.querySelector(".card__bal").innerHTML = balN !== null ? "余额 <b>$" + balN.toLocaleString() + "</b>" : "";
+        var tools = document.createElement("div"); tools.className = "card__tools";
+        var edBtn = document.createElement("button"); edBtn.className = "btn btn--sm"; edBtn.type = "button"; edBtn.textContent = "编辑";
+        edBtn.addEventListener("click", function () { openForm(en); });
+        var delBtn = document.createElement("button"); delBtn.className = "btn btn--sm"; delBtn.type = "button"; delBtn.textContent = "删除";
+        delBtn.addEventListener("click", function () { deleteEntry(en); });
+        tools.appendChild(edBtn); tools.appendChild(delBtn);
+        head.appendChild(tools);
         card.appendChild(head);
 
         (en.trades || []).forEach(function (t) {
