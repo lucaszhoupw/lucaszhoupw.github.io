@@ -29,7 +29,7 @@
   .gate__hint { color: var(--faint); font-size: 0.74rem; margin: 6px 0 0; line-height: 1.5; }
 
   /* ---- app shell ---- */
-  .app { max-width: 860px; margin: 0 auto; padding: 56px 22px 90px; }
+  .app { max-width: 880px; margin: 0 auto; padding: 56px 22px 90px; }
   .app__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
   .app__title { font-size: 1.5rem; color: var(--accent); margin: 0; }
   .app__actions { display: flex; gap: 8px; }
@@ -41,6 +41,7 @@
   .btn:hover { color: var(--text); background: var(--accent-tint); }
   .btn--solid { background: var(--accent); color: #fff; border-color: transparent; }
   .btn--solid:hover { background: var(--accent-strong); color: #fff; }
+  .btn--sm { padding: 4px 10px; font-size: 0.76rem; }
   .btn:disabled { opacity: .55; cursor: default; }
 
   /* ---- token settings ---- */
@@ -60,24 +61,44 @@
 
   /* ---- entry form ---- */
   .form { border: 1px solid var(--border-strong); border-radius: 14px; padding: 18px; margin: 16px 0 26px; background: var(--surface); }
-  .form__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .form__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
   .field { display: flex; flex-direction: column; gap: 4px; }
-  .field label { font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .field label { font-size: 0.72rem; font-weight: 700; color: var(--muted); }
   .field input, .field select, .field textarea {
     font-family: inherit; font-size: 0.92rem; padding: 8px 10px;
     border: 1px solid var(--border-strong); border-radius: 8px;
     background: var(--bg); color: var(--text);
   }
+  .field input[readonly] { background: var(--accent-tint); color: var(--muted); }
   .field--wide { grid-column: 1 / -1; }
-  .field textarea { min-height: 90px; resize: vertical; }
-  .drop {
-    grid-column: 1 / -1; border: 1px dashed var(--border-strong); border-radius: 10px;
-    padding: 14px; text-align: center; color: var(--faint); font-size: 0.82rem; cursor: pointer;
+
+  .sec-title { font-size: 0.96rem; font-weight: 700; color: var(--accent-strong); margin: 22px 0 8px; }
+
+  /* trades */
+  .trades { display: flex; flex-direction: column; gap: 12px; }
+  .trade {
+    border: 1px solid var(--border); border-radius: 12px; padding: 14px;
+    background: var(--bg); position: relative;
   }
-  .drop:hover { background: var(--accent-tint); color: var(--muted); }
-  .thumbs { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
-  .thumbs img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
-  .form__foot { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+  .trade__hd { display: flex; align-items: center; justify-content: space-between; margin: 0 0 10px; }
+  .trade__no { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+  .signal-row { display: flex; gap: 6px; align-items: flex-end; }
+  .signal-row select { flex: 1; }
+
+  /* image sections */
+  .isec { margin: 10px 0 0; }
+  .isec textarea { width: 100%; min-height: 80px; resize: vertical;
+    font-family: inherit; font-size: 0.92rem; padding: 9px 11px;
+    border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); }
+  .pastezone {
+    margin-top: 8px; border: 1px dashed var(--border-strong); border-radius: 10px;
+    padding: 12px; text-align: center; color: var(--faint); font-size: 0.8rem; cursor: pointer;
+  }
+  .pastezone:hover, .pastezone.drag { background: var(--accent-tint); color: var(--muted); }
+  .thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .thumbs img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+
+  .form__foot { display: flex; align-items: center; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
   #msg { font-size: 0.8rem; color: var(--muted); }
   #msg.err { color: #b3392f; }
   #msg.ok { color: var(--accent-strong); }
@@ -86,17 +107,27 @@
   .feed { display: flex; flex-direction: column; gap: 16px; }
   .card { border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; background: var(--surface); }
   .card__head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; }
-  .card__date { font-weight: 700; color: var(--text); font-size: 0.96rem; }
-  .card__instr { font-size: 0.8rem; padding: 2px 9px; border-radius: 999px; background: var(--accent-tint); color: var(--accent-strong); font-weight: 700; }
-  .card__dir { font-size: 0.78rem; color: var(--muted); }
-  .card__pnl { margin-left: auto; font-weight: 700; font-size: 0.98rem; }
-  .card__pnl.up { color: #1f8f4e; }
-  .card__pnl.down { color: #b3392f; }
-  .card__meta { display: flex; flex-wrap: wrap; gap: 16px; margin: 10px 0 0; font-size: 0.82rem; color: var(--muted); }
-  .card__sum { margin: 12px 0 0; font-size: 0.92rem; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
-  .card__imgs { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 0; }
-  .card__imgs img { max-width: 220px; max-height: 220px; border-radius: 8px; border: 1px solid var(--border); cursor: zoom-in; }
-  .card__imgs .ph { width: 120px; height: 80px; border-radius: 8px; background: var(--accent-tint); display: flex; align-items: center; justify-content: center; font-size: 0.74rem; color: var(--faint); }
+  .card__date { font-weight: 700; color: var(--text); font-size: 1rem; }
+  .card__chip { font-size: 0.78rem; padding: 2px 9px; border-radius: 999px; background: var(--accent-tint); color: var(--accent-strong); font-weight: 700; }
+  .card__acct { font-size: 0.8rem; color: var(--muted); }
+  .card__bal { margin-left: auto; font-size: 0.86rem; color: var(--muted); }
+  .card__bal b { color: var(--text); }
+
+  .trow { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px; }
+  .trow__top { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; font-size: 0.84rem; }
+  .trow__sig { font-weight: 700; color: var(--text); }
+  .tag { font-size: 0.74rem; padding: 1px 8px; border-radius: 999px; background: var(--accent-tint); color: var(--accent-strong); }
+  .grade { font-weight: 700; }
+  .grade-A { color: #1f8f4e; } .grade-B { color: #b8860b; } .grade-C { color: #b3392f; }
+  .trow__nums { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; font-size: 0.82rem; color: var(--muted); }
+  .up { color: #1f8f4e; font-weight: 700; } .down { color: #b3392f; font-weight: 700; }
+
+  .block { margin-top: 12px; }
+  .block__t { font-size: 0.78rem; font-weight: 700; color: var(--muted); margin: 0 0 4px; }
+  .block__x { font-size: 0.92rem; line-height: 1.6; color: var(--text); white-space: pre-wrap; margin: 0; }
+  .block__imgs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .block__imgs img { max-width: 220px; max-height: 220px; border-radius: 8px; border: 1px solid var(--border); cursor: zoom-in; }
+  .block__imgs .ph { width: 120px; height: 80px; border-radius: 8px; background: var(--accent-tint); display: flex; align-items: center; justify-content: center; font-size: 0.74rem; color: var(--faint); }
   .feed__empty { color: var(--faint); font-style: italic; text-align: center; padding: 28px 0; }
 
   /* ---- lightbox ---- */
@@ -142,47 +173,51 @@
 
     <!-- entry form (hidden until +New) -->
     <form id="form" class="form" hidden autocomplete="off">
+      <!-- day-level -->
       <div class="form__grid">
         <div class="field">
-          <label for="f_date" data-en="Date" data-zh="日期">Date</label>
+          <label for="f_date">Date / 日期</label>
           <input id="f_date" type="date" required />
         </div>
         <div class="field">
-          <label for="f_instr">Instrument</label>
-          <select id="f_instr">
-            <option>ES</option><option>NQ</option><option>MES</option><option>MNQ</option><option>Other</option>
+          <label for="f_daytype">Day type / 日型</label>
+          <select id="f_daytype">
+            <option value="趋势日">趋势日</option>
+            <option value="区间日">区间日</option>
+            <option value="趋势反转日">趋势反转日</option>
+            <option value="数据日">数据日</option>
           </select>
         </div>
         <div class="field">
-          <label for="f_dir">Direction</label>
-          <select id="f_dir">
-            <option>Long</option><option>Short</option>
-          </select>
+          <label for="f_count">Trades / 交易笔数</label>
+          <input id="f_count" type="number" min="0" max="10" step="1" value="0" />
         </div>
         <div class="field">
-          <label for="f_size">Size (contracts)</label>
-          <input id="f_size" type="text" inputmode="decimal" placeholder="1" />
+          <label for="f_account">Account / 账户名称</label>
+          <input id="f_account" type="text" placeholder="e.g. Apex-01" />
         </div>
         <div class="field">
-          <label for="f_entry">Entry</label>
-          <input id="f_entry" type="text" inputmode="decimal" placeholder="0.00" />
+          <label for="f_balance">Balance / 账户余额 ($)</label>
+          <input id="f_balance" type="text" inputmode="decimal" placeholder="closing balance" />
         </div>
-        <div class="field">
-          <label for="f_exit">Exit</label>
-          <input id="f_exit" type="text" inputmode="decimal" placeholder="0.00" />
-        </div>
-        <div class="field">
-          <label for="f_pnl">P/L ($)</label>
-          <input id="f_pnl" type="text" inputmode="decimal" placeholder="0.00" />
-        </div>
-        <div class="field field--wide">
-          <label for="f_sum">Summary</label>
-          <textarea id="f_sum" placeholder="Setup, execution, what went right/wrong…"></textarea>
-        </div>
-        <label class="drop" for="f_imgs" id="drop">Click to add chart screenshots (multiple)</label>
-        <input id="f_imgs" type="file" accept="image/*" multiple hidden />
-        <div class="thumbs" id="thumbs"></div>
       </div>
+
+      <!-- trades -->
+      <div class="sec-title">Trades / 交易明细
+        <button id="add-trade" class="btn btn--sm" type="button" style="margin-left:8px">+ 添加一笔</button>
+      </div>
+      <div id="trades" class="trades"></div>
+
+      <!-- narrative sections -->
+      <div class="sec-title">盘前计划 / Pre-market plan</div>
+      <div id="sec-plan"></div>
+
+      <div class="sec-title">行情分析及交易 / Analysis &amp; execution</div>
+      <div id="sec-analysis"></div>
+
+      <div class="sec-title">盘中心理及总结 / Psychology &amp; review</div>
+      <div id="sec-psych"></div>
+
       <div class="form__foot">
         <button id="save-btn" class="btn btn--solid" type="submit">Save &amp; commit</button>
         <button id="cancel-btn" class="btn" type="button">Cancel</button>
@@ -206,13 +241,19 @@
     var IMGDIR = "private/img/";
     var ITER = 200000;
     var PAT_KEY = "plz_gh_pat";
+    var DEFAULT_SIGNALS = ["高潮反转", "旗形延续", "二次入场", "突破回踩", "计划外"];
 
     // ---------- state ----------
-    var PASSWORD = null;          // AES key material, memory only
-    var journal = { entries: [] }; // in-memory copy
-    var pending = [];             // files queued in the open form: {file, url}
+    var PASSWORD = null;
+    var journal = { entries: [], config: { signals: DEFAULT_SIGNALS.slice() } };
+    var TRADES = [];   // open-form trade blocks: {el, read()}
+    var SECS = {};     // open-form image sections
 
-    // ---------- crypto helpers ----------
+    function signals() {
+      return (journal.config && journal.config.signals) || DEFAULT_SIGNALS;
+    }
+
+    // ---------- crypto ----------
     function b64ToBytes(b64) {
       var bin = atob(b64), out = new Uint8Array(bin.length);
       for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
@@ -220,19 +261,15 @@
     }
     function bytesToB64(bytes) {
       var bin = "", CH = 0x8000;
-      for (var i = 0; i < bytes.length; i += CH) {
-        bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
-      }
+      for (var i = 0; i < bytes.length; i += CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
       return btoa(bin);
     }
     async function deriveKey(password, salt, usage) {
-      var mat = await crypto.subtle.importKey(
-        "raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
-      return crypto.subtle.deriveKey(
-        { name: "PBKDF2", salt: salt, iterations: ITER, hash: "SHA-256" },
+      var mat = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+      return crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: ITER, hash: "SHA-256" },
         mat, { name: "AES-GCM", length: 256 }, false, [usage]);
     }
-    async function encBytes(plain) { // plain: Uint8Array -> Uint8Array (salt|iv|ct)
+    async function encBytes(plain) {
       var salt = crypto.getRandomValues(new Uint8Array(16));
       var iv = crypto.getRandomValues(new Uint8Array(12));
       var key = await deriveKey(PASSWORD, salt, "encrypt");
@@ -241,17 +278,15 @@
       all.set(salt, 0); all.set(iv, 16); all.set(ct, 28);
       return all;
     }
-    async function decBytes(bytes, password) { // -> Uint8Array plaintext
+    async function decBytes(bytes, password) {
       var salt = bytes.slice(0, 16), iv = bytes.slice(16, 28), ct = bytes.slice(28);
       var key = await deriveKey(password, salt, "decrypt");
-      var pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ct);
-      return new Uint8Array(pt);
+      return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ct));
     }
     async function encStr(str) { return encBytes(new TextEncoder().encode(str)); }
     async function decStr(bytes, password) { return new TextDecoder().decode(await decBytes(bytes, password)); }
 
     // ---------- transport ----------
-    // public read (no token) — fresh copy straight from the repo
     async function rawGet(path) {
       var url = "https://raw.githubusercontent.com/" + REPO + "/" + BRANCH + "/" + path + "?t=" + Date.now();
       var r = await fetch(url, { cache: "no-store" });
@@ -259,28 +294,22 @@
       if (!r.ok) throw new Error("read " + r.status);
       return new Uint8Array(await r.arrayBuffer());
     }
-    // get current sha via the API (needed to overwrite a file)
     async function ghSha(path, token) {
       var url = "https://api.github.com/repos/" + REPO + "/contents/" + path + "?ref=" + BRANCH;
       var r = await fetch(url, { headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" } });
       if (r.status === 404) return null;
       if (!r.ok) throw new Error("sha " + r.status);
-      var j = await r.json();
-      return j.sha;
+      return (await r.json()).sha;
     }
     async function ghPut(path, contentB64, message, token, sha) {
-      var url = "https://api.github.com/repos/" + REPO + "/contents/" + path;
       var body = { message: message, content: contentB64, branch: BRANCH };
       if (sha) body.sha = sha;
-      var r = await fetch(url, {
+      var r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + path, {
         method: "PUT",
         headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
         body: JSON.stringify(body)
       });
-      if (!r.ok) {
-        var t = await r.text();
-        throw new Error("commit " + r.status + " " + t.slice(0, 140));
-      }
+      if (!r.ok) { var t = await r.text(); throw new Error("commit " + r.status + " " + t.slice(0, 140)); }
       return r.json();
     }
 
@@ -293,18 +322,283 @@
       if (saved) { patInput.value = saved; patRemember.checked = true; }
     }
     function currentPat() { return patInput.value.trim(); }
-    patInput.addEventListener("input", syncPat);
-    patRemember.addEventListener("change", syncPat);
     function syncPat() {
       try {
         if (patRemember.checked && currentPat()) localStorage.setItem(PAT_KEY, currentPat());
         else localStorage.removeItem(PAT_KEY);
       } catch (e) {}
     }
+    patInput.addEventListener("input", syncPat);
+    patRemember.addEventListener("change", syncPat);
     document.getElementById("pat-clear").addEventListener("click", function () {
-      patInput.value = "";
+      patInput.value = ""; patRemember.checked = false;
       try { localStorage.removeItem(PAT_KEY); } catch (e) {}
-      patRemember.checked = false;
+    });
+
+    // ---------- helpers ----------
+    function clamp(n, lo, hi) { n = isNaN(n) ? lo : n; return Math.max(lo, Math.min(hi, n)); }
+    function uid() { return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8); }
+    function num(v) { var n = parseFloat(String(v).replace(/[, $]/g, "")); return isNaN(n) ? null : n; }
+    function commRate(instr) { return (instr === "ES" || instr === "NQ") ? 3.5 : 1.0; }
+    function readFileBytes(file) {
+      return new Promise(function (res, rej) {
+        var fr = new FileReader();
+        fr.onload = function () { res(new Uint8Array(fr.result)); };
+        fr.onerror = rej; fr.readAsArrayBuffer(file);
+      });
+    }
+
+    // ---------- image section component ----------
+    function makeImageSection(mount, withImages) {
+      var wrap = document.createElement("div");
+      wrap.className = "isec";
+      var ta = document.createElement("textarea");
+      ta.placeholder = "文字…";
+      wrap.appendChild(ta);
+      var pending = []; // {file,url}
+      var thumbs;
+      if (withImages) {
+        var zone = document.createElement("div");
+        zone.className = "pastezone";
+        zone.tabIndex = 0;
+        zone.textContent = "粘贴截图 (Ctrl/Cmd+V) 或点击上传 · paste or click";
+        var fileInput = document.createElement("input");
+        fileInput.type = "file"; fileInput.accept = "image/*"; fileInput.multiple = true; fileInput.hidden = true;
+        thumbs = document.createElement("div"); thumbs.className = "thumbs";
+        wrap.appendChild(zone); wrap.appendChild(fileInput); wrap.appendChild(thumbs);
+
+        function addFiles(files) {
+          for (var i = 0; i < files.length; i++) {
+            var f = files[i];
+            if (!f || !/^image\//.test(f.type)) continue;
+            pending.push({ file: f, url: URL.createObjectURL(f) });
+          }
+          drawThumbs();
+        }
+        function drawThumbs() {
+          thumbs.innerHTML = "";
+          pending.forEach(function (p, idx) {
+            var img = document.createElement("img");
+            img.src = p.url; img.title = "点击移除 · click to remove";
+            img.addEventListener("click", function () { URL.revokeObjectURL(p.url); pending.splice(idx, 1); drawThumbs(); });
+            thumbs.appendChild(img);
+          });
+        }
+        zone.addEventListener("click", function () { fileInput.click(); });
+        fileInput.addEventListener("change", function () { addFiles(fileInput.files); fileInput.value = ""; });
+        // clipboard paste — fires when focus is in this section (textarea or zone)
+        wrap.addEventListener("paste", function (e) {
+          var items = (e.clipboardData || {}).items || [];
+          var imgs = [];
+          for (var i = 0; i < items.length; i++) {
+            if (items[i].type && items[i].type.indexOf("image") === 0) {
+              var f = items[i].getAsFile();
+              if (f) imgs.push(f);
+            }
+          }
+          if (imgs.length) { e.preventDefault(); addFiles(imgs); }
+        });
+        // drag & drop
+        ["dragover", "dragenter"].forEach(function (ev) {
+          zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.add("drag"); });
+        });
+        ["dragleave", "drop"].forEach(function (ev) {
+          zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.remove("drag"); });
+        });
+        zone.addEventListener("drop", function (e) {
+          if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
+        });
+      }
+      mount.innerHTML = "";
+      mount.appendChild(wrap);
+      return {
+        read: function () { return { text: ta.value, pending: pending }; },
+        reset: function () { ta.value = ""; pending.forEach(function (p) { URL.revokeObjectURL(p.url); }); pending.length = 0; if (thumbs) thumbs.innerHTML = ""; }
+      };
+    }
+
+    // ---------- trade block ----------
+    var tradesEl = document.getElementById("trades");
+    var countInput = document.getElementById("f_count");
+
+    function signalOptions(sel) {
+      var s = signals();
+      return s.map(function (x) { return '<option value="' + x + '"' + (x === sel ? " selected" : "") + ">" + x + "</option>"; }).join("");
+    }
+    function addTrade(data) {
+      data = data || {};
+      var el = document.createElement("div");
+      el.className = "trade";
+      el.innerHTML =
+        '<div class="trade__hd"><span class="trade__no"></span>' +
+        '<button class="btn btn--sm t-del" type="button">删除</button></div>' +
+        '<div class="form__grid">' +
+          '<div class="field field--wide"><label>交易信号 / Signal</label>' +
+            '<div class="signal-row"><select class="t-signal">' + signalOptions(data.signal) + '</select>' +
+            '<button class="btn btn--sm t-addsig" type="button" title="新增信号">＋</button></div></div>' +
+          '<div class="field"><label>入场方式 / Order</label><select class="t-order">' +
+            ['stop','limit','market'].map(function(o){return '<option'+(o===data.order?' selected':'')+'>'+o+'</option>';}).join('') + '</select></div>' +
+          '<div class="field"><label>方向 / Direction</label><select class="t-dir">' +
+            ['long','short'].map(function(o){return '<option'+(o===data.dir?' selected':'')+'>'+o+'</option>';}).join('') + '</select></div>' +
+          '<div class="field"><label>商品 / Instrument</label><select class="t-instr">' +
+            ['ES','NQ','MES','MNQ'].map(function(o){return '<option'+(o===data.instr?' selected':'')+'>'+o+'</option>';}).join('') + '</select></div>' +
+          '<div class="field"><label>手数 / Size</label><input class="t-size" type="number" min="1" step="1" value="' + (data.size != null ? data.size : 2) + '" /></div>' +
+          '<div class="field"><label>手续费 / Commission ($)</label><input class="t-comm" type="text" readonly /></div>' +
+          '<div class="field"><label>净盈亏 / Net P&amp;L ($)</label><input class="t-pnl" type="text" inputmode="decimal" value="' + (data.pnl != null ? data.pnl : "") + '" /></div>' +
+          '<div class="field"><label>风险 / Risk ($)</label><input class="t-risk" type="text" inputmode="decimal" value="' + (data.risk != null ? data.risk : "") + '" /></div>' +
+          '<div class="field"><label>盈亏R / R-multiple</label><input class="t-r" type="text" readonly /></div>' +
+          '<div class="field"><label>评分 / Grade</label><select class="t-grade">' +
+            ['A','B','C'].map(function(o){return '<option'+(o===data.grade?' selected':'')+'>'+o+'</option>';}).join('') + '</select></div>' +
+        '</div>';
+
+      var $ = function (c) { return el.querySelector(c); };
+      var instr = $(".t-instr"), size = $(".t-size"), comm = $(".t-comm"),
+          pnl = $(".t-pnl"), risk = $(".t-risk"), rOut = $(".t-r");
+
+      function calcComm() {
+        var s = parseFloat(size.value) || 0;
+        comm.value = (commRate(instr.value) * s).toFixed(2);
+      }
+      function calcR() {
+        var p = num(pnl.value), rk = num(risk.value);
+        if (p === null || rk === null || rk === 0) { rOut.value = "—"; return; }
+        var r = p / rk;
+        rOut.value = (r >= 0 ? "+" : "") + r.toFixed(2);
+      }
+      instr.addEventListener("change", calcComm);
+      size.addEventListener("input", calcComm);
+      pnl.addEventListener("input", calcR);
+      risk.addEventListener("input", calcR);
+      calcComm(); calcR();
+
+      $(".t-addsig").addEventListener("click", function () { promptNewSignal($(".t-signal")); });
+      $(".t-del").addEventListener("click", function () {
+        var i = TRADES.indexOf(block);
+        if (i >= 0) { TRADES.splice(i, 1); el.remove(); reindex(); countInput.value = TRADES.length; }
+      });
+
+      var block = {
+        el: el,
+        read: function () {
+          return {
+            signal: $(".t-signal").value, order: $(".t-order").value, dir: $(".t-dir").value,
+            instr: instr.value, size: size.value.trim(), comm: comm.value,
+            pnl: pnl.value.trim(), risk: risk.value.trim(), r: rOut.value, grade: $(".t-grade").value
+          };
+        }
+      };
+      TRADES.push(block);
+      tradesEl.appendChild(el);
+      reindex();
+    }
+    function reindex() {
+      var nodes = tradesEl.querySelectorAll(".trade__no");
+      for (var i = 0; i < nodes.length; i++) nodes[i].textContent = "第 " + (i + 1) + " 笔 · Trade " + (i + 1);
+    }
+    function setCount(n) {
+      n = clamp(parseInt(n, 10), 0, 10);
+      while (TRADES.length < n) addTrade();
+      while (TRADES.length > n) { var b = TRADES.pop(); b.el.remove(); }
+      countInput.value = n;
+      reindex();
+    }
+    countInput.addEventListener("input", function () { setCount(countInput.value); });
+    document.getElementById("add-trade").addEventListener("click", function () { if (TRADES.length < 10) setCount(TRADES.length + 1); });
+
+    function promptNewSignal(selectToSet) {
+      var name = window.prompt("新增交易信号名称：");
+      if (!name) return;
+      name = name.trim();
+      if (!name) return;
+      if (signals().indexOf(name) < 0) journal.config.signals.push(name);
+      refreshSignalSelects();
+      if (selectToSet) selectToSet.value = name;
+    }
+    function refreshSignalSelects() {
+      var list = signals();
+      tradesEl.querySelectorAll(".t-signal").forEach(function (sel) {
+        var cur = sel.value;
+        sel.innerHTML = list.map(function (x) { return '<option' + (x === cur ? ' selected' : '') + '>' + x + '</option>'; }).join("");
+      });
+    }
+
+    // ---------- new-entry lifecycle ----------
+    var form = document.getElementById("form");
+    var msg = document.getElementById("msg");
+
+    document.getElementById("new-btn").addEventListener("click", function () {
+      openForm();
+    });
+    function openForm() {
+      form.hidden = false;
+      document.getElementById("f_date").value = new Date().toISOString().slice(0, 10);
+      document.getElementById("f_daytype").value = "趋势日";
+      document.getElementById("f_account").value = "";
+      document.getElementById("f_balance").value = "";
+      TRADES.forEach(function (b) { b.el.remove(); }); TRADES = [];
+      setCount(0);
+      SECS.plan = makeImageSection(document.getElementById("sec-plan"), true);
+      SECS.analysis = makeImageSection(document.getElementById("sec-analysis"), true);
+      SECS.psych = makeImageSection(document.getElementById("sec-psych"), false);
+      msg.textContent = ""; msg.className = "";
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    document.getElementById("cancel-btn").addEventListener("click", function () { form.hidden = true; });
+
+    async function commitImages(pending, token) {
+      var out = [], localMap = {};
+      for (var i = 0; i < pending.length; i++) {
+        var raw = await readFileBytes(pending[i].file);
+        var enc = await encBytes(raw);
+        var id = uid();
+        await ghPut(IMGDIR + id + ".enc", bytesToB64(enc), "journal: add image", token, null);
+        out.push({ id: id, mime: pending[i].file.type });
+        localMap[id] = pending[i].url;
+      }
+      return { refs: out, local: localMap };
+    }
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var token = currentPat();
+      if (!token) { msg.className = "err"; msg.textContent = "Add a GitHub token above to save."; document.getElementById("tok").open = true; return; }
+      var saveBtn = document.getElementById("save-btn");
+      saveBtn.disabled = true; msg.className = ""; msg.textContent = "Encrypting & committing…";
+      try {
+        var plan = SECS.plan.read(), analysis = SECS.analysis.read(), psych = SECS.psych.read();
+        var planImg = await commitImages(plan.pending, token);
+        var anaImg = await commitImages(analysis.pending, token);
+
+        var entry = {
+          id: uid(),
+          date: document.getElementById("f_date").value,
+          dayType: document.getElementById("f_daytype").value,
+          tradeCount: TRADES.length,
+          account: document.getElementById("f_account").value.trim(),
+          balance: document.getElementById("f_balance").value.trim(),
+          trades: TRADES.map(function (b) { return b.read(); }),
+          plan: { text: plan.text, images: planImg.refs },
+          analysis: { text: analysis.text, images: anaImg.refs },
+          psych: { text: psych.text },
+          ts: Date.now()
+        };
+        journal.entries.push(entry);
+
+        var encJ = await encStr(JSON.stringify({ entries: journal.entries, config: journal.config }));
+        var sha = await ghSha(JOURNAL, token);
+        await ghPut(JOURNAL, bytesToB64(encJ), "journal: " + entry.date, token, sha);
+
+        // attach freshly-uploaded urls for instant display
+        entry._local = {};
+        Object.keys(planImg.local).forEach(function (k) { entry._local[k] = planImg.local[k]; });
+        Object.keys(anaImg.local).forEach(function (k) { entry._local[k] = anaImg.local[k]; });
+
+        msg.className = "ok"; msg.textContent = "Saved.";
+        form.hidden = true;
+        render();
+      } catch (err) {
+        msg.className = "err"; msg.textContent = "Failed: " + (err && err.message ? err.message : "error");
+      } finally { saveBtn.disabled = false; }
     });
 
     // ---------- gate ----------
@@ -321,156 +615,27 @@
       try {
         var bytes = await rawGet(JOURNAL);
         if (bytes === null) {
-          // first run — no journal yet; this password becomes the key
-          PASSWORD = pw;
-          journal = { entries: [] };
+          PASSWORD = pw; journal = { entries: [], config: { signals: DEFAULT_SIGNALS.slice() } };
         } else {
-          var txt = await decStr(bytes, pw); // throws if wrong password
-          journal = JSON.parse(txt);
-          if (!journal.entries) journal.entries = [];
+          var txt = await decStr(bytes, pw);
+          var data = JSON.parse(txt);
+          journal = { entries: data.entries || [], config: data.config || { signals: DEFAULT_SIGNALS.slice() } };
+          if (!journal.config.signals || !journal.config.signals.length) journal.config.signals = DEFAULT_SIGNALS.slice();
           PASSWORD = pw;
         }
         enterApp();
       } catch (err) {
-        busyEl.hidden = true; goBtn.disabled = false;
-        errEl.hidden = false;
-        errEl.textContent = (err && /read|sha|commit|network|fetch/i.test(err.message))
-          ? "Network error. Try again." : "Wrong password.";
-        document.getElementById("pw").value = "";
-        document.getElementById("pw").focus();
+        busyEl.hidden = true; goBtn.disabled = false; errEl.hidden = false;
+        errEl.textContent = (err && /read|sha|commit|network|fetch/i.test(err.message)) ? "Network error. Try again." : "Wrong password.";
+        document.getElementById("pw").value = ""; document.getElementById("pw").focus();
       }
     });
-
     function enterApp() {
       document.getElementById("gate").remove();
       document.getElementById("app").hidden = false;
       document.title = "Journal";
-      loadPat();
-      render();
+      loadPat(); render();
     }
-
-    // ---------- entry form ----------
-    var form = document.getElementById("form");
-    var thumbs = document.getElementById("thumbs");
-    var msg = document.getElementById("msg");
-    var imgsInput = document.getElementById("f_imgs");
-
-    document.getElementById("new-btn").addEventListener("click", function () {
-      form.hidden = false;
-      if (!document.getElementById("f_date").value) {
-        document.getElementById("f_date").value = new Date().toISOString().slice(0, 10);
-      }
-      form.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-    document.getElementById("cancel-btn").addEventListener("click", resetForm);
-
-    imgsInput.addEventListener("change", function () {
-      for (var i = 0; i < imgsInput.files.length; i++) {
-        var f = imgsInput.files[i];
-        if (!/^image\//.test(f.type)) continue;
-        var url = URL.createObjectURL(f);
-        pending.push({ file: f, url: url });
-      }
-      imgsInput.value = "";
-      drawThumbs();
-    });
-    function drawThumbs() {
-      thumbs.innerHTML = "";
-      pending.forEach(function (p, idx) {
-        var img = document.createElement("img");
-        img.src = p.url; img.title = "Click to remove";
-        img.addEventListener("click", function () {
-          URL.revokeObjectURL(p.url);
-          pending.splice(idx, 1);
-          drawThumbs();
-        });
-        thumbs.appendChild(img);
-      });
-    }
-    function resetForm() {
-      form.reset();
-      pending.forEach(function (p) { URL.revokeObjectURL(p.url); });
-      pending = [];
-      thumbs.innerHTML = "";
-      msg.textContent = ""; msg.className = "";
-      form.hidden = true;
-    }
-
-    function readFileBytes(file) {
-      return new Promise(function (resolve, reject) {
-        var fr = new FileReader();
-        fr.onload = function () { resolve(new Uint8Array(fr.result)); };
-        fr.onerror = reject;
-        fr.readAsArrayBuffer(file);
-      });
-    }
-    function uid() {
-      return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
-    }
-
-    form.addEventListener("submit", async function (e) {
-      e.preventDefault();
-      var token = currentPat();
-      if (!token) {
-        msg.className = "err";
-        msg.textContent = "Add a GitHub token above to save.";
-        document.getElementById("tok").open = true;
-        return;
-      }
-      var saveBtn = document.getElementById("save-btn");
-      saveBtn.disabled = true; msg.className = ""; msg.textContent = "Encrypting & committing…";
-
-      try {
-        // 1) commit each screenshot as its own encrypted blob
-        var images = [];
-        for (var i = 0; i < pending.length; i++) {
-          var p = pending[i];
-          var raw = await readFileBytes(p.file);
-          var enc = await encBytes(raw);
-          var id = uid();
-          await ghPut(IMGDIR + id + ".enc", bytesToB64(enc),
-            "journal: add image", token, null);
-          images.push({ id: id, mime: p.file.type, localUrl: p.url });
-        }
-
-        // 2) build entry + append
-        var entry = {
-          id: uid(),
-          date: document.getElementById("f_date").value,
-          instr: document.getElementById("f_instr").value,
-          dir: document.getElementById("f_dir").value,
-          size: document.getElementById("f_size").value.trim(),
-          entry: document.getElementById("f_entry").value.trim(),
-          exit: document.getElementById("f_exit").value.trim(),
-          pnl: document.getElementById("f_pnl").value.trim(),
-          summary: document.getElementById("f_sum").value,
-          images: images.map(function (m) { return { id: m.id, mime: m.mime }; }),
-          ts: Date.now()
-        };
-        journal.entries.push(entry);
-
-        // 3) encrypt journal and commit (with current sha if it exists)
-        var encJ = await encStr(JSON.stringify({ entries: journal.entries }));
-        var sha = await ghSha(JOURNAL, token);
-        await ghPut(JOURNAL, bytesToB64(encJ), "journal: add entry " + entry.date, token, sha);
-
-        // keep freshly-uploaded blob URLs for instant display
-        entry._localImgs = images.map(function (m) { return { id: m.id, url: m.localUrl }; });
-
-        msg.className = "ok"; msg.textContent = "Saved.";
-        // detach pending urls from revoke (now owned by the entry)
-        pending = [];
-        form.reset();
-        thumbs.innerHTML = "";
-        form.hidden = true;
-        render();
-      } catch (err) {
-        msg.className = "err";
-        msg.textContent = "Failed: " + (err && err.message ? err.message : "unknown error");
-      } finally {
-        saveBtn.disabled = false;
-      }
-    });
 
     // ---------- render feed ----------
     var feed = document.getElementById("feed");
@@ -480,20 +645,31 @@
         var bytes = await rawGet(IMGDIR + rec.id + ".enc");
         if (!bytes) throw new Error("missing");
         var plain = await decBytes(bytes, PASSWORD);
-        var blob = new Blob([plain], { type: rec.mime || "image/png" });
-        var url = URL.createObjectURL(blob);
-        imgEl.src = url;
-        imgEl.hidden = false;
-        if (ph) ph.remove();
-      } catch (e) {
-        if (ph) ph.textContent = "image unavailable";
-      }
+        var url = URL.createObjectURL(new Blob([plain], { type: rec.mime || "image/png" }));
+        imgEl.src = url; imgEl.hidden = false; if (ph) ph.remove();
+      } catch (e) { if (ph) ph.textContent = "image unavailable"; }
     }
 
-    function fmtMoney(v) {
-      var n = parseFloat(String(v).replace(/[, $]/g, ""));
-      if (isNaN(n)) return null;
-      return n;
+    function imgBlock(title, sec, local) {
+      if ((!sec || !sec.text) && (!sec || !sec.images || !sec.images.length)) return null;
+      var b = document.createElement("div"); b.className = "block";
+      var t = document.createElement("p"); t.className = "block__t"; t.textContent = title; b.appendChild(t);
+      if (sec.text) { var x = document.createElement("p"); x.className = "block__x"; x.textContent = sec.text; b.appendChild(x); }
+      if (sec.images && sec.images.length) {
+        var wrap = document.createElement("div"); wrap.className = "block__imgs";
+        sec.images.forEach(function (rec) {
+          var img = document.createElement("img"); img.alt = "chart";
+          img.addEventListener("click", function () { openLbx(img.src); });
+          if (local && local[rec.id]) { img.src = local[rec.id]; wrap.appendChild(img); }
+          else {
+            img.hidden = true;
+            var ph = document.createElement("div"); ph.className = "ph"; ph.textContent = "decrypting…";
+            wrap.appendChild(ph); wrap.appendChild(img); loadImage(img, rec, ph);
+          }
+        });
+        b.appendChild(wrap);
+      }
+      return b;
     }
 
     function render() {
@@ -503,83 +679,60 @@
       });
       feed.innerHTML = "";
       if (!list.length) {
-        var e = document.createElement("div");
-        e.className = "feed__empty";
-        e.textContent = "No entries yet. Click “+ New entry” to add your first trade.";
-        feed.appendChild(e);
-        return;
+        var e = document.createElement("div"); e.className = "feed__empty";
+        e.textContent = "No entries yet. Click “+ New entry” to add your first day.";
+        feed.appendChild(e); return;
       }
       list.forEach(function (en) {
-        var card = document.createElement("div");
-        card.className = "card";
+        var card = document.createElement("div"); card.className = "card";
 
-        var head = document.createElement("div");
-        head.className = "card__head";
-        head.innerHTML =
-          '<span class="card__date"></span>' +
-          '<span class="card__instr"></span>' +
-          '<span class="card__dir"></span>';
+        var head = document.createElement("div"); head.className = "card__head";
+        head.innerHTML = '<span class="card__date"></span><span class="card__chip"></span><span class="card__acct"></span><span class="card__bal"></span>';
         head.querySelector(".card__date").textContent = en.date || "—";
-        head.querySelector(".card__instr").textContent = en.instr || "";
-        head.querySelector(".card__dir").textContent = en.dir || "";
-
-        var pnlN = fmtMoney(en.pnl);
-        if (pnlN !== null) {
-          var pnl = document.createElement("span");
-          pnl.className = "card__pnl " + (pnlN >= 0 ? "up" : "down");
-          pnl.textContent = (pnlN >= 0 ? "+" : "−") + "$" + Math.abs(pnlN).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-          head.appendChild(pnl);
-        }
+        head.querySelector(".card__chip").textContent = en.dayType || "";
+        head.querySelector(".card__acct").textContent = (en.account ? en.account + " · " : "") + (en.tradeCount || 0) + " 笔";
+        var balN = num(en.balance);
+        head.querySelector(".card__bal").innerHTML = balN !== null ? "余额 <b>$" + balN.toLocaleString() + "</b>" : "";
         card.appendChild(head);
 
-        var meta = document.createElement("div");
-        meta.className = "card__meta";
-        var bits = [];
-        if (en.size) bits.push("Size " + en.size);
-        if (en.entry) bits.push("Entry " + en.entry);
-        if (en.exit) bits.push("Exit " + en.exit);
-        meta.innerHTML = bits.map(function (b) { return "<span></span>"; }).join("");
-        bits.forEach(function (b, i) { meta.children[i].textContent = b; });
-        if (bits.length) card.appendChild(meta);
+        (en.trades || []).forEach(function (t) {
+          var row = document.createElement("div"); row.className = "trow";
+          var top = document.createElement("div"); top.className = "trow__top";
+          top.innerHTML = '<span class="trow__sig"></span><span class="tag tag-instr"></span>' +
+            '<span class="tag"></span><span class="tag"></span><span class="grade grade-' + (t.grade || "") + '"></span>';
+          top.querySelector(".trow__sig").textContent = t.signal || "";
+          top.querySelector(".tag-instr").textContent = t.instr || "";
+          top.children[2].textContent = t.dir || "";
+          top.children[3].textContent = t.order || "";
+          top.querySelector(".grade").textContent = t.grade ? "评分 " + t.grade : "";
+          row.appendChild(top);
 
-        if (en.summary) {
-          var sum = document.createElement("p");
-          sum.className = "card__sum";
-          sum.textContent = en.summary;
-          card.appendChild(sum);
-        }
+          var nums = document.createElement("div"); nums.className = "trow__nums";
+          var pnlN = num(t.pnl);
+          var pnlHtml = pnlN === null ? "" : '<span class="' + (pnlN >= 0 ? "up" : "down") + '">' + (pnlN >= 0 ? "+" : "−") + "$" + Math.abs(pnlN).toLocaleString() + "</span>";
+          var rHtml = (t.r && t.r !== "—") ? '<span class="' + (t.r.indexOf("-") === 0 ? "down" : "up") + '">' + t.r + "R</span>" : "";
+          var bits = [];
+          bits.push("手数 " + (t.size || "—"));
+          if (pnlHtml) bits.push("净盈亏 " + pnlHtml);
+          if (t.risk) bits.push("风险 $" + t.risk);
+          if (rHtml) bits.push(rHtml);
+          if (t.comm) bits.push("手续费 $" + t.comm);
+          nums.innerHTML = bits.map(function (b) { return "<span>" + b + "</span>"; }).join("");
+          row.appendChild(nums);
+          card.appendChild(row);
+        });
 
-        if (en.images && en.images.length) {
-          var wrap = document.createElement("div");
-          wrap.className = "card__imgs";
-          en.images.forEach(function (rec) {
-            var img = document.createElement("img");
-            img.alt = "chart";
-            img.addEventListener("click", function () { openLbx(img.src); });
-            var local = (en._localImgs || []).filter(function (m) { return m.id === rec.id; })[0];
-            if (local) {
-              img.src = local.url;
-              wrap.appendChild(img);
-            } else {
-              img.hidden = true;
-              var ph = document.createElement("div");
-              ph.className = "ph";
-              ph.textContent = "decrypting…";
-              wrap.appendChild(ph);
-              wrap.appendChild(img);
-              loadImage(img, rec, ph);
-            }
-          });
-          card.appendChild(wrap);
-        }
+        var local = en._local || null;
+        var pb = imgBlock("盘前计划", en.plan, local); if (pb) card.appendChild(pb);
+        var ab = imgBlock("行情分析及交易", en.analysis, local); if (ab) card.appendChild(ab);
+        var sb = imgBlock("盘中心理及总结", en.psych, local); if (sb) card.appendChild(sb);
 
         feed.appendChild(card);
       });
     }
 
     // ---------- lightbox ----------
-    var lbx = document.getElementById("lbx");
-    var lbxImg = document.getElementById("lbx-img");
+    var lbx = document.getElementById("lbx"), lbxImg = document.getElementById("lbx-img");
     function openLbx(src) { lbxImg.src = src; lbx.classList.add("open"); }
     lbx.addEventListener("click", function () { lbx.classList.remove("open"); lbxImg.src = ""; });
   })();
