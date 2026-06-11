@@ -363,7 +363,7 @@
     var BRANCH = "main";
     var JOURNAL = "private/journal.enc";
     var IMGDIR = "private/img/";
-    var ITER = 200000;
+    var ITER = 120000;
     var PAT_KEY = "plz_gh_pat";
     var DEFAULT_SIGNALS = ["高潮反转", "旗形延续", "二次入场", "突破回踩", "计划外"];
     var DEFAULT_ORDERS = ["stop", "limit", "market"];
@@ -373,6 +373,7 @@
 
     // ---------- state ----------
     var PASSWORD = null;
+    var SESSION_SALT = null; // one salt for the whole account -> key derived once
     var journal = { entries: [], config: {} };
     var journalSha = null; // last known sha of journal.enc (kept fresh from PUT responses)
     var TRADES = [];   // open-form trade blocks: {el, read()}
@@ -419,27 +420,36 @@
       for (var i = 0; i < bytes.length; i += CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
       return btoa(bin);
     }
-    async function deriveKey(password, salt, usage) {
-      var mat = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
-      return crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: ITER, hash: "SHA-256" },
-        mat, { name: "AES-GCM", length: 256 }, false, [usage]);
+    // One PBKDF2 per distinct salt, cached. Every blob in an account shares the
+    // journal's salt, so the key is derived just once per session.
+    var keyCache = {};
+    function saltHex(salt) { var s = ""; for (var i = 0; i < salt.length; i++) s += ("0" + salt[i].toString(16)).slice(-2); return s; }
+    async function getKey(salt) {
+      var k = saltHex(salt);
+      if (keyCache[k]) return keyCache[k];
+      var mat = await crypto.subtle.importKey("raw", new TextEncoder().encode(PASSWORD), "PBKDF2", false, ["deriveKey"]);
+      var key = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: ITER, hash: "SHA-256" },
+        mat, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+      keyCache[k] = key;
+      return key;
     }
     async function encBytes(plain) {
-      var salt = crypto.getRandomValues(new Uint8Array(16));
+      var salt = SESSION_SALT || crypto.getRandomValues(new Uint8Array(16));
+      if (!SESSION_SALT) SESSION_SALT = salt;
       var iv = crypto.getRandomValues(new Uint8Array(12));
-      var key = await deriveKey(PASSWORD, salt, "encrypt");
+      var key = await getKey(salt);
       var ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, plain));
       var all = new Uint8Array(28 + ct.length);
       all.set(salt, 0); all.set(iv, 16); all.set(ct, 28);
       return all;
     }
-    async function decBytes(bytes, password) {
+    async function decBytes(bytes) {
       var salt = bytes.slice(0, 16), iv = bytes.slice(16, 28), ct = bytes.slice(28);
-      var key = await deriveKey(password, salt, "decrypt");
+      var key = await getKey(salt);
       return new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ct));
     }
     async function encStr(str) { return encBytes(new TextEncoder().encode(str)); }
-    async function decStr(bytes, password) { return new TextDecoder().decode(await decBytes(bytes, password)); }
+    async function decStr(bytes) { return new TextDecoder().decode(await decBytes(bytes)); }
 
     // ---------- transport ----------
     async function rawGet(path) {
@@ -987,16 +997,18 @@
       try {
         var bytes = await rawGet(JOURNAL);
         if (bytes === null) {
-          PASSWORD = pw; journal = { entries: [], config: {} };
+          PASSWORD = pw; SESSION_SALT = null; keyCache = {};
+          journal = { entries: [], config: {} };
         } else {
-          var txt = await decStr(bytes, pw);
+          PASSWORD = pw; SESSION_SALT = bytes.slice(0, 16); keyCache = {};
+          var txt = await decStr(bytes);
           var data = JSON.parse(txt);
           journal = { entries: data.entries || [], config: data.config || {} };
-          PASSWORD = pw;
         }
         ensureConfig();
         enterApp();
       } catch (err) {
+        PASSWORD = null; SESSION_SALT = null; keyCache = {};
         busyEl.hidden = true; goBtn.disabled = false; errEl.hidden = false;
         errEl.textContent = (err && /read|sha|commit|network|fetch/i.test(err.message)) ? "Network error. Try again." : "Wrong password.";
         document.getElementById("pw").value = ""; document.getElementById("pw").focus();
@@ -1018,7 +1030,7 @@
       try {
         var bytes = await rawGet(IMGDIR + rec.id + ".enc");
         if (!bytes) throw new Error("missing");
-        var plain = await decBytes(bytes, PASSWORD);
+        var plain = await decBytes(bytes);
         var url = URL.createObjectURL(new Blob([plain], { type: rec.mime || "image/png" }));
         imgEl.src = url; imgEl.hidden = false; if (ph) ph.remove();
       } catch (e) { if (ph) ph.textContent = "image unavailable"; }
@@ -1027,7 +1039,7 @@
       try {
         var bytes = await rawGet(IMGDIR + rec.id + ".enc");
         if (!bytes) throw new Error("missing");
-        var plain = await decBytes(bytes, PASSWORD);
+        var plain = await decBytes(bytes);
         img.src = URL.createObjectURL(new Blob([plain], { type: rec.mime || "image/png" }));
         img.hidden = false;
       } catch (e) { img.alt = "(image)"; img.hidden = false; }
@@ -1356,12 +1368,17 @@
         if (!d || d.date !== e.date) { d = { date: e.date, list: [] }; days.push(d); }
         d.list.push(e);
       });
-      var rows = [], cum = 0, intradayPeak = initBal, eodPeak = initBal;
+      var rows = [], cumBefore = 0, intradayPeak = initBal, eodPeak = initBal;
       days.forEach(function (day) {
-        var dayCum = 0, lineEOD = eodPeak - D, first = true;
+        // a recorded day is already over, so its EOD line reflects this day's
+        // close: it floats up with the day's profit and never drops
+        var daySum = day.list.reduce(function (a, e) { return a + (e.pnl || 0); }, 0);
+        var lineEOD = 0;
+        if (mode === "EOD") { eodPeak = Math.max(eodPeak, initBal + cumBefore + daySum); lineEOD = eodPeak - D; }
+        var run = cumBefore, dayCum = 0, first = true;
         day.list.forEach(function (e) {
-          cum += (e.pnl || 0); dayCum += (e.pnl || 0);
-          var equity = initBal + cum, line;
+          run += (e.pnl || 0); dayCum += (e.pnl || 0);
+          var equity = initBal + run, line;
           if (mode === "EOD") line = lineEOD;
           else { intradayPeak = Math.max(intradayPeak, equity); line = intradayPeak - D; }
           rows.push({
@@ -1370,7 +1387,7 @@
           });
           first = false;
         });
-        eodPeak = Math.max(eodPeak, initBal + cum); // day close equity feeds next day's EOD line
+        cumBefore += daySum;
       });
       return rows;
     }
