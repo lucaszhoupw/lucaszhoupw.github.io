@@ -8,6 +8,7 @@
 <link rel="icon" href="assets/favicon.svg" />
 <link rel="stylesheet" href="styles.css?v=17" />
 <style>
+  /* ---- gate ---- */
   .gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
   .gate__box { width: 100%; max-width: 300px; display: flex; flex-direction: column; gap: 12px; text-align: center; }
   .gate__title { font-size: 1.2rem; color: var(--accent); font-weight: 700; margin: 0 0 4px; letter-spacing: 0.04em; }
@@ -25,76 +26,563 @@
   .gate__btn:hover { background: var(--accent-strong); }
   .gate__btn:disabled { opacity: .6; cursor: default; }
   .gate__err { color: #b3392f; font-size: 0.85rem; margin: 2px 0 0; }
+  .gate__hint { color: var(--faint); font-size: 0.74rem; margin: 6px 0 0; line-height: 1.5; }
 
-  .vault { max-width: 900px; margin: 0 auto; padding: 80px 24px 80px; }
-  .vault__bar { display: flex; justify-content: flex-end; margin-bottom: 18px; }
-  .vault__lock {
-    font-family: inherit; font-size: 0.82rem; color: var(--muted);
-    background: transparent; border: 1px solid var(--border-strong);
-    border-radius: 999px; padding: 5px 14px; cursor: pointer;
+  /* ---- app shell ---- */
+  .app { max-width: 860px; margin: 0 auto; padding: 56px 22px 90px; }
+  .app__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+  .app__title { font-size: 1.5rem; color: var(--accent); margin: 0; }
+  .app__actions { display: flex; gap: 8px; }
+  .btn {
+    font-family: inherit; font-size: 0.84rem; cursor: pointer;
+    padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border-strong);
+    background: transparent; color: var(--muted); transition: background .15s, color .15s;
   }
-  .vault__lock:hover { color: var(--text); background: var(--accent-tint); }
-  .vault__title { font-size: 1.6rem; color: var(--accent); margin: 0 0 10px; }
-  .vault__empty { color: var(--faint); font-style: italic; }
+  .btn:hover { color: var(--text); background: var(--accent-tint); }
+  .btn--solid { background: var(--accent); color: #fff; border-color: transparent; }
+  .btn--solid:hover { background: var(--accent-strong); color: #fff; }
+  .btn:disabled { opacity: .55; cursor: default; }
+
+  /* ---- token settings ---- */
+  .tok { border: 1px solid var(--border); border-radius: 12px; margin: 12px 0 4px; background: var(--surface); }
+  .tok > summary { cursor: pointer; padding: 11px 16px; font-size: 0.82rem; color: var(--muted); list-style: none; }
+  .tok > summary::-webkit-details-marker { display: none; }
+  .tok > summary::before { content: "⚙ "; }
+  .tok__body { padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .tok__body p { font-size: 0.74rem; color: var(--faint); line-height: 1.6; margin: 0; }
+  .tok__body input[type="password"], .tok__body input[type="text"] {
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.82rem;
+    padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: 8px;
+    background: var(--bg); color: var(--text); width: 100%;
+  }
+  .tok__row { display: flex; align-items: center; gap: 8px; }
+  .tok__row label { font-size: 0.78rem; color: var(--muted); }
+
+  /* ---- entry form ---- */
+  .form { border: 1px solid var(--border-strong); border-radius: 14px; padding: 18px; margin: 16px 0 26px; background: var(--surface); }
+  .form__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .field input, .field select, .field textarea {
+    font-family: inherit; font-size: 0.92rem; padding: 8px 10px;
+    border: 1px solid var(--border-strong); border-radius: 8px;
+    background: var(--bg); color: var(--text);
+  }
+  .field--wide { grid-column: 1 / -1; }
+  .field textarea { min-height: 90px; resize: vertical; }
+  .drop {
+    grid-column: 1 / -1; border: 1px dashed var(--border-strong); border-radius: 10px;
+    padding: 14px; text-align: center; color: var(--faint); font-size: 0.82rem; cursor: pointer;
+  }
+  .drop:hover { background: var(--accent-tint); color: var(--muted); }
+  .thumbs { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+  .thumbs img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+  .form__foot { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+  #msg { font-size: 0.8rem; color: var(--muted); }
+  #msg.err { color: #b3392f; }
+  #msg.ok { color: var(--accent-strong); }
+
+  /* ---- entries feed ---- */
+  .feed { display: flex; flex-direction: column; gap: 16px; }
+  .card { border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; background: var(--surface); }
+  .card__head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; }
+  .card__date { font-weight: 700; color: var(--text); font-size: 0.96rem; }
+  .card__instr { font-size: 0.8rem; padding: 2px 9px; border-radius: 999px; background: var(--accent-tint); color: var(--accent-strong); font-weight: 700; }
+  .card__dir { font-size: 0.78rem; color: var(--muted); }
+  .card__pnl { margin-left: auto; font-weight: 700; font-size: 0.98rem; }
+  .card__pnl.up { color: #1f8f4e; }
+  .card__pnl.down { color: #b3392f; }
+  .card__meta { display: flex; flex-wrap: wrap; gap: 16px; margin: 10px 0 0; font-size: 0.82rem; color: var(--muted); }
+  .card__sum { margin: 12px 0 0; font-size: 0.92rem; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
+  .card__imgs { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 0; }
+  .card__imgs img { max-width: 220px; max-height: 220px; border-radius: 8px; border: 1px solid var(--border); cursor: zoom-in; }
+  .card__imgs .ph { width: 120px; height: 80px; border-radius: 8px; background: var(--accent-tint); display: flex; align-items: center; justify-content: center; font-size: 0.74rem; color: var(--faint); }
+  .feed__empty { color: var(--faint); font-style: italic; text-align: center; padding: 28px 0; }
+
+  /* ---- lightbox ---- */
+  .lbx { position: fixed; inset: 0; background: rgba(12,14,13,.86); display: none; align-items: center; justify-content: center; z-index: 50; padding: 20px; cursor: zoom-out; }
+  .lbx.open { display: flex; }
+  .lbx img { max-width: 96vw; max-height: 92vh; border-radius: 8px; }
 </style>
 </head>
 <body>
+  <!-- password gate -->
   <section id="gate" class="gate">
     <form id="gate-form" class="gate__box" autocomplete="off">
       <p class="gate__title" data-en="Private" data-zh="私密">Private</p>
       <input id="pw" class="gate__input" type="password" placeholder="Password" aria-label="Password" autocomplete="current-password" autofocus />
       <button id="go" class="gate__btn" type="submit" data-en="Enter" data-zh="进入">Enter</button>
-      <p id="err" class="gate__err" hidden data-en="Wrong password." data-zh="密码错误。">Wrong password.</p>
+      <p id="err" class="gate__err" hidden>Wrong password.</p>
+      <p id="gate-busy" class="gate__hint" hidden>Checking…</p>
     </form>
   </section>
 
-  <main id="vault" class="vault" hidden>
-    <div class="vault__bar">
-      <button class="vault__lock" type="button" onclick="location.reload()" data-en="Lock" data-zh="锁定">Lock</button>
+  <!-- journal app -->
+  <main id="app" class="app" hidden>
+    <div class="app__bar">
+      <h1 class="app__title">Trading Journal</h1>
+      <div class="app__actions">
+        <button id="new-btn" class="btn btn--solid" type="button">+ New entry</button>
+        <button class="btn" type="button" onclick="location.reload()">Lock</button>
+      </div>
     </div>
-    <div id="vault-body"></div>
+
+    <details class="tok" id="tok">
+      <summary>GitHub token (needed only to save)</summary>
+      <div class="tok__body">
+        <p>Create a fine-grained personal access token scoped to <b>this repository only</b>, with <b>Contents: Read and write</b>. It is stored in this browser only (never committed) and lets the page push encrypted records to your repo.</p>
+        <input id="pat" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false" />
+        <div class="tok__row">
+          <input id="pat-remember" type="checkbox" />
+          <label for="pat-remember">Remember on this device</label>
+          <button id="pat-clear" class="btn" type="button" style="margin-left:auto">Forget</button>
+        </div>
+      </div>
+    </details>
+
+    <!-- entry form (hidden until +New) -->
+    <form id="form" class="form" hidden autocomplete="off">
+      <div class="form__grid">
+        <div class="field">
+          <label for="f_date" data-en="Date" data-zh="日期">Date</label>
+          <input id="f_date" type="date" required />
+        </div>
+        <div class="field">
+          <label for="f_instr">Instrument</label>
+          <select id="f_instr">
+            <option>ES</option><option>NQ</option><option>MES</option><option>MNQ</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f_dir">Direction</label>
+          <select id="f_dir">
+            <option>Long</option><option>Short</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f_size">Size (contracts)</label>
+          <input id="f_size" type="text" inputmode="decimal" placeholder="1" />
+        </div>
+        <div class="field">
+          <label for="f_entry">Entry</label>
+          <input id="f_entry" type="text" inputmode="decimal" placeholder="0.00" />
+        </div>
+        <div class="field">
+          <label for="f_exit">Exit</label>
+          <input id="f_exit" type="text" inputmode="decimal" placeholder="0.00" />
+        </div>
+        <div class="field">
+          <label for="f_pnl">P/L ($)</label>
+          <input id="f_pnl" type="text" inputmode="decimal" placeholder="0.00" />
+        </div>
+        <div class="field field--wide">
+          <label for="f_sum">Summary</label>
+          <textarea id="f_sum" placeholder="Setup, execution, what went right/wrong…"></textarea>
+        </div>
+        <label class="drop" for="f_imgs" id="drop">Click to add chart screenshots (multiple)</label>
+        <input id="f_imgs" type="file" accept="image/*" multiple hidden />
+        <div class="thumbs" id="thumbs"></div>
+      </div>
+      <div class="form__foot">
+        <button id="save-btn" class="btn btn--solid" type="submit">Save &amp; commit</button>
+        <button id="cancel-btn" class="btn" type="button">Cancel</button>
+        <span id="msg"></span>
+      </div>
+    </form>
+
+    <div id="feed" class="feed"></div>
   </main>
 
-  <script>
-    // Content is AES-256-GCM encrypted; the password is the decryption key
-    // (never stored). The repo only ever contains this ciphertext.
-    var ENC = "9SztJqHLq9q5iA1ZL/Yg+VFTbZ28v8tQ9PlFeXMPAGhFFFlb2K8h3GX79+LA9slbhUbos7UKnRr10h9Wfw6KVaemYhiSDPzV4UY+t3T5Aj1FbHZZCmQT/pvMVMjcr9XwJNHbFZD5WfXGyY6S9TgFtRHkGwz/8rzkykTgzRR06kypoi0AWEbnvhdjxSisJYrYThVBPoSnPbmQTuzQktVdoo/56sp3MIzzeM2ARYQKWYDNPzDwcZgUBe8KcjwZ+RlwrvPgj3QXuT/QPTc16ookGMHcSjGjcuDn84GqBdjxHkUDszALV0o7FHx0KuGS9nSyfyD/WxfGDcgtaLctF1+VhZbY";
-    var ITER = 200000;
+  <div id="lbx" class="lbx"><img id="lbx-img" alt="" /></div>
 
+  <script>
+  (function () {
+    "use strict";
+
+    // ---------- config ----------
+    var REPO = "lucaszhoupw/lucaszhoupw.github.io";
+    var BRANCH = "main";
+    var JOURNAL = "private/journal.enc";
+    var IMGDIR = "private/img/";
+    var ITER = 200000;
+    var PAT_KEY = "plz_gh_pat";
+
+    // ---------- state ----------
+    var PASSWORD = null;          // AES key material, memory only
+    var journal = { entries: [] }; // in-memory copy
+    var pending = [];             // files queued in the open form: {file, url}
+
+    // ---------- crypto helpers ----------
     function b64ToBytes(b64) {
       var bin = atob(b64), out = new Uint8Array(bin.length);
       for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
       return out;
     }
-    async function decrypt(b64, password) {
-      var bytes = b64ToBytes(b64);
-      var salt = bytes.slice(0, 16), iv = bytes.slice(16, 28), ct = bytes.slice(28);
-      var mat = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
-      var key = await crypto.subtle.deriveKey(
+    function bytesToB64(bytes) {
+      var bin = "", CH = 0x8000;
+      for (var i = 0; i < bytes.length; i += CH) {
+        bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+      }
+      return btoa(bin);
+    }
+    async function deriveKey(password, salt, usage) {
+      var mat = await crypto.subtle.importKey(
+        "raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+      return crypto.subtle.deriveKey(
         { name: "PBKDF2", salt: salt, iterations: ITER, hash: "SHA-256" },
-        mat, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+        mat, { name: "AES-GCM", length: 256 }, false, [usage]);
+    }
+    async function encBytes(plain) { // plain: Uint8Array -> Uint8Array (salt|iv|ct)
+      var salt = crypto.getRandomValues(new Uint8Array(16));
+      var iv = crypto.getRandomValues(new Uint8Array(12));
+      var key = await deriveKey(PASSWORD, salt, "encrypt");
+      var ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, plain));
+      var all = new Uint8Array(28 + ct.length);
+      all.set(salt, 0); all.set(iv, 16); all.set(ct, 28);
+      return all;
+    }
+    async function decBytes(bytes, password) { // -> Uint8Array plaintext
+      var salt = bytes.slice(0, 16), iv = bytes.slice(16, 28), ct = bytes.slice(28);
+      var key = await deriveKey(password, salt, "decrypt");
       var pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ct);
-      return new TextDecoder().decode(pt);
+      return new Uint8Array(pt);
+    }
+    async function encStr(str) { return encBytes(new TextEncoder().encode(str)); }
+    async function decStr(bytes, password) { return new TextDecoder().decode(await decBytes(bytes, password)); }
+
+    // ---------- transport ----------
+    // public read (no token) — fresh copy straight from the repo
+    async function rawGet(path) {
+      var url = "https://raw.githubusercontent.com/" + REPO + "/" + BRANCH + "/" + path + "?t=" + Date.now();
+      var r = await fetch(url, { cache: "no-store" });
+      if (r.status === 404) return null;
+      if (!r.ok) throw new Error("read " + r.status);
+      return new Uint8Array(await r.arrayBuffer());
+    }
+    // get current sha via the API (needed to overwrite a file)
+    async function ghSha(path, token) {
+      var url = "https://api.github.com/repos/" + REPO + "/contents/" + path + "?ref=" + BRANCH;
+      var r = await fetch(url, { headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" } });
+      if (r.status === 404) return null;
+      if (!r.ok) throw new Error("sha " + r.status);
+      var j = await r.json();
+      return j.sha;
+    }
+    async function ghPut(path, contentB64, message, token, sha) {
+      var url = "https://api.github.com/repos/" + REPO + "/contents/" + path;
+      var body = { message: message, content: contentB64, branch: BRANCH };
+      if (sha) body.sha = sha;
+      var r = await fetch(url, {
+        method: "PUT",
+        headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) {
+        var t = await r.text();
+        throw new Error("commit " + r.status + " " + t.slice(0, 140));
+      }
+      return r.json();
     }
 
-    var form = document.getElementById("gate-form");
-    var err = document.getElementById("err");
-    var go = document.getElementById("go");
-    form.addEventListener("submit", function (e) {
+    // ---------- token storage ----------
+    var patInput = document.getElementById("pat");
+    var patRemember = document.getElementById("pat-remember");
+    function loadPat() {
+      var saved = "";
+      try { saved = localStorage.getItem(PAT_KEY) || ""; } catch (e) {}
+      if (saved) { patInput.value = saved; patRemember.checked = true; }
+    }
+    function currentPat() { return patInput.value.trim(); }
+    patInput.addEventListener("input", syncPat);
+    patRemember.addEventListener("change", syncPat);
+    function syncPat() {
+      try {
+        if (patRemember.checked && currentPat()) localStorage.setItem(PAT_KEY, currentPat());
+        else localStorage.removeItem(PAT_KEY);
+      } catch (e) {}
+    }
+    document.getElementById("pat-clear").addEventListener("click", function () {
+      patInput.value = "";
+      try { localStorage.removeItem(PAT_KEY); } catch (e) {}
+      patRemember.checked = false;
+    });
+
+    // ---------- gate ----------
+    var gateForm = document.getElementById("gate-form");
+    var errEl = document.getElementById("err");
+    var busyEl = document.getElementById("gate-busy");
+    var goBtn = document.getElementById("go");
+
+    gateForm.addEventListener("submit", async function (e) {
       e.preventDefault();
-      err.hidden = true; go.disabled = true;
-      decrypt(ENC, document.getElementById("pw").value).then(function (html) {
-        document.getElementById("gate").remove();
-        var body = document.getElementById("vault-body");
-        body.innerHTML = html;
-        document.getElementById("vault").hidden = false;
-        document.title = "Journal";
-      }).catch(function () {
-        err.hidden = false; go.disabled = false;
+      var pw = document.getElementById("pw").value;
+      if (!pw) return;
+      errEl.hidden = true; busyEl.hidden = false; goBtn.disabled = true;
+      try {
+        var bytes = await rawGet(JOURNAL);
+        if (bytes === null) {
+          // first run — no journal yet; this password becomes the key
+          PASSWORD = pw;
+          journal = { entries: [] };
+        } else {
+          var txt = await decStr(bytes, pw); // throws if wrong password
+          journal = JSON.parse(txt);
+          if (!journal.entries) journal.entries = [];
+          PASSWORD = pw;
+        }
+        enterApp();
+      } catch (err) {
+        busyEl.hidden = true; goBtn.disabled = false;
+        errEl.hidden = false;
+        errEl.textContent = (err && /read|sha|commit|network|fetch/i.test(err.message))
+          ? "Network error. Try again." : "Wrong password.";
         document.getElementById("pw").value = "";
         document.getElementById("pw").focus();
-      });
+      }
     });
+
+    function enterApp() {
+      document.getElementById("gate").remove();
+      document.getElementById("app").hidden = false;
+      document.title = "Journal";
+      loadPat();
+      render();
+    }
+
+    // ---------- entry form ----------
+    var form = document.getElementById("form");
+    var thumbs = document.getElementById("thumbs");
+    var msg = document.getElementById("msg");
+    var imgsInput = document.getElementById("f_imgs");
+
+    document.getElementById("new-btn").addEventListener("click", function () {
+      form.hidden = false;
+      if (!document.getElementById("f_date").value) {
+        document.getElementById("f_date").value = new Date().toISOString().slice(0, 10);
+      }
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    document.getElementById("cancel-btn").addEventListener("click", resetForm);
+
+    imgsInput.addEventListener("change", function () {
+      for (var i = 0; i < imgsInput.files.length; i++) {
+        var f = imgsInput.files[i];
+        if (!/^image\//.test(f.type)) continue;
+        var url = URL.createObjectURL(f);
+        pending.push({ file: f, url: url });
+      }
+      imgsInput.value = "";
+      drawThumbs();
+    });
+    function drawThumbs() {
+      thumbs.innerHTML = "";
+      pending.forEach(function (p, idx) {
+        var img = document.createElement("img");
+        img.src = p.url; img.title = "Click to remove";
+        img.addEventListener("click", function () {
+          URL.revokeObjectURL(p.url);
+          pending.splice(idx, 1);
+          drawThumbs();
+        });
+        thumbs.appendChild(img);
+      });
+    }
+    function resetForm() {
+      form.reset();
+      pending.forEach(function (p) { URL.revokeObjectURL(p.url); });
+      pending = [];
+      thumbs.innerHTML = "";
+      msg.textContent = ""; msg.className = "";
+      form.hidden = true;
+    }
+
+    function readFileBytes(file) {
+      return new Promise(function (resolve, reject) {
+        var fr = new FileReader();
+        fr.onload = function () { resolve(new Uint8Array(fr.result)); };
+        fr.onerror = reject;
+        fr.readAsArrayBuffer(file);
+      });
+    }
+    function uid() {
+      return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+    }
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var token = currentPat();
+      if (!token) {
+        msg.className = "err";
+        msg.textContent = "Add a GitHub token above to save.";
+        document.getElementById("tok").open = true;
+        return;
+      }
+      var saveBtn = document.getElementById("save-btn");
+      saveBtn.disabled = true; msg.className = ""; msg.textContent = "Encrypting & committing…";
+
+      try {
+        // 1) commit each screenshot as its own encrypted blob
+        var images = [];
+        for (var i = 0; i < pending.length; i++) {
+          var p = pending[i];
+          var raw = await readFileBytes(p.file);
+          var enc = await encBytes(raw);
+          var id = uid();
+          await ghPut(IMGDIR + id + ".enc", bytesToB64(enc),
+            "journal: add image", token, null);
+          images.push({ id: id, mime: p.file.type, localUrl: p.url });
+        }
+
+        // 2) build entry + append
+        var entry = {
+          id: uid(),
+          date: document.getElementById("f_date").value,
+          instr: document.getElementById("f_instr").value,
+          dir: document.getElementById("f_dir").value,
+          size: document.getElementById("f_size").value.trim(),
+          entry: document.getElementById("f_entry").value.trim(),
+          exit: document.getElementById("f_exit").value.trim(),
+          pnl: document.getElementById("f_pnl").value.trim(),
+          summary: document.getElementById("f_sum").value,
+          images: images.map(function (m) { return { id: m.id, mime: m.mime }; }),
+          ts: Date.now()
+        };
+        journal.entries.push(entry);
+
+        // 3) encrypt journal and commit (with current sha if it exists)
+        var encJ = await encStr(JSON.stringify({ entries: journal.entries }));
+        var sha = await ghSha(JOURNAL, token);
+        await ghPut(JOURNAL, bytesToB64(encJ), "journal: add entry " + entry.date, token, sha);
+
+        // keep freshly-uploaded blob URLs for instant display
+        entry._localImgs = images.map(function (m) { return { id: m.id, url: m.localUrl }; });
+
+        msg.className = "ok"; msg.textContent = "Saved.";
+        // detach pending urls from revoke (now owned by the entry)
+        pending = [];
+        form.reset();
+        thumbs.innerHTML = "";
+        form.hidden = true;
+        render();
+      } catch (err) {
+        msg.className = "err";
+        msg.textContent = "Failed: " + (err && err.message ? err.message : "unknown error");
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
+
+    // ---------- render feed ----------
+    var feed = document.getElementById("feed");
+
+    async function loadImage(imgEl, rec, ph) {
+      try {
+        var bytes = await rawGet(IMGDIR + rec.id + ".enc");
+        if (!bytes) throw new Error("missing");
+        var plain = await decBytes(bytes, PASSWORD);
+        var blob = new Blob([plain], { type: rec.mime || "image/png" });
+        var url = URL.createObjectURL(blob);
+        imgEl.src = url;
+        imgEl.hidden = false;
+        if (ph) ph.remove();
+      } catch (e) {
+        if (ph) ph.textContent = "image unavailable";
+      }
+    }
+
+    function fmtMoney(v) {
+      var n = parseFloat(String(v).replace(/[, $]/g, ""));
+      if (isNaN(n)) return null;
+      return n;
+    }
+
+    function render() {
+      var list = journal.entries.slice().sort(function (a, b) {
+        if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+        return (b.ts || 0) - (a.ts || 0);
+      });
+      feed.innerHTML = "";
+      if (!list.length) {
+        var e = document.createElement("div");
+        e.className = "feed__empty";
+        e.textContent = "No entries yet. Click “+ New entry” to add your first trade.";
+        feed.appendChild(e);
+        return;
+      }
+      list.forEach(function (en) {
+        var card = document.createElement("div");
+        card.className = "card";
+
+        var head = document.createElement("div");
+        head.className = "card__head";
+        head.innerHTML =
+          '<span class="card__date"></span>' +
+          '<span class="card__instr"></span>' +
+          '<span class="card__dir"></span>';
+        head.querySelector(".card__date").textContent = en.date || "—";
+        head.querySelector(".card__instr").textContent = en.instr || "";
+        head.querySelector(".card__dir").textContent = en.dir || "";
+
+        var pnlN = fmtMoney(en.pnl);
+        if (pnlN !== null) {
+          var pnl = document.createElement("span");
+          pnl.className = "card__pnl " + (pnlN >= 0 ? "up" : "down");
+          pnl.textContent = (pnlN >= 0 ? "+" : "−") + "$" + Math.abs(pnlN).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          head.appendChild(pnl);
+        }
+        card.appendChild(head);
+
+        var meta = document.createElement("div");
+        meta.className = "card__meta";
+        var bits = [];
+        if (en.size) bits.push("Size " + en.size);
+        if (en.entry) bits.push("Entry " + en.entry);
+        if (en.exit) bits.push("Exit " + en.exit);
+        meta.innerHTML = bits.map(function (b) { return "<span></span>"; }).join("");
+        bits.forEach(function (b, i) { meta.children[i].textContent = b; });
+        if (bits.length) card.appendChild(meta);
+
+        if (en.summary) {
+          var sum = document.createElement("p");
+          sum.className = "card__sum";
+          sum.textContent = en.summary;
+          card.appendChild(sum);
+        }
+
+        if (en.images && en.images.length) {
+          var wrap = document.createElement("div");
+          wrap.className = "card__imgs";
+          en.images.forEach(function (rec) {
+            var img = document.createElement("img");
+            img.alt = "chart";
+            img.addEventListener("click", function () { openLbx(img.src); });
+            var local = (en._localImgs || []).filter(function (m) { return m.id === rec.id; })[0];
+            if (local) {
+              img.src = local.url;
+              wrap.appendChild(img);
+            } else {
+              img.hidden = true;
+              var ph = document.createElement("div");
+              ph.className = "ph";
+              ph.textContent = "decrypting…";
+              wrap.appendChild(ph);
+              wrap.appendChild(img);
+              loadImage(img, rec, ph);
+            }
+          });
+          card.appendChild(wrap);
+        }
+
+        feed.appendChild(card);
+      });
+    }
+
+    // ---------- lightbox ----------
+    var lbx = document.getElementById("lbx");
+    var lbxImg = document.getElementById("lbx-img");
+    function openLbx(src) { lbxImg.src = src; lbx.classList.add("open"); }
+    lbx.addEventListener("click", function () { lbx.classList.remove("open"); lbxImg.src = ""; });
+  })();
   </script>
 </body>
 </html>
