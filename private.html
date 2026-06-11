@@ -71,6 +71,7 @@
   }
   .field input[readonly] { background: var(--accent-tint); color: var(--muted); }
   .field--wide { grid-column: 1 / -1; }
+  .err-line { color: #b3392f; font-size: 0.74rem; margin-top: 6px; }
 
   .sec-title { font-size: 0.96rem; font-weight: 700; color: var(--accent-strong); margin: 22px 0 8px; }
 
@@ -82,8 +83,19 @@
   }
   .trade__hd { display: flex; align-items: center; justify-content: space-between; margin: 0 0 10px; }
   .trade__no { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+  .trade__btns { display: flex; gap: 6px; }
   .signal-row { display: flex; gap: 6px; align-items: flex-end; }
   .signal-row select { flex: 1; }
+
+  /* sub-accounts (compact) */
+  .subs { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .sub { border: 1px dashed var(--border-strong); border-radius: 10px; padding: 10px 12px; background: var(--accent-tint); }
+  .sub__hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .sub__t { font-size: 0.74rem; font-weight: 700; color: var(--muted); }
+  .sub .form__grid { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+  .sub .field label { font-size: 0.66rem; }
+  .sub .field input, .sub .field select { font-size: 0.82rem; padding: 6px 8px; }
+  .sub__mirror { font-size: 0.7rem; color: var(--faint); margin-top: 6px; }
 
   /* image sections */
   .isec { margin: 10px 0 0; }
@@ -106,13 +118,18 @@
   /* ---- entries feed ---- */
   .feed { display: flex; flex-direction: column; gap: 16px; }
   .card { border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; background: var(--surface); }
-  .card__head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; }
+  .card__head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; min-height: 26px; }
   .card__date { font-weight: 700; color: var(--text); font-size: 1rem; }
   .card__chip { font-size: 0.78rem; padding: 2px 9px; border-radius: 999px; background: var(--accent-tint); color: var(--accent-strong); font-weight: 700; }
   .card__acct { font-size: 0.8rem; color: var(--muted); }
-  .card__bal { margin-left: auto; font-size: 0.86rem; color: var(--muted); }
+  .card__count { font-size: 0.8rem; color: var(--muted); }
+  .card__total { margin-left: auto; font-size: 0.86rem; color: var(--muted); }
+  .card__bal { font-size: 0.86rem; color: var(--muted); }
   .card__bal b { color: var(--text); }
   .card__tools { display: flex; gap: 6px; margin-left: 8px; }
+  .card__body { margin-top: 4px; }
+  .card--collapsed .card__body { display: none; }
+  .card__toggle { display: block; margin-left: auto; margin-top: 10px; }
 
   .trow { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px; }
   .trow__top { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; font-size: 0.84rem; }
@@ -121,6 +138,7 @@
   .grade { font-weight: 700; }
   .grade-A { color: #1f8f4e; } .grade-B { color: #b8860b; } .grade-C { color: #b3392f; }
   .trow__nums { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; font-size: 0.82rem; color: var(--muted); }
+  .subrow { font-size: 0.76rem; color: var(--faint); margin-top: 6px; padding-left: 12px; border-left: 2px solid var(--border); display: flex; flex-wrap: wrap; gap: 10px; }
   .up { color: #1f8f4e; font-weight: 700; } .down { color: #b3392f; font-weight: 700; }
 
   .block { margin-top: 12px; }
@@ -146,6 +164,7 @@
   .chip { display: inline-flex; align-items: center; gap: 4px; background: var(--accent-tint); color: var(--text); border-radius: 999px; padding: 4px 6px 4px 12px; font-size: 0.84rem; }
   .chip button { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 1.05rem; line-height: 1; padding: 0 4px; }
   .chip button:hover { color: #b3392f; }
+  .chips-empty { font-size: 0.78rem; color: var(--faint); font-style: italic; }
   .addrow { display: flex; gap: 8px; margin-top: 10px; }
   .addrow input { flex: 1; font-family: inherit; font-size: 0.9rem; padding: 7px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); }
   .sheet__foot { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
@@ -215,8 +234,8 @@
           <input id="f_count" type="number" min="0" max="10" step="1" value="0" />
         </div>
         <div class="field">
-          <label for="f_account">Account / 账户名称</label>
-          <input id="f_account" type="text" placeholder="e.g. Apex-01" />
+          <label for="f_account">Main account / 主账户</label>
+          <select id="f_account" class="acct-select"></select>
         </div>
         <div class="field">
           <label for="f_balance">Balance / 账户余额 ($)</label>
@@ -258,6 +277,11 @@
         <button id="sheet-close" class="btn btn--sm" type="button">关闭</button>
       </div>
       <div class="sheet__sec">
+        <h3>账户 · Accounts</h3>
+        <div id="set-accounts" class="chips"></div>
+        <div class="addrow"><input id="set-account-in" type="text" placeholder="新增账户…" /><button id="set-account-add" class="btn btn--sm" type="button">添加</button></div>
+      </div>
+      <div class="sheet__sec">
         <h3>交易信号 · Signals</h3>
         <div id="set-signals" class="chips"></div>
         <div class="addrow"><input id="set-signal-in" type="text" placeholder="新增信号…" /><button id="set-signal-add" class="btn btn--sm" type="button">添加</button></div>
@@ -289,25 +313,28 @@
     var PAT_KEY = "plz_gh_pat";
     var DEFAULT_SIGNALS = ["高潮反转", "旗形延续", "二次入场", "突破回踩", "计划外"];
     var DEFAULT_ORDERS = ["stop", "limit", "market"];
+    var INSTRS = ["ES", "NQ", "MES", "MNQ"];
+    var POINT_VALUE = { ES: 50, MES: 5, NQ: 20, MNQ: 2 }; // $ per point per contract
+    var TICK_DIV = 4; // 0.25-pt tick -> points*4 must be integer
 
     // ---------- state ----------
     var PASSWORD = null;
-    var journal = { entries: [], config: { signals: DEFAULT_SIGNALS.slice(), orders: DEFAULT_ORDERS.slice() } };
+    var journal = { entries: [], config: {} };
     var journalSha = null; // last known sha of journal.enc (kept fresh from PUT responses)
     var TRADES = [];   // open-form trade blocks: {el, read()}
     var SECS = {};     // open-form image sections
 
-    function signals() {
-      return (journal.config && journal.config.signals) || DEFAULT_SIGNALS;
-    }
-    function orders() {
-      return (journal.config && journal.config.orders) || DEFAULT_ORDERS;
-    }
+    function signals() { return (journal.config && journal.config.signals) || DEFAULT_SIGNALS; }
+    function orders() { return (journal.config && journal.config.orders) || DEFAULT_ORDERS; }
+    function accounts() { return (journal.config && journal.config.accounts) || []; }
     function ensureConfig() {
       if (!journal.config) journal.config = {};
       if (!journal.config.signals || !journal.config.signals.length) journal.config.signals = DEFAULT_SIGNALS.slice();
       if (!journal.config.orders || !journal.config.orders.length) journal.config.orders = DEFAULT_ORDERS.slice();
+      if (!journal.config.accounts) journal.config.accounts = [];
     }
+    function pointValue(instr) { return POINT_VALUE[instr] || 0; }
+    function commRate(instr) { return (instr === "ES" || instr === "NQ") ? 3.5 : 1.0; }
 
     // ---------- crypto ----------
     function b64ToBytes(b64) {
@@ -369,8 +396,6 @@
       return r.json();
     }
     function sleep(ms) { return new Promise(function (res) { setTimeout(res, ms); }); }
-    // Commit the journal with optimistic-concurrency handling: reuse the sha
-    // we already know, and on a 409/422 conflict re-read the sha and retry.
     async function commitJournal(message, token) {
       var encJ = await encStr(JSON.stringify({ entries: journal.entries, config: journal.config }));
       var b64 = bytesToB64(encJ);
@@ -423,11 +448,12 @@
       var n = parseFloat(String(v).replace(/[, $]/g, ""));
       return isNaN(n) ? null : n;
     }
-    function money(n) { // number -> "$1,234.56"
+    function money(n) { // -> "$1,234.56" (absolute value)
       n = num(n); if (n === null) return "";
       return "$" + Math.abs(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
-    function commRate(instr) { return (instr === "ES" || instr === "NQ") ? 3.5 : 1.0; }
+    function moneySigned(n) { n = num(n); if (n === null) return ""; return (n < 0 ? "-" : "") + money(n); }
+    function isInt(x) { return x !== null && Math.abs(x - Math.round(x)) < 1e-6; }
     function readFileBytes(file) {
       return new Promise(function (res, rej) {
         var fr = new FileReader();
@@ -435,6 +461,61 @@
         fr.onerror = rej; fr.readAsArrayBuffer(file);
       });
     }
+
+    // live money input: always shows a leading $, settles to 2 decimals on blur
+    function sanitizeMoney(raw) {
+      raw = String(raw);
+      var neg = raw.indexOf("-") >= 0;
+      var body = raw.replace(/[^0-9.]/g, "");
+      var dot = body.indexOf(".");
+      if (dot >= 0) body = body.slice(0, dot + 1) + body.slice(dot + 1).replace(/\./g, "");
+      return { neg: neg, body: body };
+    }
+    function liveMoney(raw) {
+      var s = sanitizeMoney(raw);
+      if (s.body === "" && !s.neg) return "";
+      return (s.neg ? "-$" : "$") + s.body;
+    }
+    function attachMoney(el, onChange) {
+      el.addEventListener("input", function () {
+        el.value = liveMoney(el.value);
+        if (onChange) onChange();
+      });
+      el.addEventListener("blur", function () {
+        var n = num(el.value);
+        el.value = (n === null) ? "" : moneySigned(n);
+        if (onChange) onChange();
+      });
+    }
+
+    // ---------- option builders ----------
+    function optList(list, sel, useValue) {
+      var s = list.slice();
+      if (sel && s.indexOf(sel) < 0) s.unshift(sel);
+      return s.map(function (x) {
+        var v = useValue ? (' value="' + x + '"') : "";
+        return "<option" + v + (x === sel ? " selected" : "") + ">" + x + "</option>";
+      }).join("");
+    }
+    function signalOptions(sel) { return optList(signals(), sel, true); }
+    function orderOptions(sel) { return optList(orders(), sel, false); }
+    function accountOptions(sel) {
+      var s = accounts().slice();
+      if (sel && s.indexOf(sel) < 0) s.unshift(sel);
+      if (!s.length) return '<option value="">（在设置中添加账户）</option>';
+      return s.map(function (x) { return "<option" + (x === sel ? " selected" : "") + ">" + x + "</option>"; }).join("");
+    }
+    function refreshSelects(cls, optFn) {
+      document.querySelectorAll(cls).forEach(function (sel) {
+        var cur = sel.value;
+        sel.innerHTML = optFn(cur);
+        if (cur) sel.value = cur;
+      });
+    }
+    function refreshSignalSelects() { refreshSelects(".t-signal", signalOptions); }
+    function refreshOrderSelects() { refreshSelects(".t-order", orderOptions); }
+    function refreshAccountSelects() { refreshSelects(".acct-select", accountOptions); }
+    function refreshAllSelects() { refreshSignalSelects(); refreshOrderSelects(); refreshAccountSelects(); }
 
     // ---------- image section component ----------
     function makeImageSection(mount, withImages, text0, existing) {
@@ -444,8 +525,8 @@
       ta.placeholder = "文字…";
       ta.value = text0 || "";
       wrap.appendChild(ta);
-      var pending = [];                       // newly added files {file,url}
-      var kept = (existing || []).slice();    // already-committed refs {id,mime}
+      var pending = [];
+      var kept = (existing || []).slice();
       var thumbs;
       if (withImages) {
         var zone = document.createElement("div");
@@ -467,7 +548,6 @@
         }
         function drawThumbs() {
           thumbs.innerHTML = "";
-          // existing (already committed) screenshots — decrypt to preview
           kept.forEach(function (rec, idx) {
             var img = document.createElement("img");
             img.hidden = true; img.title = "点击移除 · click to remove";
@@ -475,7 +555,6 @@
             thumbs.appendChild(img);
             decryptThumb(rec, img);
           });
-          // newly added screenshots
           pending.forEach(function (p, idx) {
             var img = document.createElement("img");
             img.src = p.url; img.title = "点击移除 · click to remove";
@@ -485,7 +564,6 @@
         }
         zone.addEventListener("click", function () { fileInput.click(); });
         fileInput.addEventListener("change", function () { addFiles(fileInput.files); fileInput.value = ""; });
-        // clipboard paste — fires when focus is in this section (textarea or zone)
         wrap.addEventListener("paste", function (e) {
           var items = (e.clipboardData || {}).items || [];
           var imgs = [];
@@ -497,7 +575,6 @@
           }
           if (imgs.length) { e.preventDefault(); addFiles(imgs); }
         });
-        // drag & drop
         ["dragover", "dragenter"].forEach(function (ev) {
           zone.addEventListener(ev, function (e) { e.preventDefault(); zone.classList.add("drag"); });
         });
@@ -507,75 +584,169 @@
         zone.addEventListener("drop", function (e) {
           if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files);
         });
-        drawThumbs(); // show existing screenshots up front
+        drawThumbs();
       }
       mount.innerHTML = "";
       mount.appendChild(wrap);
-      return {
-        read: function () { return { text: ta.value, pending: pending, kept: kept }; }
-      };
+      return { read: function () { return { text: ta.value, pending: pending, kept: kept }; } };
     }
 
     // ---------- trade block ----------
     var tradesEl = document.getElementById("trades");
     var countInput = document.getElementById("f_count");
 
-    function signalOptions(sel) {
-      var s = signals().slice();
-      if (sel && s.indexOf(sel) < 0) s.unshift(sel); // keep a custom/legacy signal selectable
-      return s.map(function (x) { return '<option value="' + x + '"' + (x === sel ? " selected" : "") + ">" + x + "</option>"; }).join("");
-    }
-    function orderOptions(sel) {
-      var s = orders().slice();
-      if (sel && s.indexOf(sel) < 0) s.unshift(sel);
-      return s.map(function (x) { return '<option' + (x === sel ? " selected" : "") + ">" + x + "</option>"; }).join("");
-    }
     function addTrade(data) {
       data = data || {};
+      var di = data.instr || "MES";
       var el = document.createElement("div");
       el.className = "trade";
       el.innerHTML =
         '<div class="trade__hd"><span class="trade__no"></span>' +
-        '<button class="btn btn--sm t-del" type="button">删除</button></div>' +
+          '<div class="trade__btns">' +
+            '<button class="btn btn--sm t-copy" type="button" title="复制为从账户">复制</button>' +
+            '<button class="btn btn--sm t-del" type="button">删除</button>' +
+          '</div></div>' +
         '<div class="form__grid">' +
           '<div class="field field--wide"><label>交易信号 / Signal</label>' +
             '<div class="signal-row"><select class="t-signal">' + signalOptions(data.signal) + '</select>' +
             '<button class="btn btn--sm t-addsig" type="button" title="新增信号">＋</button></div></div>' +
-          '<div class="field"><label>入场方式 / Order</label><select class="t-order">' +
-            orderOptions(data.order) + '</select></div>' +
+          '<div class="field"><label>入场方式 / Order</label><select class="t-order">' + orderOptions(data.order) + '</select></div>' +
           '<div class="field"><label>方向 / Direction</label><select class="t-dir">' +
-            ['long','short'].map(function(o){return '<option'+(o===data.dir?' selected':'')+'>'+o+'</option>';}).join('') + '</select></div>' +
+            optList(["long", "short"], data.dir, false) + '</select></div>' +
           '<div class="field"><label>商品 / Instrument</label><select class="t-instr">' +
-            ['ES','NQ','MES','MNQ'].map(function(o){return '<option'+(o===data.instr?' selected':'')+'>'+o+'</option>';}).join('') + '</select></div>' +
+            optList(INSTRS, di, false) + '</select></div>' +
           '<div class="field"><label>手数 / Size</label><input class="t-size" type="number" min="1" step="1" value="' + (data.size != null ? data.size : 2) + '" /></div>' +
-          '<div class="field"><label>手续费 / Commission ($)</label><input class="t-comm" type="text" readonly /></div>' +
-          '<div class="field"><label>净盈亏 / Net P&amp;L ($)</label><input class="t-pnl" type="text" inputmode="decimal" value="' + (data.pnl != null ? data.pnl : "") + '" /></div>' +
-          '<div class="field"><label>风险 / Risk ($)</label><input class="t-risk" type="text" inputmode="decimal" value="' + (data.risk != null ? data.risk : "") + '" /></div>' +
+          '<div class="field"><label>手续费 / Commission</label><input class="t-comm" type="text" readonly /></div>' +
+          '<div class="field"><label>净盈亏 / Net P&amp;L</label><input class="t-pnl" type="text" inputmode="decimal" /></div>' +
+          '<div class="field"><label>风险 / Risk</label><input class="t-risk" type="text" inputmode="decimal" /></div>' +
           '<div class="field"><label>盈亏R / R-multiple</label><input class="t-r" type="text" readonly /></div>' +
+          '<div class="field"><label>点数 / Points</label><input class="t-points" type="text" readonly /></div>' +
           '<div class="field"><label>评分 / Grade</label><select class="t-grade">' +
-            ['A','B','C'].map(function(o){return '<option'+(o===data.grade?' selected':'')+'>'+o+'</option>';}).join('') + '</select></div>' +
-        '</div>';
+            optList(["A", "B", "C"], data.grade, false) + '</select></div>' +
+        '</div>' +
+        '<div class="t-err err-line" hidden>净盈亏不合法：4×(净盈亏+手续费)÷每点价值 不是整数（未落在有效跳动点上）</div>' +
+        '<div class="subs"></div>';
 
       var $ = function (c) { return el.querySelector(c); };
       var instr = $(".t-instr"), size = $(".t-size"), comm = $(".t-comm"),
-          pnl = $(".t-pnl"), risk = $(".t-risk"), rOut = $(".t-r");
+          pnl = $(".t-pnl"), risk = $(".t-risk"), rOut = $(".t-r"), pointsOut = $(".t-points"),
+          errLine = $(".t-err"), subsWrap = $(".subs");
+      var subBlocks = [];
 
-      function calcComm() {
-        var s = parseFloat(size.value) || 0;
-        comm.value = "$" + (commRate(instr.value) * s).toFixed(2);
+      function calcComm() { comm.value = money(commRate(instr.value) * (parseFloat(size.value) || 0)); }
+      function gross() { // (pnl + commission) — gross before commission
+        var p = num(pnl.value); if (p === null) return null;
+        return p + (num(comm.value) || 0);
+      }
+      function calcPoints() {
+        var g = gross(), pv = pointValue(instr.value);
+        if (g === null || !pv) { pointsOut.value = "—"; errLine.hidden = true; return; }
+        var pts = g / pv;
+        pointsOut.value = (pts >= 0 ? "+" : "") + pts.toFixed(2);
+        errLine.hidden = isInt(TICK_DIV * pts);
       }
       function calcR() {
         var p = num(pnl.value), rk = num(risk.value);
-        if (p === null || rk === null || rk === 0) { rOut.value = "—"; return; }
-        var r = p / rk;
-        rOut.value = (r >= 0 ? "+" : "") + r.toFixed(2) + " R";
+        rOut.value = (p === null || rk === null || rk === 0) ? "—" : (p / rk >= 0 ? "+" : "") + (p / rk).toFixed(2) + " R";
       }
-      instr.addEventListener("change", calcComm);
-      size.addEventListener("input", calcComm);
-      pnl.addEventListener("input", calcR);
-      risk.addEventListener("input", calcR);
-      calcComm(); calcR();
+      function recalcSubs() { subBlocks.forEach(function (s) { s.recalc(); }); }
 
+      instr.addEventListener("change", function () { calcComm(); calcPoints(); recalcSubs(); });
+      size.addEventListener("input", function () { calcComm(); calcPoints(); recalcSubs(); });
+      attachMoney(pnl, function () { calcR(); calcPoints(); });
+      attachMoney(risk, function () { calcR(); recalcSubs(); });
+      [".t-signal", ".t-order", ".t-dir", ".t-grade"].forEach(function (c) {
+        $(c).addEventListener("change", recalcSubs);
+      });
+
+      if (data.pnl != null) pnl.value = moneySigned(data.pnl);
+      if (data.risk != null) risk.value = moneySigned(data.risk);
+      calcComm(); calcR(); calcPoints();
+
+      function mainVals() {
+        return {
+          signal: $(".t-signal").value, order: $(".t-order").value, dir: $(".t-dir").value,
+          instr: instr.value, grade: $(".t-grade").value,
+          size: num(size.value), risk: num(risk.value)
+        };
+      }
+
+      // --- sub-account block ---
+      function addSub(sd) {
+        sd = sd || {};
+        var sEl = document.createElement("div");
+        sEl.className = "sub";
+        sEl.innerHTML =
+          '<div class="sub__hd"><span class="sub__t">从账户 · Sub-account</span>' +
+            '<button class="btn btn--sm s-del" type="button">删除</button></div>' +
+          '<div class="form__grid">' +
+            '<div class="field"><label>账户 / Account</label><select class="s-account acct-select">' + accountOptions(sd.account) + '</select></div>' +
+            '<div class="field"><label>倍数 / Multiplier</label><input class="s-mult" type="number" step="any" value="' + (sd.multiplier != null ? sd.multiplier : 1) + '" /></div>' +
+            '<div class="field"><label>实际手数 / Size</label><input class="s-size" type="text" readonly /></div>' +
+            '<div class="field"><label>手续费 / Comm.</label><input class="s-comm" type="text" readonly /></div>' +
+            '<div class="field"><label>风险 / Risk</label><input class="s-risk" type="text" readonly /></div>' +
+            '<div class="field"><label>净盈亏 / Net P&amp;L</label><input class="s-pnl" type="text" inputmode="decimal" /></div>' +
+            '<div class="field"><label>盈亏R / R</label><input class="s-r" type="text" readonly /></div>' +
+            '<div class="field"><label>点数 / Points</label><input class="s-points" type="text" readonly /></div>' +
+          '</div>' +
+          '<div class="s-err err-line" hidden>倍数 × 主账户手数 不是整数</div>' +
+          '<div class="sub__mirror"></div>';
+        var q = function (c) { return sEl.querySelector(c); };
+        var accSel = q(".s-account"), mult = q(".s-mult"), sSize = q(".s-size"), sComm = q(".s-comm"),
+            sRisk = q(".s-risk"), sPnl = q(".s-pnl"), sR = q(".s-r"), sPoints = q(".s-points"),
+            sErr = q(".s-err"), mirror = q(".sub__mirror");
+
+        function recalc() {
+          var mv = mainVals();
+          var m = num(mult.value);
+          var sz = (m === null || mv.size === null) ? null : mv.size * m;
+          sSize.value = (sz === null) ? "—" : String(sz);
+          sErr.hidden = (sz === null) || isInt(sz);
+          var cm = (sz === null) ? null : commRate(mv.instr) * sz;
+          sComm.value = (cm === null) ? "—" : money(cm);
+          var rk = (m === null || mv.risk === null) ? null : m * mv.risk;
+          sRisk.value = (rk === null) ? "—" : moneySigned(rk);
+          var pn = num(sPnl.value);
+          sR.value = (pn === null || rk === null || rk === 0) ? "—" : (pn / rk >= 0 ? "+" : "") + (pn / rk).toFixed(2) + " R";
+          var pv = pointValue(mv.instr);
+          var pts = (pn === null || !pv) ? null : (pn + (cm || 0)) / pv;
+          sPoints.value = (pts === null) ? "—" : (pts >= 0 ? "+" : "") + pts.toFixed(2);
+          mirror.textContent = "跟随主条目：" + mv.signal + " · " + mv.dir + " · " + mv.instr + " · " + mv.order + " · 评分 " + mv.grade;
+        }
+        accSel.addEventListener("change", recalc);
+        mult.addEventListener("input", recalc);
+        attachMoney(sPnl, recalc);
+        if (sd.pnl != null) sPnl.value = moneySigned(sd.pnl);
+        q(".s-del").addEventListener("click", function () {
+          var i = subBlocks.indexOf(sub); if (i >= 0) subBlocks.splice(i, 1);
+          sEl.remove();
+        });
+
+        var sub = {
+          el: sEl, recalc: recalc,
+          read: function () {
+            var mv = mainVals();
+            var m = num(mult.value);
+            var sz = (m === null || mv.size === null) ? null : mv.size * m;
+            var cm = (sz === null) ? null : commRate(mv.instr) * sz;
+            var rk = (m === null || mv.risk === null) ? null : m * mv.risk;
+            var pn = num(sPnl.value);
+            var rr = (pn === null || rk === null || rk === 0) ? null : pn / rk;
+            var pv = pointValue(mv.instr);
+            var pts = (pn === null || !pv) ? null : (pn + (cm || 0)) / pv;
+            return {
+              sub: true, account: accSel.value, multiplier: m,
+              signal: mv.signal, order: mv.order, dir: mv.dir, instr: mv.instr, grade: mv.grade,
+              size: sz, comm: cm, risk: rk, pnl: pn, r: rr, points: pts
+            };
+          }
+        };
+        subBlocks.push(sub);
+        subsWrap.appendChild(sEl);
+        recalc();
+      }
+
+      $(".t-copy").addEventListener("click", function () { addSub(); });
       $(".t-addsig").addEventListener("click", function () { promptNewSignal($(".t-signal")); });
       $(".t-del").addEventListener("click", function () {
         var i = TRADES.indexOf(block);
@@ -586,6 +757,8 @@
         el: el,
         read: function () {
           var p = num(pnl.value), rk = num(risk.value);
+          var g = (p === null) ? null : p + (num(comm.value) || 0);
+          var pv = pointValue(instr.value);
           return {
             signal: $(".t-signal").value, order: $(".t-order").value, dir: $(".t-dir").value,
             instr: instr.value,
@@ -594,16 +767,20 @@
             pnl: p,
             risk: rk,
             r: (p === null || rk === null || rk === 0) ? null : p / rk,
-            grade: $(".t-grade").value
+            points: (g === null || !pv) ? null : g / pv,
+            grade: $(".t-grade").value,
+            subs: subBlocks.map(function (s) { return s.read(); })
           };
         }
       };
       TRADES.push(block);
       tradesEl.appendChild(el);
+      (data.subs || []).forEach(function (sd) { addSub(sd); });
       reindex(); syncEmpty();
     }
+
     function reindex() {
-      var nodes = tradesEl.querySelectorAll(".trade__no");
+      var nodes = tradesEl.querySelectorAll(".trade > .trade__hd .trade__no");
       for (var i = 0; i < nodes.length; i++) nodes[i].textContent = "第 " + (i + 1) + " 笔 · Trade " + (i + 1);
     }
     function setCount(n) {
@@ -619,27 +796,11 @@
     function promptNewSignal(selectToSet) {
       var name = window.prompt("新增交易信号名称：");
       if (!name) return;
-      name = name.trim();
-      if (!name) return;
+      name = name.trim(); if (!name) return;
+      ensureConfig();
       if (signals().indexOf(name) < 0) journal.config.signals.push(name);
       refreshSignalSelects();
       if (selectToSet) selectToSet.value = name;
-    }
-    function refreshSignalSelects() {
-      var list = signals();
-      tradesEl.querySelectorAll(".t-signal").forEach(function (sel) {
-        var cur = sel.value, s = list.slice();
-        if (cur && s.indexOf(cur) < 0) s.unshift(cur);
-        sel.innerHTML = s.map(function (x) { return '<option' + (x === cur ? ' selected' : '') + '>' + x + '</option>'; }).join("");
-      });
-    }
-    function refreshOrderSelects() {
-      var list = orders();
-      tradesEl.querySelectorAll(".t-order").forEach(function (sel) {
-        var cur = sel.value, s = list.slice();
-        if (cur && s.indexOf(cur) < 0) s.unshift(cur);
-        sel.innerHTML = s.map(function (x) { return '<option' + (x === cur ? ' selected' : '') + '>' + x + '</option>'; }).join("");
-      });
     }
     function syncEmpty() {
       var ex = tradesEl.querySelector(".trades-empty");
@@ -651,18 +812,22 @@
     // ---------- new-entry lifecycle ----------
     var form = document.getElementById("form");
     var msg = document.getElementById("msg");
+    var balanceInput = document.getElementById("f_balance");
+    attachMoney(balanceInput, null);
 
-    var editing = null; // entry being edited, or null for a fresh one
+    var editing = null;
     document.getElementById("new-btn").addEventListener("click", function () { openForm(null); });
     function openForm(entry) {
       editing = entry || null;
+      ensureConfig();
       form.hidden = false;
       var today = new Date().toISOString().slice(0, 10);
       document.getElementById("f_date").value = entry ? (entry.date || today) : today;
       document.getElementById("f_daytype").value = entry ? (entry.dayType || "趋势日") : "趋势日";
-      document.getElementById("f_account").value = entry ? (entry.account || "") : "";
-      document.getElementById("f_balance").value = entry ? (entry.balance || "") : "";
+      document.getElementById("f_account").innerHTML = accountOptions(entry ? (entry.account || "") : "");
+      balanceInput.value = (entry && entry.balance != null) ? moneySigned(entry.balance) : "";
       TRADES.forEach(function (b) { b.el.remove(); }); TRADES = [];
+      tradesEl.innerHTML = "";
       if (entry && entry.trades && entry.trades.length) {
         entry.trades.forEach(function (t) { addTrade(t); });
         countInput.value = TRADES.length; reindex();
@@ -706,8 +871,8 @@
           date: document.getElementById("f_date").value,
           dayType: document.getElementById("f_daytype").value,
           tradeCount: TRADES.length,
-          account: document.getElementById("f_account").value.trim(),
-          balance: num(document.getElementById("f_balance").value),
+          account: document.getElementById("f_account").value,
+          balance: num(balanceInput.value),
           trades: TRADES.map(function (b) { return b.read(); }),
           plan: { text: plan.text, images: (plan.kept || []).concat(planImg.refs) },
           analysis: { text: analysis.text, images: (analysis.kept || []).concat(anaImg.refs) },
@@ -721,7 +886,6 @@
 
         await commitJournal("journal: " + (editing ? "update " : "") + entry.date, token);
 
-        // attach freshly-uploaded urls for instant display (not serialized — set after commit)
         entry._local = {};
         Object.keys(planImg.local).forEach(function (k) { entry._local[k] = planImg.local[k]; });
         Object.keys(anaImg.local).forEach(function (k) { entry._local[k] = anaImg.local[k]; });
@@ -769,7 +933,6 @@
       document.getElementById("app").hidden = false;
       document.title = "Journal";
       loadPat(); render();
-      // prime the known journal sha so the first commit uses a fresh value
       var tk = currentPat();
       if (tk) { ghSha(JOURNAL, tk).then(function (s) { journalSha = s; }).catch(function () {}); }
     }
@@ -786,7 +949,6 @@
         imgEl.src = url; imgEl.hidden = false; if (ph) ph.remove();
       } catch (e) { if (ph) ph.textContent = "image unavailable"; }
     }
-    // used by the editor to preview already-committed screenshots
     async function decryptThumb(rec, img) {
       try {
         var bytes = await rawGet(IMGDIR + rec.id + ".enc");
@@ -835,6 +997,15 @@
       return b;
     }
 
+    function signedR(rN) {
+      if (rN === null) return "";
+      return '<span class="' + (rN < 0 ? "down" : "up") + '">' + (rN >= 0 ? "+" : "−") + Math.abs(rN).toFixed(2) + "R</span>";
+    }
+    function signedMoney(pN) {
+      if (pN === null) return "";
+      return '<span class="' + (pN >= 0 ? "up" : "down") + '">' + (pN >= 0 ? "+" : "−") + money(pN) + "</span>";
+    }
+
     function render() {
       var list = journal.entries.slice().sort(function (a, b) {
         if (a.date !== b.date) return a.date < b.date ? 1 : -1;
@@ -849,11 +1020,18 @@
       list.forEach(function (en) {
         var card = document.createElement("div"); card.className = "card";
 
+        // --- summary head (always visible) ---
         var head = document.createElement("div"); head.className = "card__head";
-        head.innerHTML = '<span class="card__date"></span><span class="card__chip"></span><span class="card__acct"></span><span class="card__bal"></span>';
+        head.innerHTML = '<span class="card__date"></span><span class="card__chip"></span>' +
+          '<span class="card__acct"></span><span class="card__count"></span>' +
+          '<span class="card__total"></span><span class="card__bal"></span>';
         head.querySelector(".card__date").textContent = en.date || "—";
         head.querySelector(".card__chip").textContent = en.dayType || "";
-        head.querySelector(".card__acct").textContent = (en.account ? en.account + " · " : "") + (en.tradeCount || 0) + " 笔";
+        head.querySelector(".card__acct").textContent = en.account || "";
+        head.querySelector(".card__count").textContent = (en.tradeCount || 0) + " 笔";
+        var totalPnl = (en.trades || []).reduce(function (a, t) { return a + (num(t.pnl) || 0); }, 0);
+        var hasPnl = (en.trades || []).some(function (t) { return num(t.pnl) !== null; });
+        head.querySelector(".card__total").innerHTML = hasPnl ? "总盈亏 " + signedMoney(totalPnl) : "";
         var balN = num(en.balance);
         head.querySelector(".card__bal").innerHTML = balN !== null ? "余额 <b>" + money(balN) + "</b>" : "";
         var tools = document.createElement("div"); tools.className = "card__tools";
@@ -864,6 +1042,9 @@
         tools.appendChild(edBtn); tools.appendChild(delBtn);
         head.appendChild(tools);
         card.appendChild(head);
+
+        // --- collapsible body ---
+        var body = document.createElement("div"); body.className = "card__body";
 
         (en.trades || []).forEach(function (t) {
           var row = document.createElement("div"); row.className = "trow";
@@ -878,24 +1059,54 @@
           row.appendChild(top);
 
           var nums = document.createElement("div"); nums.className = "trow__nums";
-          var pnlN = num(t.pnl), riskN = num(t.risk), commN = num(t.comm), rN = num(t.r), sizeN = num(t.size);
-          var pnlHtml = pnlN === null ? "" : '<span class="' + (pnlN >= 0 ? "up" : "down") + '">' + (pnlN >= 0 ? "+" : "−") + money(pnlN) + "</span>";
-          var rHtml = rN === null ? "" : '<span class="' + (rN < 0 ? "down" : "up") + '">' + (rN >= 0 ? "+" : "−") + Math.abs(rN).toFixed(2) + "R</span>";
+          var pnlN = num(t.pnl), riskN = num(t.risk), commN = num(t.comm), rN = num(t.r), sizeN = num(t.size), ptsN = num(t.points);
           var bits = [];
           bits.push("手数 " + (sizeN === null ? "—" : sizeN));
-          if (pnlHtml) bits.push("净盈亏 " + pnlHtml);
+          if (pnlN !== null) bits.push("净盈亏 " + signedMoney(pnlN));
           if (riskN !== null) bits.push("风险 " + money(riskN));
-          if (rHtml) bits.push(rHtml);
+          if (rN !== null) bits.push(signedR(rN));
+          if (ptsN !== null) bits.push("点数 " + (ptsN >= 0 ? "+" : "") + ptsN.toFixed(2));
           if (commN !== null) bits.push("手续费 " + money(commN));
           nums.innerHTML = bits.map(function (b) { return "<span>" + b + "</span>"; }).join("");
           row.appendChild(nums);
-          card.appendChild(row);
+
+          (t.subs || []).forEach(function (s) {
+            var sr = document.createElement("div"); sr.className = "subrow";
+            var sPnl = num(s.pnl), sR = num(s.r), sPts = num(s.points), sCm = num(s.comm), sSz = num(s.size);
+            var parts = [];
+            parts.push("从 " + (s.account || "—"));
+            if (s.multiplier != null) parts.push("×" + s.multiplier);
+            if (sSz !== null) parts.push(sSz + " 手");
+            if (sPnl !== null) parts.push("净盈亏 " + signedMoney(sPnl));
+            if (sR !== null) parts.push(signedR(sR));
+            if (sPts !== null) parts.push((sPts >= 0 ? "+" : "") + sPts.toFixed(2) + " pt");
+            if (sCm !== null) parts.push("费 " + money(sCm));
+            sr.innerHTML = parts.map(function (x) { return "<span>" + x + "</span>"; }).join("");
+            row.appendChild(sr);
+          });
+
+          body.appendChild(row);
         });
 
         var local = en._local || null;
-        var pb = imgBlock("盘前计划", en.plan, local); if (pb) card.appendChild(pb);
-        var ab = imgBlock("行情分析及交易", en.analysis, local); if (ab) card.appendChild(ab);
-        var sb = imgBlock("盘中心理及总结", en.psych, local); if (sb) card.appendChild(sb);
+        var pb = imgBlock("盘前计划", en.plan, local); if (pb) body.appendChild(pb);
+        var ab = imgBlock("行情分析及交易", en.analysis, local); if (ab) body.appendChild(ab);
+        var sb = imgBlock("盘中心理及总结", en.psych, local); if (sb) body.appendChild(sb);
+
+        card.appendChild(body);
+
+        // --- expand / collapse toggle (only if there is something to show) ---
+        if (body.children.length) {
+          card.classList.add("card--collapsed");
+          var toggle = document.createElement("button");
+          toggle.className = "btn btn--sm card__toggle";
+          toggle.textContent = "展开 ▾";
+          toggle.addEventListener("click", function () {
+            var collapsed = card.classList.toggle("card--collapsed");
+            toggle.textContent = collapsed ? "展开 ▾" : "收起 ▴";
+          });
+          card.appendChild(toggle);
+        }
 
         feed.appendChild(card);
       });
@@ -907,24 +1118,28 @@
     document.getElementById("sheet-close").addEventListener("click", function () { sheet.hidden = true; });
     sheet.addEventListener("click", function (e) { if (e.target === sheet) sheet.hidden = true; });
 
-    function chipList(container, getList, key) {
+    function chipList(container, getList, key, minOne) {
       container.innerHTML = "";
-      getList().forEach(function (name) {
+      var list = getList();
+      if (!list.length) { container.innerHTML = '<span class="chips-empty">（暂无，添加一个）</span>'; return; }
+      list.forEach(function (name) {
         var c = document.createElement("span"); c.className = "chip";
         var t = document.createElement("span"); t.textContent = name; c.appendChild(t);
         var x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.title = "删除";
         x.addEventListener("click", function () {
           var a = journal.config[key];
-          if (a.length <= 1) { window.alert("至少保留一个。"); return; }
+          if (minOne && a.length <= 1) { window.alert("至少保留一个。"); return; }
           var i = a.indexOf(name); if (i >= 0) a.splice(i, 1);
-          renderSettings(); refreshSignalSelects(); refreshOrderSelects();
+          renderSettings(); refreshAllSelects();
         });
         c.appendChild(x); container.appendChild(c);
       });
     }
     function renderSettings() {
-      chipList(document.getElementById("set-signals"), signals, "signals");
-      chipList(document.getElementById("set-orders"), orders, "orders");
+      ensureConfig();
+      chipList(document.getElementById("set-accounts"), accounts, "accounts", false);
+      chipList(document.getElementById("set-signals"), signals, "signals", true);
+      chipList(document.getElementById("set-orders"), orders, "orders", true);
     }
     function openSettings() {
       ensureConfig();
@@ -934,20 +1149,22 @@
     }
     function addToList(key, val) {
       val = (val || "").trim(); if (!val) return;
+      ensureConfig();
       if (journal.config[key].indexOf(val) < 0) journal.config[key].push(val);
-      renderSettings(); refreshSignalSelects(); refreshOrderSelects();
+      renderSettings(); refreshAllSelects();
     }
-    document.getElementById("set-signal-add").addEventListener("click", function () {
-      var inp = document.getElementById("set-signal-in"); addToList("signals", inp.value); inp.value = ""; inp.focus();
-    });
-    document.getElementById("set-order-add").addEventListener("click", function () {
-      var inp = document.getElementById("set-order-in"); addToList("orders", inp.value); inp.value = ""; inp.focus();
-    });
-    ["set-signal-in", "set-order-in"].forEach(function (id) {
-      document.getElementById(id).addEventListener("keydown", function (e) {
-        if (e.key === "Enter") { e.preventDefault(); document.getElementById(id === "set-signal-in" ? "set-signal-add" : "set-order-add").click(); }
+    function wireAdd(inputId, btnId, key) {
+      document.getElementById(btnId).addEventListener("click", function () {
+        var inp = document.getElementById(inputId); addToList(key, inp.value); inp.value = ""; inp.focus();
       });
-    });
+      document.getElementById(inputId).addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); document.getElementById(btnId).click(); }
+      });
+    }
+    wireAdd("set-account-in", "set-account-add", "accounts");
+    wireAdd("set-signal-in", "set-signal-add", "signals");
+    wireAdd("set-order-in", "set-order-add", "orders");
+
     document.getElementById("sheet-save").addEventListener("click", async function () {
       var smsg = document.getElementById("sheet-msg");
       var token = currentPat();
