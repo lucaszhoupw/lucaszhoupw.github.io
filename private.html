@@ -128,7 +128,11 @@
   .card__bal b { color: var(--text); }
   .card__tools { display: flex; gap: 6px; margin-left: 8px; }
   .card__body { margin-top: 4px; }
-  .card--collapsed .card__body { display: none; }
+  .card__bodywrap { position: relative; }
+  .card--collapsed .card__bodywrap { max-height: 180px; overflow: hidden; }
+  .card__fade { display: none; position: absolute; left: 0; right: 0; bottom: 0; height: 70px; cursor: pointer;
+    background: linear-gradient(to bottom, transparent, var(--surface)); }
+  .card--collapsed .card__fade { display: block; }
   .card__toggle { display: block; margin-left: auto; margin-top: 10px; }
 
   .trow { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px; }
@@ -170,6 +174,38 @@
   .sheet__foot { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
   #sheet-msg { font-size: 0.8rem; color: var(--muted); }
 
+  /* ---- account editor (settings) ---- */
+  .acct-edit { border: 1px solid var(--border-strong); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; background: var(--bg); }
+  .acct-edit__top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .acct-edit__top input { flex: 1; font-family: inherit; font-size: 0.9rem; font-weight: 700; padding: 6px 9px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
+  .acct-edit__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+  .acct-edit__grid label { display: block; font-size: 0.66rem; font-weight: 700; color: var(--muted); margin-bottom: 3px; }
+  .acct-edit__grid input, .acct-edit__grid select { width: 100%; font-family: inherit; font-size: 0.82rem; padding: 6px 8px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
+
+  /* ---- dashboard ---- */
+  .dash__bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 6px 0 18px; }
+  .dash__bar select { font-family: inherit; font-size: 0.9rem; padding: 7px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
+  .dash__acctline { font-size: 0.8rem; color: var(--muted); }
+  .cal__nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 10px; }
+  .cal__label { font-weight: 700; color: var(--text); min-width: 130px; text-align: center; }
+  .cal__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal__dow { text-align: center; font-size: 0.7rem; color: var(--faint); padding: 4px 0; font-weight: 700; }
+  .cal__cell { min-height: 62px; border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px; }
+  .cal__cell.empty { border: none; }
+  .cal__cell.has { background: var(--accent-tint); }
+  .cal__day { font-size: 0.72rem; font-weight: 700; color: var(--muted); }
+  .cal__pnl { font-size: 0.74rem; font-weight: 700; margin-top: 4px; }
+  .cal__cnt { font-size: 0.66rem; color: var(--faint); }
+
+  .dtable { overflow-x: auto; margin-top: 22px; }
+  .dtable table { border-collapse: collapse; width: 100%; font-size: 0.78rem; }
+  .dtable th, .dtable td { border: 1px solid var(--border); padding: 6px 9px; text-align: right; white-space: nowrap; }
+  .dtable th { background: var(--accent-tint); color: var(--accent-strong); font-weight: 700; }
+  .dtable td:first-child, .dtable th:first-child,
+  .dtable td.l, .dtable th.l { text-align: left; }
+  .dtable tr.daystart td { border-top: 2px solid var(--border-strong); }
+  .dtable .empty { color: var(--faint); font-style: italic; padding: 20px; text-align: center; }
+
   /* ---- lightbox ---- */
   .lbx { position: fixed; inset: 0; background: rgba(12,14,13,.86); display: none; align-items: center; justify-content: center; z-index: 50; padding: 20px; cursor: zoom-out; }
   .lbx.open { display: flex; }
@@ -194,6 +230,7 @@
       <h1 class="app__title">Trading Journal</h1>
       <div class="app__actions">
         <button id="new-btn" class="btn btn--solid" type="button">+ New entry</button>
+        <button id="dash-btn" class="btn" type="button">📊 Dashboard</button>
         <button id="settings-btn" class="btn" type="button" title="设置 · Settings">⚙</button>
         <button class="btn" type="button" onclick="location.reload()">Lock</button>
       </div>
@@ -267,6 +304,17 @@
     </form>
 
     <div id="feed" class="feed"></div>
+
+    <!-- dashboard view -->
+    <section id="dash" class="dash" hidden>
+      <div class="dash__bar">
+        <button id="dash-back" class="btn">← 返回日志 · Back</button>
+        <select id="dash-acct" class="acct-select"></select>
+        <span id="dash-acctline" class="dash__acctline"></span>
+      </div>
+      <div id="dash-cal"></div>
+      <div id="dash-table" class="dtable"></div>
+    </section>
   </main>
 
   <!-- settings sheet -->
@@ -278,8 +326,8 @@
       </div>
       <div class="sheet__sec">
         <h3>账户 · Accounts</h3>
-        <div id="set-accounts" class="chips"></div>
-        <div class="addrow"><input id="set-account-in" type="text" placeholder="新增账户…" /><button id="set-account-add" class="btn btn--sm" type="button">添加</button></div>
+        <div id="set-accounts"></div>
+        <button id="set-account-add" class="btn btn--sm" type="button" style="margin-top:8px">+ 添加账户</button>
       </div>
       <div class="sheet__sec">
         <h3>交易信号 · Signals</h3>
@@ -324,14 +372,33 @@
     var TRADES = [];   // open-form trade blocks: {el, read()}
     var SECS = {};     // open-form image sections
 
+    var ACCOUNT_SIZES = [25000, 50000, 100000, 150000];
+    var DEFAULT_ACCT = { size: 50000, initialBalance: 0, maxDrawdown: 2000, drawdownMode: "Intraday" };
+
     function signals() { return (journal.config && journal.config.signals) || DEFAULT_SIGNALS; }
     function orders() { return (journal.config && journal.config.orders) || DEFAULT_ORDERS; }
     function accounts() { return (journal.config && journal.config.accounts) || []; }
+    function accountNames() { return accounts().map(function (a) { return a.name; }).filter(Boolean); }
+    function accountByName(name) {
+      var a = accounts();
+      for (var i = 0; i < a.length; i++) if (a[i].name === name) return a[i];
+      return null;
+    }
     function ensureConfig() {
       if (!journal.config) journal.config = {};
       if (!journal.config.signals || !journal.config.signals.length) journal.config.signals = DEFAULT_SIGNALS.slice();
       if (!journal.config.orders || !journal.config.orders.length) journal.config.orders = DEFAULT_ORDERS.slice();
-      if (!journal.config.accounts) journal.config.accounts = [];
+      if (!Array.isArray(journal.config.accounts)) journal.config.accounts = [];
+      journal.config.accounts = journal.config.accounts.map(function (a) {
+        if (typeof a === "string") a = { name: a };
+        return {
+          name: a.name || "",
+          size: a.size != null ? a.size : DEFAULT_ACCT.size,
+          initialBalance: a.initialBalance != null ? a.initialBalance : DEFAULT_ACCT.initialBalance,
+          maxDrawdown: a.maxDrawdown != null ? a.maxDrawdown : DEFAULT_ACCT.maxDrawdown,
+          drawdownMode: a.drawdownMode || DEFAULT_ACCT.drawdownMode
+        };
+      });
     }
     function pointValue(instr) { return POINT_VALUE[instr] || 0; }
     function commRate(instr) { return (instr === "ES" || instr === "NQ") ? 3.5 : 1.0; }
@@ -500,8 +567,8 @@
     function signalOptions(sel) { return optList(signals(), sel, true); }
     function orderOptions(sel) { return optList(orders(), sel, false); }
     function accountOptions(sel) {
-      var s = accounts().slice();
-      if (sel && s.indexOf(sel) < 0) s.unshift(sel);
+      var s = accountNames();
+      if (sel && s.indexOf(sel) < 0) s = [sel].concat(s);
       if (!s.length) return '<option value="">（在设置中添加账户）</option>';
       return s.map(function (x) { return "<option" + (x === sel ? " selected" : "") + ">" + x + "</option>"; }).join("");
     }
@@ -639,11 +706,12 @@
         return p + (num(comm.value) || 0);
       }
       function calcPoints() {
-        var g = gross(), pv = pointValue(instr.value);
+        var g = gross(), pv = pointValue(instr.value), sz = parseFloat(size.value) || 0;
         if (g === null || !pv) { pointsOut.value = "—"; errLine.hidden = true; return; }
-        var pts = g / pv;
-        pointsOut.value = (pts >= 0 ? "+" : "") + pts.toFixed(2);
-        errLine.hidden = isInt(TICK_DIV * pts);
+        var totalPts = g / pv;                 // total points across all contracts
+        var perPts = sz ? totalPts / sz : totalPts; // points per contract (displayed)
+        pointsOut.value = (perPts >= 0 ? "+" : "") + perPts.toFixed(2);
+        errLine.hidden = isInt(TICK_DIV * totalPts); // tick validity is size-independent
       }
       function calcR() {
         var p = num(pnl.value), rk = num(risk.value);
@@ -709,7 +777,7 @@
           var pn = num(sPnl.value);
           sR.value = (pn === null || rk === null || rk === 0) ? "—" : (pn / rk >= 0 ? "+" : "") + (pn / rk).toFixed(2) + " R";
           var pv = pointValue(mv.instr);
-          var pts = (pn === null || !pv) ? null : (pn + (cm || 0)) / pv;
+          var pts = (pn === null || !pv || !sz) ? null : (pn + (cm || 0)) / pv / sz;
           sPoints.value = (pts === null) ? "—" : (pts >= 0 ? "+" : "") + pts.toFixed(2);
           mirror.textContent = "跟随主条目：" + mv.signal + " · " + mv.dir + " · " + mv.instr + " · " + mv.order + " · 评分 " + mv.grade;
         }
@@ -733,7 +801,7 @@
             var pn = num(sPnl.value);
             var rr = (pn === null || rk === null || rk === 0) ? null : pn / rk;
             var pv = pointValue(mv.instr);
-            var pts = (pn === null || !pv) ? null : (pn + (cm || 0)) / pv;
+            var pts = (pn === null || !pv || !sz) ? null : (pn + (cm || 0)) / pv / sz;
             return {
               sub: true, account: accSel.value, multiplier: m,
               signal: mv.signal, order: mv.order, dir: mv.dir, instr: mv.instr, grade: mv.grade,
@@ -756,18 +824,18 @@
       var block = {
         el: el,
         read: function () {
-          var p = num(pnl.value), rk = num(risk.value);
+          var p = num(pnl.value), rk = num(risk.value), sz = num(size.value);
           var g = (p === null) ? null : p + (num(comm.value) || 0);
           var pv = pointValue(instr.value);
           return {
             signal: $(".t-signal").value, order: $(".t-order").value, dir: $(".t-dir").value,
             instr: instr.value,
-            size: num(size.value),
+            size: sz,
             comm: num(comm.value),
             pnl: p,
             risk: rk,
             r: (p === null || rk === null || rk === 0) ? null : p / rk,
-            points: (g === null || !pv) ? null : g / pv,
+            points: (g === null || !pv || !sz) ? null : g / pv / sz,
             grade: $(".t-grade").value,
             subs: subBlocks.map(function (s) { return s.read(); })
           };
@@ -820,6 +888,7 @@
     function openForm(entry) {
       editing = entry || null;
       ensureConfig();
+      closeDashboard();
       form.hidden = false;
       var today = new Date().toISOString().slice(0, 10);
       document.getElementById("f_date").value = entry ? (entry.date || today) : today;
@@ -1093,18 +1162,24 @@
         var ab = imgBlock("行情分析及交易", en.analysis, local); if (ab) body.appendChild(ab);
         var sb = imgBlock("盘中心理及总结", en.psych, local); if (sb) body.appendChild(sb);
 
-        card.appendChild(body);
+        var bodywrap = document.createElement("div"); bodywrap.className = "card__bodywrap";
+        bodywrap.appendChild(body);
+        var fade = document.createElement("div"); fade.className = "card__fade";
+        bodywrap.appendChild(fade);
+        card.appendChild(bodywrap);
 
-        // --- expand / collapse toggle (only if there is something to show) ---
+        // --- expand / collapse (faded preview when collapsed) ---
         if (body.children.length) {
           card.classList.add("card--collapsed");
           var toggle = document.createElement("button");
           toggle.className = "btn btn--sm card__toggle";
           toggle.textContent = "展开 ▾";
-          toggle.addEventListener("click", function () {
+          var toggleCard = function () {
             var collapsed = card.classList.toggle("card--collapsed");
             toggle.textContent = collapsed ? "展开 ▾" : "收起 ▴";
-          });
+          };
+          toggle.addEventListener("click", toggleCard);
+          fade.addEventListener("click", toggleCard);
           card.appendChild(toggle);
         }
 
@@ -1135,9 +1210,43 @@
         c.appendChild(x); container.appendChild(c);
       });
     }
+    function renderAccounts() {
+      var box = document.getElementById("set-accounts");
+      box.innerHTML = "";
+      var list = journal.config.accounts;
+      if (!list.length) { box.innerHTML = '<span class="chips-empty">（暂无账户，点击下方添加）</span>'; return; }
+      list.forEach(function (acc, idx) {
+        var row = document.createElement("div"); row.className = "acct-edit";
+        row.innerHTML =
+          '<div class="acct-edit__top"><input class="a-name" type="text" placeholder="账户名称" />' +
+            '<button class="btn btn--sm a-del" type="button">删除</button></div>' +
+          '<div class="acct-edit__grid">' +
+            '<div><label>账户大小 Size</label><select class="a-size">' +
+              ACCOUNT_SIZES.map(function (s) { return '<option value="' + s + '"' + (s === acc.size ? ' selected' : '') + '>' + (s / 1000) + 'k</option>'; }).join('') + '</select></div>' +
+            '<div><label>初始余额 Init.</label><input class="a-init" type="text" inputmode="decimal" /></div>' +
+            '<div><label>最大回撤 Max DD</label><input class="a-dd" type="text" inputmode="decimal" /></div>' +
+            '<div><label>回撤模式 Mode</label><select class="a-mode">' +
+              ['Intraday', 'EOD'].map(function (m) { return '<option' + (m === acc.drawdownMode ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select></div>' +
+          '</div>';
+        var q = function (c) { return row.querySelector(c); };
+        q(".a-name").value = acc.name;
+        q(".a-init").value = moneySigned(acc.initialBalance);
+        q(".a-dd").value = moneySigned(acc.maxDrawdown);
+        q(".a-name").addEventListener("input", function () { acc.name = q(".a-name").value; });
+        q(".a-name").addEventListener("change", refreshAccountSelects);
+        q(".a-size").addEventListener("change", function () { acc.size = parseFloat(q(".a-size").value); });
+        attachMoney(q(".a-init"), function () { acc.initialBalance = num(q(".a-init").value) || 0; });
+        attachMoney(q(".a-dd"), function () { acc.maxDrawdown = num(q(".a-dd").value) || 0; });
+        q(".a-mode").addEventListener("change", function () { acc.drawdownMode = q(".a-mode").value; });
+        q(".a-del").addEventListener("click", function () {
+          journal.config.accounts.splice(idx, 1); renderAccounts(); refreshAccountSelects();
+        });
+        box.appendChild(row);
+      });
+    }
     function renderSettings() {
       ensureConfig();
-      chipList(document.getElementById("set-accounts"), accounts, "accounts", false);
+      renderAccounts();
       chipList(document.getElementById("set-signals"), signals, "signals", true);
       chipList(document.getElementById("set-orders"), orders, "orders", true);
     }
@@ -1161,7 +1270,15 @@
         if (e.key === "Enter") { e.preventDefault(); document.getElementById(btnId).click(); }
       });
     }
-    wireAdd("set-account-in", "set-account-add", "accounts");
+    document.getElementById("set-account-add").addEventListener("click", function () {
+      ensureConfig();
+      var n = journal.config.accounts.length + 1;
+      journal.config.accounts.push({
+        name: "账户" + n, size: DEFAULT_ACCT.size, initialBalance: DEFAULT_ACCT.initialBalance,
+        maxDrawdown: DEFAULT_ACCT.maxDrawdown, drawdownMode: DEFAULT_ACCT.drawdownMode
+      });
+      renderAccounts(); refreshAccountSelects();
+    });
     wireAdd("set-signal-in", "set-signal-add", "signals");
     wireAdd("set-order-in", "set-order-add", "orders");
 
@@ -1175,6 +1292,157 @@
         smsg.textContent = "已保存 ✓";
       } catch (e) { smsg.textContent = "失败：" + (e && e.message ? e.message : "error"); }
     });
+
+    // ---------- dashboard ----------
+    var dash = document.getElementById("dash");
+    var tokEl = document.getElementById("tok");
+    var dashAcctSel = document.getElementById("dash-acct");
+    var dashCal = document.getElementById("dash-cal");
+    var dashTable = document.getElementById("dash-table");
+    var dashAcctLine = document.getElementById("dash-acctline");
+    var dashYear, dashMonth;
+
+    document.getElementById("dash-btn").addEventListener("click", openDashboard);
+    document.getElementById("dash-back").addEventListener("click", closeDashboard);
+    dashAcctSel.addEventListener("change", function () { initMonthForAccount(); renderDash(); });
+
+    function openDashboard() {
+      ensureConfig();
+      form.hidden = true;
+      tokEl.style.display = "none";
+      feed.style.display = "none";
+      dash.hidden = false;
+      dashAcctSel.innerHTML = accountOptions(dashAcctSel.value || "");
+      initMonthForAccount();
+      renderDash();
+    }
+    function closeDashboard() {
+      dash.hidden = true;
+      tokEl.style.display = "";
+      feed.style.display = "";
+    }
+
+    function pad2(n) { return (n < 10 ? "0" : "") + n; }
+    function mkExec(en, instr, size, pnl, comm) {
+      var sz = num(size), p = num(pnl), cm = num(comm), pv = pointValue(instr);
+      var pts = (p === null || !pv || !sz) ? null : (p + (cm || 0)) / pv / sz;
+      return { date: en.date, ts: en.ts, instr: instr, size: sz, pnl: p, comm: cm, points: pts };
+    }
+    function executionsFor(name) {
+      var ex = [];
+      journal.entries.forEach(function (en) {
+        (en.trades || []).forEach(function (t) {
+          if (en.account === name) ex.push(mkExec(en, t.instr, t.size, t.pnl, t.comm));
+          (t.subs || []).forEach(function (s) {
+            if (s.account === name) ex.push(mkExec(en, s.instr, s.size, s.pnl, s.comm));
+          });
+        });
+      });
+      ex.sort(function (a, b) { if (a.date !== b.date) return a.date < b.date ? -1 : 1; return (a.ts || 0) - (b.ts || 0); });
+      return ex;
+    }
+    // running cumulative + trailing-drawdown blowout line
+    function computeRows(ex, acc) {
+      var initBal = num(acc && acc.initialBalance) || 0;
+      var D = num(acc && acc.maxDrawdown) || 0;
+      var mode = (acc && acc.drawdownMode) || "Intraday";
+      var days = [];
+      ex.forEach(function (e) {
+        var d = days[days.length - 1];
+        if (!d || d.date !== e.date) { d = { date: e.date, list: [] }; days.push(d); }
+        d.list.push(e);
+      });
+      var rows = [], cum = 0, intradayPeak = initBal, eodPeak = initBal;
+      days.forEach(function (day) {
+        var dayCum = 0, lineEOD = eodPeak - D, first = true;
+        day.list.forEach(function (e) {
+          cum += (e.pnl || 0); dayCum += (e.pnl || 0);
+          var equity = initBal + cum, line;
+          if (mode === "EOD") line = lineEOD;
+          else { intradayPeak = Math.max(intradayPeak, equity); line = intradayPeak - D; }
+          rows.push({
+            date: e.date, instr: e.instr, size: e.size, pnl: e.pnl, points: e.points,
+            dayCum: dayCum, total: equity, limit: line, safety: equity - line, dayStart: first
+          });
+          first = false;
+        });
+        eodPeak = Math.max(eodPeak, initBal + cum); // day close equity feeds next day's EOD line
+      });
+      return rows;
+    }
+    function initMonthForAccount() {
+      var ex = executionsFor(dashAcctSel.value);
+      var ref = ex.length ? ex[ex.length - 1].date : new Date().toISOString().slice(0, 10);
+      var p = ref.split("-");
+      dashYear = parseInt(p[0], 10); dashMonth = parseInt(p[1], 10) - 1;
+    }
+    function shiftMonth(d) {
+      dashMonth += d;
+      if (dashMonth < 0) { dashMonth = 11; dashYear--; }
+      else if (dashMonth > 11) { dashMonth = 0; dashYear++; }
+      renderDash();
+    }
+    function renderDash() {
+      var acc = accountByName(dashAcctSel.value);
+      var ex = executionsFor(dashAcctSel.value);
+      dashAcctLine.textContent = acc
+        ? (acc.size / 1000) + "k · 初始 " + money(acc.initialBalance) + " · 最大回撤 " + money(acc.maxDrawdown) + " · " + acc.drawdownMode
+        : "";
+      renderCalendar(ex);
+      renderTable(ex, acc);
+    }
+    function renderCalendar(ex) {
+      var byDate = {};
+      ex.forEach(function (e) { var m = byDate[e.date] || (byDate[e.date] = { pnl: 0, count: 0 }); m.pnl += (e.pnl || 0); m.count++; });
+      var mn = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+      var html = '<div class="cal__nav"><button class="btn btn--sm" id="cal-prev" type="button">‹</button>' +
+        '<span class="cal__label">' + dashYear + " 年 " + mn[dashMonth] + '</span>' +
+        '<button class="btn btn--sm" id="cal-next" type="button">›</button></div><div class="cal__grid">';
+      ["日","一","二","三","四","五","六"].forEach(function (d) { html += '<div class="cal__dow">' + d + '</div>'; });
+      var startDow = new Date(dashYear, dashMonth, 1).getDay();
+      var daysInMonth = new Date(dashYear, dashMonth + 1, 0).getDate();
+      for (var i = 0; i < startDow; i++) html += '<div class="cal__cell empty"></div>';
+      for (var dnum = 1; dnum <= daysInMonth; dnum++) {
+        var ds = dashYear + "-" + pad2(dashMonth + 1) + "-" + pad2(dnum);
+        var m = byDate[ds];
+        if (m) {
+          html += '<div class="cal__cell has"><div class="cal__day">' + dnum + '</div>' +
+            '<div class="cal__pnl ' + (m.pnl >= 0 ? "up" : "down") + '">' + (m.pnl >= 0 ? "+" : "−") + money(m.pnl) + '</div>' +
+            '<div class="cal__cnt">' + m.count + ' 笔</div></div>';
+        } else {
+          html += '<div class="cal__cell"><div class="cal__day">' + dnum + '</div></div>';
+        }
+      }
+      html += '</div>';
+      dashCal.innerHTML = html;
+      document.getElementById("cal-prev").addEventListener("click", function () { shiftMonth(-1); });
+      document.getElementById("cal-next").addEventListener("click", function () { shiftMonth(1); });
+    }
+    function cellMoney(n) {
+      if (n === null || n === undefined) return "";
+      return '<span class="' + (n >= 0 ? "up" : "down") + '">' + (n >= 0 ? "+" : "−") + money(n) + '</span>';
+    }
+    function renderTable(ex, acc) {
+      var rows = computeRows(ex, acc);
+      if (!rows.length) { dashTable.innerHTML = '<div class="empty">该账户暂无交易记录</div>'; return; }
+      var head = '<tr><th class="l">日期</th><th>商品</th><th>手数</th><th>净盈亏</th><th>点数</th>' +
+        '<th>当日累计</th><th>总累计盈亏</th><th>最大亏损限制</th><th>安全距离</th></tr>';
+      var body = "";
+      rows.slice().reverse().forEach(function (r) {
+        body += '<tr' + (r.dayStart ? ' class="daystart"' : '') + '>' +
+          '<td class="l">' + (r.date || "") + '</td>' +
+          '<td>' + (r.instr || "") + '</td>' +
+          '<td>' + (r.size == null ? "" : r.size) + '</td>' +
+          '<td>' + cellMoney(r.pnl) + '</td>' +
+          '<td>' + (r.points == null ? "" : (r.points >= 0 ? "+" : "") + r.points.toFixed(2)) + '</td>' +
+          '<td>' + cellMoney(r.dayCum) + '</td>' +
+          '<td>' + cellMoney(r.total) + '</td>' +
+          '<td>' + moneySigned(r.limit) + '</td>' +
+          '<td>' + cellMoney(r.safety) + '</td>' +
+          '</tr>';
+      });
+      dashTable.innerHTML = '<table>' + head + body + '</table>';
+    }
 
     // ---------- lightbox ----------
     var lbx = document.getElementById("lbx"), lbxImg = document.getElementById("lbx-img");
