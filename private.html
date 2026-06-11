@@ -131,6 +131,26 @@
   .block__imgs .ph { width: 120px; height: 80px; border-radius: 8px; background: var(--accent-tint); display: flex; align-items: center; justify-content: center; font-size: 0.74rem; color: var(--faint); }
   .feed__empty { color: var(--faint); font-style: italic; text-align: center; padding: 28px 0; }
 
+  /* ---- empty-day hint ---- */
+  .trades-empty { color: var(--faint); font-size: 0.84rem; font-style: italic; padding: 6px 2px; }
+
+  /* ---- settings sheet ---- */
+  .sheet { position: fixed; inset: 0; background: rgba(12,14,13,.5); display: flex; align-items: flex-start; justify-content: center; z-index: 60; padding: 44px 20px; overflow: auto; }
+  .sheet[hidden] { display: none; }
+  .sheet__box { width: 100%; max-width: 460px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 14px; padding: 20px; }
+  .sheet__hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .sheet__title { font-size: 1.1rem; color: var(--accent); margin: 0; }
+  .sheet__sec { margin-top: 16px; }
+  .sheet__sec h3 { font-size: 0.84rem; color: var(--muted); margin: 0 0 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; background: var(--accent-tint); color: var(--text); border-radius: 999px; padding: 4px 6px 4px 12px; font-size: 0.84rem; }
+  .chip button { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 1.05rem; line-height: 1; padding: 0 4px; }
+  .chip button:hover { color: #b3392f; }
+  .addrow { display: flex; gap: 8px; margin-top: 10px; }
+  .addrow input { flex: 1; font-family: inherit; font-size: 0.9rem; padding: 7px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); }
+  .sheet__foot { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+  #sheet-msg { font-size: 0.8rem; color: var(--muted); }
+
   /* ---- lightbox ---- */
   .lbx { position: fixed; inset: 0; background: rgba(12,14,13,.86); display: none; align-items: center; justify-content: center; z-index: 50; padding: 20px; cursor: zoom-out; }
   .lbx.open { display: flex; }
@@ -155,6 +175,7 @@
       <h1 class="app__title">Trading Journal</h1>
       <div class="app__actions">
         <button id="new-btn" class="btn btn--solid" type="button">+ New entry</button>
+        <button id="settings-btn" class="btn" type="button" title="设置 · Settings">⚙</button>
         <button class="btn" type="button" onclick="location.reload()">Lock</button>
       </div>
     </div>
@@ -229,6 +250,30 @@
     <div id="feed" class="feed"></div>
   </main>
 
+  <!-- settings sheet -->
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet__box">
+      <div class="sheet__hd">
+        <h2 class="sheet__title">设置 · Settings</h2>
+        <button id="sheet-close" class="btn btn--sm" type="button">关闭</button>
+      </div>
+      <div class="sheet__sec">
+        <h3>交易信号 · Signals</h3>
+        <div id="set-signals" class="chips"></div>
+        <div class="addrow"><input id="set-signal-in" type="text" placeholder="新增信号…" /><button id="set-signal-add" class="btn btn--sm" type="button">添加</button></div>
+      </div>
+      <div class="sheet__sec">
+        <h3>入场方式 · Entry methods</h3>
+        <div id="set-orders" class="chips"></div>
+        <div class="addrow"><input id="set-order-in" type="text" placeholder="新增入场方式…" /><button id="set-order-add" class="btn btn--sm" type="button">添加</button></div>
+      </div>
+      <div class="sheet__foot">
+        <button id="sheet-save" class="btn btn--solid" type="button">保存到仓库 · Save</button>
+        <span id="sheet-msg"></span>
+      </div>
+    </div>
+  </div>
+
   <div id="lbx" class="lbx"><img id="lbx-img" alt="" /></div>
 
   <script>
@@ -243,15 +288,24 @@
     var ITER = 200000;
     var PAT_KEY = "plz_gh_pat";
     var DEFAULT_SIGNALS = ["高潮反转", "旗形延续", "二次入场", "突破回踩", "计划外"];
+    var DEFAULT_ORDERS = ["stop", "limit", "market"];
 
     // ---------- state ----------
     var PASSWORD = null;
-    var journal = { entries: [], config: { signals: DEFAULT_SIGNALS.slice() } };
+    var journal = { entries: [], config: { signals: DEFAULT_SIGNALS.slice(), orders: DEFAULT_ORDERS.slice() } };
     var TRADES = [];   // open-form trade blocks: {el, read()}
     var SECS = {};     // open-form image sections
 
     function signals() {
       return (journal.config && journal.config.signals) || DEFAULT_SIGNALS;
+    }
+    function orders() {
+      return (journal.config && journal.config.orders) || DEFAULT_ORDERS;
+    }
+    function ensureConfig() {
+      if (!journal.config) journal.config = {};
+      if (!journal.config.signals || !journal.config.signals.length) journal.config.signals = DEFAULT_SIGNALS.slice();
+      if (!journal.config.orders || !journal.config.orders.length) journal.config.orders = DEFAULT_ORDERS.slice();
     }
 
     // ---------- crypto ----------
@@ -438,6 +492,11 @@
       if (sel && s.indexOf(sel) < 0) s.unshift(sel); // keep a custom/legacy signal selectable
       return s.map(function (x) { return '<option value="' + x + '"' + (x === sel ? " selected" : "") + ">" + x + "</option>"; }).join("");
     }
+    function orderOptions(sel) {
+      var s = orders().slice();
+      if (sel && s.indexOf(sel) < 0) s.unshift(sel);
+      return s.map(function (x) { return '<option' + (x === sel ? " selected" : "") + ">" + x + "</option>"; }).join("");
+    }
     function addTrade(data) {
       data = data || {};
       var el = document.createElement("div");
@@ -450,7 +509,7 @@
             '<div class="signal-row"><select class="t-signal">' + signalOptions(data.signal) + '</select>' +
             '<button class="btn btn--sm t-addsig" type="button" title="新增信号">＋</button></div></div>' +
           '<div class="field"><label>入场方式 / Order</label><select class="t-order">' +
-            ['stop','limit','market'].map(function(o){return '<option'+(o===data.order?' selected':'')+'>'+o+'</option>';}).join('') + '</select></div>' +
+            orderOptions(data.order) + '</select></div>' +
           '<div class="field"><label>方向 / Direction</label><select class="t-dir">' +
             ['long','short'].map(function(o){return '<option'+(o===data.dir?' selected':'')+'>'+o+'</option>';}).join('') + '</select></div>' +
           '<div class="field"><label>商品 / Instrument</label><select class="t-instr">' +
@@ -487,7 +546,7 @@
       $(".t-addsig").addEventListener("click", function () { promptNewSignal($(".t-signal")); });
       $(".t-del").addEventListener("click", function () {
         var i = TRADES.indexOf(block);
-        if (i >= 0) { TRADES.splice(i, 1); el.remove(); reindex(); countInput.value = TRADES.length; }
+        if (i >= 0) { TRADES.splice(i, 1); el.remove(); reindex(); countInput.value = TRADES.length; syncEmpty(); }
       });
 
       var block = {
@@ -502,7 +561,7 @@
       };
       TRADES.push(block);
       tradesEl.appendChild(el);
-      reindex();
+      reindex(); syncEmpty();
     }
     function reindex() {
       var nodes = tradesEl.querySelectorAll(".trade__no");
@@ -513,7 +572,7 @@
       while (TRADES.length < n) addTrade();
       while (TRADES.length > n) { var b = TRADES.pop(); b.el.remove(); }
       countInput.value = n;
-      reindex();
+      reindex(); syncEmpty();
     }
     countInput.addEventListener("input", function () { setCount(countInput.value); });
     document.getElementById("add-trade").addEventListener("click", function () { if (TRADES.length < 10) setCount(TRADES.length + 1); });
@@ -530,9 +589,24 @@
     function refreshSignalSelects() {
       var list = signals();
       tradesEl.querySelectorAll(".t-signal").forEach(function (sel) {
-        var cur = sel.value;
-        sel.innerHTML = list.map(function (x) { return '<option' + (x === cur ? ' selected' : '') + '>' + x + '</option>'; }).join("");
+        var cur = sel.value, s = list.slice();
+        if (cur && s.indexOf(cur) < 0) s.unshift(cur);
+        sel.innerHTML = s.map(function (x) { return '<option' + (x === cur ? ' selected' : '') + '>' + x + '</option>'; }).join("");
       });
+    }
+    function refreshOrderSelects() {
+      var list = orders();
+      tradesEl.querySelectorAll(".t-order").forEach(function (sel) {
+        var cur = sel.value, s = list.slice();
+        if (cur && s.indexOf(cur) < 0) s.unshift(cur);
+        sel.innerHTML = s.map(function (x) { return '<option' + (x === cur ? ' selected' : '') + '>' + x + '</option>'; }).join("");
+      });
+    }
+    function syncEmpty() {
+      var ex = tradesEl.querySelector(".trades-empty");
+      if (TRADES.length === 0) {
+        if (!ex) { var d = document.createElement("div"); d.className = "trades-empty"; d.textContent = "空仓日 · no-trade day（0 笔）"; tradesEl.appendChild(d); }
+      } else if (ex) { ex.remove(); }
     }
 
     // ---------- new-entry lifecycle ----------
@@ -638,14 +712,14 @@
       try {
         var bytes = await rawGet(JOURNAL);
         if (bytes === null) {
-          PASSWORD = pw; journal = { entries: [], config: { signals: DEFAULT_SIGNALS.slice() } };
+          PASSWORD = pw; journal = { entries: [], config: {} };
         } else {
           var txt = await decStr(bytes, pw);
           var data = JSON.parse(txt);
-          journal = { entries: data.entries || [], config: data.config || { signals: DEFAULT_SIGNALS.slice() } };
-          if (!journal.config.signals || !journal.config.signals.length) journal.config.signals = DEFAULT_SIGNALS.slice();
+          journal = { entries: data.entries || [], config: data.config || {} };
           PASSWORD = pw;
         }
+        ensureConfig();
         enterApp();
       } catch (err) {
         busyEl.hidden = true; goBtn.disabled = false; errEl.hidden = false;
@@ -788,6 +862,66 @@
         feed.appendChild(card);
       });
     }
+
+    // ---------- settings sheet ----------
+    var sheet = document.getElementById("sheet");
+    document.getElementById("settings-btn").addEventListener("click", openSettings);
+    document.getElementById("sheet-close").addEventListener("click", function () { sheet.hidden = true; });
+    sheet.addEventListener("click", function (e) { if (e.target === sheet) sheet.hidden = true; });
+
+    function chipList(container, getList, key) {
+      container.innerHTML = "";
+      getList().forEach(function (name) {
+        var c = document.createElement("span"); c.className = "chip";
+        var t = document.createElement("span"); t.textContent = name; c.appendChild(t);
+        var x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.title = "删除";
+        x.addEventListener("click", function () {
+          var a = journal.config[key];
+          if (a.length <= 1) { window.alert("至少保留一个。"); return; }
+          var i = a.indexOf(name); if (i >= 0) a.splice(i, 1);
+          renderSettings(); refreshSignalSelects(); refreshOrderSelects();
+        });
+        c.appendChild(x); container.appendChild(c);
+      });
+    }
+    function renderSettings() {
+      chipList(document.getElementById("set-signals"), signals, "signals");
+      chipList(document.getElementById("set-orders"), orders, "orders");
+    }
+    function openSettings() {
+      ensureConfig();
+      renderSettings();
+      document.getElementById("sheet-msg").textContent = "";
+      sheet.hidden = false;
+    }
+    function addToList(key, val) {
+      val = (val || "").trim(); if (!val) return;
+      if (journal.config[key].indexOf(val) < 0) journal.config[key].push(val);
+      renderSettings(); refreshSignalSelects(); refreshOrderSelects();
+    }
+    document.getElementById("set-signal-add").addEventListener("click", function () {
+      var inp = document.getElementById("set-signal-in"); addToList("signals", inp.value); inp.value = ""; inp.focus();
+    });
+    document.getElementById("set-order-add").addEventListener("click", function () {
+      var inp = document.getElementById("set-order-in"); addToList("orders", inp.value); inp.value = ""; inp.focus();
+    });
+    ["set-signal-in", "set-order-in"].forEach(function (id) {
+      document.getElementById(id).addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); document.getElementById(id === "set-signal-in" ? "set-signal-add" : "set-order-add").click(); }
+      });
+    });
+    document.getElementById("sheet-save").addEventListener("click", async function () {
+      var smsg = document.getElementById("sheet-msg");
+      var token = currentPat();
+      if (!token) { document.getElementById("tok").open = true; smsg.textContent = "需要 GitHub token"; return; }
+      smsg.textContent = "保存中…";
+      try {
+        var encJ = await encStr(JSON.stringify({ entries: journal.entries, config: journal.config }));
+        var sha = await ghSha(JOURNAL, token);
+        await ghPut(JOURNAL, bytesToB64(encJ), "journal: update settings", token, sha);
+        smsg.textContent = "已保存 ✓";
+      } catch (e) { smsg.textContent = "失败：" + (e && e.message ? e.message : "error"); }
+    });
 
     // ---------- lightbox ----------
     var lbx = document.getElementById("lbx"), lbxImg = document.getElementById("lbx-img");
