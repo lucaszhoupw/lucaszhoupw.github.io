@@ -183,6 +183,15 @@
   .acct-edit__grid input, .acct-edit__grid select { width: 100%; font-family: inherit; font-size: 0.82rem; padding: 6px 8px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
 
   /* ---- dashboard ---- */
+  .dstats { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .stat { border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px; background: var(--surface); }
+  .stat__label { font-size: 0.66rem; font-weight: 700; color: var(--faint); }
+  .stat__value { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-top: 3px; }
+  .chart { margin-bottom: 18px; }
+  .chart svg { width: 100%; height: auto; display: block; }
+  .chart__note { color: var(--faint); font-style: italic; font-size: 0.84rem; padding: 26px 0; text-align: center; }
+  .chart__legend { display: flex; gap: 18px; justify-content: center; font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
+  .chart__legend i { display: inline-block; width: 16px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 5px; }
   .dash__bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 6px 0 18px; }
   .dash__bar select { font-family: inherit; font-size: 0.9rem; padding: 7px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
   .dash__acctline { font-size: 0.8rem; color: var(--muted); }
@@ -230,8 +239,8 @@
       <h1 class="app__title">Trading Journal</h1>
       <div class="app__actions">
         <button id="new-btn" class="btn btn--solid" type="button">+ New entry</button>
-        <button id="dash-btn" class="btn" type="button">📊 Dashboard</button>
-        <button id="settings-btn" class="btn" type="button" title="设置 · Settings">⚙</button>
+        <button id="dash-btn" class="btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><polyline points="3 17 9 11 13 15 21 6"/></svg>Dashboard</button>
+        <button id="settings-btn" class="btn" type="button" title="设置 · Settings">⚙ Settings</button>
         <button class="btn" type="button" onclick="location.reload()">Lock</button>
       </div>
     </div>
@@ -312,6 +321,8 @@
         <select id="dash-acct" class="acct-select"></select>
         <span id="dash-acctline" class="dash__acctline"></span>
       </div>
+      <div id="dash-stats" class="dstats"></div>
+      <div id="dash-chart"></div>
       <div id="dash-cal"></div>
       <div id="dash-table" class="dtable"></div>
     </section>
@@ -333,11 +344,6 @@
         <h3>交易信号 · Signals</h3>
         <div id="set-signals" class="chips"></div>
         <div class="addrow"><input id="set-signal-in" type="text" placeholder="新增信号…" /><button id="set-signal-add" class="btn btn--sm" type="button">添加</button></div>
-      </div>
-      <div class="sheet__sec">
-        <h3>入场方式 · Entry methods</h3>
-        <div id="set-orders" class="chips"></div>
-        <div class="addrow"><input id="set-order-in" type="text" placeholder="新增入场方式…" /><button id="set-order-add" class="btn btn--sm" type="button">添加</button></div>
       </div>
       <div class="sheet__foot">
         <button id="sheet-save" class="btn btn--solid" type="button">保存到仓库 · Save</button>
@@ -376,7 +382,7 @@
     var DEFAULT_ACCT = { size: 50000, initialBalance: 0, maxDrawdown: 2000, drawdownMode: "Intraday" };
 
     function signals() { return (journal.config && journal.config.signals) || DEFAULT_SIGNALS; }
-    function orders() { return (journal.config && journal.config.orders) || DEFAULT_ORDERS; }
+    function orders() { return DEFAULT_ORDERS; } // fixed order types: stop / limit / market
     function accounts() { return (journal.config && journal.config.accounts) || []; }
     function accountNames() { return accounts().map(function (a) { return a.name; }).filter(Boolean); }
     function accountByName(name) {
@@ -387,7 +393,6 @@
     function ensureConfig() {
       if (!journal.config) journal.config = {};
       if (!journal.config.signals || !journal.config.signals.length) journal.config.signals = DEFAULT_SIGNALS.slice();
-      if (!journal.config.orders || !journal.config.orders.length) journal.config.orders = DEFAULT_ORDERS.slice();
       if (!Array.isArray(journal.config.accounts)) journal.config.accounts = [];
       journal.config.accounts = journal.config.accounts.map(function (a) {
         if (typeof a === "string") a = { name: a };
@@ -582,7 +587,7 @@
     function refreshSignalSelects() { refreshSelects(".t-signal", signalOptions); }
     function refreshOrderSelects() { refreshSelects(".t-order", orderOptions); }
     function refreshAccountSelects() { refreshSelects(".acct-select", accountOptions); }
-    function refreshAllSelects() { refreshSignalSelects(); refreshOrderSelects(); refreshAccountSelects(); }
+    function refreshAllSelects() { refreshSignalSelects(); refreshAccountSelects(); }
 
     // ---------- image section component ----------
     function makeImageSection(mount, withImages, text0, existing) {
@@ -1248,7 +1253,6 @@
       ensureConfig();
       renderAccounts();
       chipList(document.getElementById("set-signals"), signals, "signals", true);
-      chipList(document.getElementById("set-orders"), orders, "orders", true);
     }
     function openSettings() {
       ensureConfig();
@@ -1280,7 +1284,6 @@
       renderAccounts(); refreshAccountSelects();
     });
     wireAdd("set-signal-in", "set-signal-add", "signals");
-    wireAdd("set-order-in", "set-order-add", "orders");
 
     document.getElementById("sheet-save").addEventListener("click", async function () {
       var smsg = document.getElementById("sheet-msg");
@@ -1323,18 +1326,19 @@
     }
 
     function pad2(n) { return (n < 10 ? "0" : "") + n; }
-    function mkExec(en, instr, size, pnl, comm) {
-      var sz = num(size), p = num(pnl), cm = num(comm), pv = pointValue(instr);
+    function mkExec(en, instr, size, pnl, comm, risk) {
+      var sz = num(size), p = num(pnl), cm = num(comm), rk = num(risk), pv = pointValue(instr);
       var pts = (p === null || !pv || !sz) ? null : (p + (cm || 0)) / pv / sz;
-      return { date: en.date, ts: en.ts, instr: instr, size: sz, pnl: p, comm: cm, points: pts };
+      var r = (p === null || rk === null || rk === 0) ? null : p / rk;
+      return { date: en.date, ts: en.ts, instr: instr, size: sz, pnl: p, comm: cm, risk: rk, r: r, points: pts };
     }
     function executionsFor(name) {
       var ex = [];
       journal.entries.forEach(function (en) {
         (en.trades || []).forEach(function (t) {
-          if (en.account === name) ex.push(mkExec(en, t.instr, t.size, t.pnl, t.comm));
+          if (en.account === name) ex.push(mkExec(en, t.instr, t.size, t.pnl, t.comm, t.risk));
           (t.subs || []).forEach(function (s) {
-            if (s.account === name) ex.push(mkExec(en, s.instr, s.size, s.pnl, s.comm));
+            if (s.account === name) ex.push(mkExec(en, s.instr, s.size, s.pnl, s.comm, s.risk));
           });
         });
       });
@@ -1385,11 +1389,92 @@
     function renderDash() {
       var acc = accountByName(dashAcctSel.value);
       var ex = executionsFor(dashAcctSel.value);
+      var rows = computeRows(ex, acc);
       dashAcctLine.textContent = acc
         ? (acc.size / 1000) + "k · 初始 " + money(acc.initialBalance) + " · 最大回撤 " + money(acc.maxDrawdown) + " · " + acc.drawdownMode
         : "";
+      renderStats(ex, rows, acc);
+      renderChart(rows);
       renderCalendar(ex);
-      renderTable(ex, acc);
+      renderTable(rows);
+    }
+
+    function statCard(label, value) {
+      return '<div class="stat"><div class="stat__label">' + label + '</div><div class="stat__value">' + value + '</div></div>';
+    }
+    function signed(n) { return '<span class="' + (n >= 0 ? "up" : "down") + '">' + (n >= 0 ? "+" : "−") + money(n) + '</span>'; }
+    function renderStats(ex, rows, acc) {
+      var box = document.getElementById("dash-stats");
+      var n = ex.length;
+      if (!n) { box.innerHTML = ""; return; }
+      var wins = 0, gw = 0, gl = 0, tot = 0, comm = 0, rs = [];
+      ex.forEach(function (e) {
+        var p = e.pnl || 0; tot += p; comm += (e.comm || 0);
+        if (p > 0) { wins++; gw += p; } else if (p < 0) { gl += Math.abs(p); }
+        if (e.r != null) rs.push(e.r);
+      });
+      var winRate = wins / n;
+      var pf = gl ? gw / gl : (gw > 0 ? Infinity : null);
+      var avgR = rs.length ? rs.reduce(function (a, v) { return a + v; }, 0) / rs.length : null;
+      var last = rows[rows.length - 1];
+      var D = num(acc && acc.maxDrawdown) || 0;
+      var safety = last ? last.safety : null, curTotal = last ? last.total : null;
+      var safetyPct = (safety != null && D) ? safety / D * 100 : null;
+      box.innerHTML =
+        statCard("笔数 Trades", n) +
+        statCard("胜率 Win rate", (winRate * 100).toFixed(1) + "%") +
+        statCard("总盈亏 Net P&L", signed(tot)) +
+        statCard("平均每笔 Avg", signed(tot / n)) +
+        statCard("平均R Avg R", avgR == null ? "—" : (avgR >= 0 ? "+" : "−") + Math.abs(avgR).toFixed(2)) +
+        statCard("盈亏比 PF", pf == null ? "—" : (pf === Infinity ? "∞" : pf.toFixed(2))) +
+        statCard("总手续费 Comm.", money(comm)) +
+        statCard("总累计盈亏 Equity", curTotal == null ? "—" : signed(curTotal)) +
+        statCard("安全距离 Safety", safety == null ? "—" : signed(safety)) +
+        statCard("距爆仓 %DD", safetyPct == null ? "—" : safetyPct.toFixed(0) + "%");
+    }
+
+    function fmtAxis(v) {
+      var a = Math.abs(v), t = a >= 1000 ? (a / 1000).toFixed(1) + "k" : a.toFixed(0);
+      return (v < 0 ? "-$" : "$") + t;
+    }
+    function renderChart(rows) {
+      var box = document.getElementById("dash-chart");
+      box.className = "chart";
+      if (rows.length <= 5) {
+        box.innerHTML = '<div class="chart__note">该账户交易满 6 笔后显示曲线（当前 ' + rows.length + ' 笔）</div>';
+        return;
+      }
+      var W = 640, H = 260, mL = 56, mR = 14, mT = 14, mB = 30;
+      var pw = W - mL - mR, ph = H - mT - mB, n = rows.length;
+      var ys = []; rows.forEach(function (r) { ys.push(r.total); ys.push(r.limit); });
+      var ymin = Math.min.apply(null, ys), ymax = Math.max.apply(null, ys);
+      if (ymin === ymax) ymax = ymin + 1;
+      var pad = (ymax - ymin) * 0.08; ymin -= pad; ymax += pad;
+      var X = function (i) { return mL + (n === 1 ? 0 : (i / (n - 1)) * pw); };
+      var Y = function (v) { return mT + (1 - (v - ymin) / (ymax - ymin)) * ph; };
+      var d = function (key) { return rows.map(function (r, i) { return (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(r[key]).toFixed(1); }).join(" "); };
+      var grid = "", labels = "", T = 4;
+      for (var g = 0; g <= T; g++) {
+        var val = ymin + (ymax - ymin) * g / T, yy = Y(val);
+        grid += '<line x1="' + mL + '" y1="' + yy.toFixed(1) + '" x2="' + (W - mR) + '" y2="' + yy.toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
+        labels += '<text x="' + (mL - 6) + '" y="' + (yy + 3).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--faint)">' + fmtAxis(val) + '</text>';
+      }
+      var zero = "";
+      if (ymin < 0 && ymax > 0) { var yz = Y(0); zero = '<line x1="' + mL + '" y1="' + yz.toFixed(1) + '" x2="' + (W - mR) + '" y2="' + yz.toFixed(1) + '" stroke="var(--border-strong)" stroke-width="1" stroke-dasharray="2 2"/>'; }
+      var xl = "", XT = Math.min(n - 1, 6);
+      for (var k = 0; k <= XT; k++) {
+        var idx = Math.round(k / XT * (n - 1)), xx = X(idx);
+        xl += '<text x="' + xx.toFixed(1) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="9" fill="var(--faint)">' + (idx + 1) + '</text>';
+      }
+      box.innerHTML =
+        '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img">' + grid + zero +
+        '<path d="' + d("limit") + '" fill="none" stroke="#b3392f" stroke-width="2" stroke-dasharray="5 4"/>' +
+        '<path d="' + d("total") + '" fill="none" stroke-width="2.4" style="stroke:var(--accent)"/>' +
+        labels + xl +
+        '<text x="' + (mL + pw / 2) + '" y="' + (H - 1) + '" text-anchor="middle" font-size="9" fill="var(--faint)">累计交易笔数</text>' +
+        '</svg>' +
+        '<div class="chart__legend"><span><i style="border-color:var(--accent)"></i>总累计盈亏</span>' +
+        '<span><i style="border-color:#b3392f"></i>最大亏损限制</span></div>';
     }
     function renderCalendar(ex) {
       var byDate = {};
@@ -1422,8 +1507,7 @@
       if (n === null || n === undefined) return "";
       return '<span class="' + (n >= 0 ? "up" : "down") + '">' + (n >= 0 ? "+" : "−") + money(n) + '</span>';
     }
-    function renderTable(ex, acc) {
-      var rows = computeRows(ex, acc);
+    function renderTable(rows) {
       if (!rows.length) { dashTable.innerHTML = '<div class="empty">该账户暂无交易记录</div>'; return; }
       var head = '<tr><th class="l">日期</th><th>商品</th><th>手数</th><th>净盈亏</th><th>点数</th>' +
         '<th>当日累计</th><th>总累计盈亏</th><th>最大亏损限制</th><th>安全距离</th></tr>';
