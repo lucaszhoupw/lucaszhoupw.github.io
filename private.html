@@ -393,7 +393,15 @@
     // ---------- helpers ----------
     function clamp(n, lo, hi) { n = isNaN(n) ? lo : n; return Math.max(lo, Math.min(hi, n)); }
     function uid() { return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8); }
-    function num(v) { var n = parseFloat(String(v).replace(/[, $]/g, "")); return isNaN(n) ? null : n; }
+    function num(v) {
+      if (v === null || v === undefined || v === "") return null;
+      var n = parseFloat(String(v).replace(/[, $]/g, ""));
+      return isNaN(n) ? null : n;
+    }
+    function money(n) { // number -> "$1,234.56"
+      n = num(n); if (n === null) return "";
+      return "$" + Math.abs(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
     function commRate(instr) { return (instr === "ES" || instr === "NQ") ? 3.5 : 1.0; }
     function readFileBytes(file) {
       return new Promise(function (res, rej) {
@@ -529,13 +537,13 @@
 
       function calcComm() {
         var s = parseFloat(size.value) || 0;
-        comm.value = (commRate(instr.value) * s).toFixed(2);
+        comm.value = "$" + (commRate(instr.value) * s).toFixed(2);
       }
       function calcR() {
         var p = num(pnl.value), rk = num(risk.value);
         if (p === null || rk === null || rk === 0) { rOut.value = "—"; return; }
         var r = p / rk;
-        rOut.value = (r >= 0 ? "+" : "") + r.toFixed(2);
+        rOut.value = (r >= 0 ? "+" : "") + r.toFixed(2) + " R";
       }
       instr.addEventListener("change", calcComm);
       size.addEventListener("input", calcComm);
@@ -552,10 +560,16 @@
       var block = {
         el: el,
         read: function () {
+          var p = num(pnl.value), rk = num(risk.value);
           return {
             signal: $(".t-signal").value, order: $(".t-order").value, dir: $(".t-dir").value,
-            instr: instr.value, size: size.value.trim(), comm: comm.value,
-            pnl: pnl.value.trim(), risk: risk.value.trim(), r: rOut.value, grade: $(".t-grade").value
+            instr: instr.value,
+            size: num(size.value),
+            comm: num(comm.value),
+            pnl: p,
+            risk: rk,
+            r: (p === null || rk === null || rk === 0) ? null : p / rk,
+            grade: $(".t-grade").value
           };
         }
       };
@@ -668,7 +682,7 @@
           dayType: document.getElementById("f_daytype").value,
           tradeCount: TRADES.length,
           account: document.getElementById("f_account").value.trim(),
-          balance: document.getElementById("f_balance").value.trim(),
+          balance: num(document.getElementById("f_balance").value),
           trades: TRADES.map(function (b) { return b.read(); }),
           plan: { text: plan.text, images: (plan.kept || []).concat(planImg.refs) },
           analysis: { text: analysis.text, images: (analysis.kept || []).concat(anaImg.refs) },
@@ -817,7 +831,7 @@
         head.querySelector(".card__chip").textContent = en.dayType || "";
         head.querySelector(".card__acct").textContent = (en.account ? en.account + " · " : "") + (en.tradeCount || 0) + " 笔";
         var balN = num(en.balance);
-        head.querySelector(".card__bal").innerHTML = balN !== null ? "余额 <b>$" + balN.toLocaleString() + "</b>" : "";
+        head.querySelector(".card__bal").innerHTML = balN !== null ? "余额 <b>" + money(balN) + "</b>" : "";
         var tools = document.createElement("div"); tools.className = "card__tools";
         var edBtn = document.createElement("button"); edBtn.className = "btn btn--sm"; edBtn.type = "button"; edBtn.textContent = "编辑";
         edBtn.addEventListener("click", function () { openForm(en); });
@@ -840,15 +854,15 @@
           row.appendChild(top);
 
           var nums = document.createElement("div"); nums.className = "trow__nums";
-          var pnlN = num(t.pnl);
-          var pnlHtml = pnlN === null ? "" : '<span class="' + (pnlN >= 0 ? "up" : "down") + '">' + (pnlN >= 0 ? "+" : "−") + "$" + Math.abs(pnlN).toLocaleString() + "</span>";
-          var rHtml = (t.r && t.r !== "—") ? '<span class="' + (t.r.indexOf("-") === 0 ? "down" : "up") + '">' + t.r + "R</span>" : "";
+          var pnlN = num(t.pnl), riskN = num(t.risk), commN = num(t.comm), rN = num(t.r), sizeN = num(t.size);
+          var pnlHtml = pnlN === null ? "" : '<span class="' + (pnlN >= 0 ? "up" : "down") + '">' + (pnlN >= 0 ? "+" : "−") + money(pnlN) + "</span>";
+          var rHtml = rN === null ? "" : '<span class="' + (rN < 0 ? "down" : "up") + '">' + (rN >= 0 ? "+" : "−") + Math.abs(rN).toFixed(2) + "R</span>";
           var bits = [];
-          bits.push("手数 " + (t.size || "—"));
+          bits.push("手数 " + (sizeN === null ? "—" : sizeN));
           if (pnlHtml) bits.push("净盈亏 " + pnlHtml);
-          if (t.risk) bits.push("风险 $" + t.risk);
+          if (riskN !== null) bits.push("风险 " + money(riskN));
           if (rHtml) bits.push(rHtml);
-          if (t.comm) bits.push("手续费 $" + t.comm);
+          if (commN !== null) bits.push("手续费 " + money(commN));
           nums.innerHTML = bits.map(function (b) { return "<span>" + b + "</span>"; }).join("");
           row.appendChild(nums);
           card.appendChild(row);
