@@ -195,11 +195,13 @@
 
   /* ---- dashboard ---- */
   .dash > div { margin-bottom: 32px; }
-  .dstats { display: flex; flex-wrap: nowrap; overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
-  .stat { flex: 1 0 0; min-width: 88px; padding: 11px 10px; text-align: center; border-left: 1px solid var(--border); }
+  .dstats { display: flex; flex-wrap: nowrap; overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface);
+    scrollbar-width: none; -ms-overflow-style: none; }
+  .dstats::-webkit-scrollbar { display: none; }
+  .stat { flex: 1 0 0; min-width: 72px; padding: 8px 8px; text-align: center; border-left: 1px solid var(--border); }
   .stat:first-child { border-left: none; }
-  .stat__label { font-size: 0.64rem; font-weight: 700; color: var(--faint); white-space: nowrap; }
-  .stat__value { font-size: 1rem; font-weight: 700; color: var(--text); margin-top: 4px; white-space: nowrap; }
+  .stat__label { font-size: 0.6rem; font-weight: 700; color: var(--faint); white-space: nowrap; }
+  .stat__value { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-top: 3px; white-space: nowrap; }
   .chart svg { width: 100%; height: auto; display: block; }
   .chart__note { color: var(--faint); font-style: italic; font-size: 0.84rem; padding: 26px 0; text-align: center; }
   .chart__legend { display: flex; gap: 18px; justify-content: center; font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
