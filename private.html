@@ -7,6 +7,10 @@
 <title>·</title>
 <link rel="icon" href="assets/favicon.svg" />
 <link rel="stylesheet" href="styles.css?v=17" />
+<script>
+  // apply saved theme before paint (no flash)
+  try { var t = localStorage.getItem("plz_theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch (e) {}
+</script>
 <style>
   /* ---- gate ---- */
   .gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
@@ -146,13 +150,16 @@
   .block { margin-top: 12px; }
   .block__t { font-size: 0.78rem; font-weight: 700; color: var(--muted); margin: 0 0 4px; }
   .block__x { font-size: 0.92rem; line-height: 1.6; color: var(--text); white-space: pre-wrap; margin: 0; }
-  .block__imgs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
-  .block__imgs img { max-width: 220px; max-height: 220px; border-radius: 8px; border: 1px solid var(--border); cursor: zoom-in; }
-  .block__imgs .ph { width: 120px; height: 80px; border-radius: 8px; background: var(--accent-tint); display: flex; align-items: center; justify-content: center; font-size: 0.74rem; color: var(--faint); }
+  .block__imgs { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+  .block__imgs img { width: 100%; max-width: 660px; height: auto; border-radius: 8px; border: 1px solid var(--border); cursor: zoom-in; }
+  .block__imgs .ph { width: 100%; max-width: 660px; height: 180px; border-radius: 8px; background: var(--accent-tint); display: flex; align-items: center; justify-content: center; font-size: 0.74rem; color: var(--faint); }
   .feed__empty { color: var(--faint); font-style: italic; text-align: center; padding: 28px 0; }
 
   /* ---- empty-day hint ---- */
   .trades-empty { color: var(--faint); font-size: 0.84rem; font-style: italic; padding: 6px 2px; }
+  .feed-bar { display: flex; align-items: center; gap: 10px; margin: 6px 0 14px; }
+  .feed-bar label { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+  .feed-bar select { font-family: inherit; font-size: 0.9rem; padding: 6px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
 
   /* ---- settings sheet ---- */
   .sheet { position: fixed; inset: 0; background: rgba(12,14,13,.5); display: flex; align-items: flex-start; justify-content: center; z-index: 60; padding: 44px 20px; overflow: auto; }
@@ -171,6 +178,12 @@
   .addrow input { flex: 1; font-family: inherit; font-size: 0.9rem; padding: 7px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); }
   .sheet__foot { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
   #sheet-msg { font-size: 0.8rem; color: var(--muted); }
+  .swatches { display: flex; gap: 12px; }
+  .swatch { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border-strong); cursor: pointer; padding: 0; }
+  .swatch--on { box-shadow: 0 0 0 3px var(--accent-tint); border-color: var(--accent); }
+  .swatch--green { background: #2f5d4f; }
+  .swatch--red { background: #9a3232; }
+  .swatch--blue { background: #2a4a72; }
 
   /* ---- account editor (settings) ---- */
   .acct-edit { border: 1px solid var(--border-strong); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; background: var(--bg); }
@@ -181,24 +194,26 @@
   .acct-edit__grid input, .acct-edit__grid select { width: 100%; font-family: inherit; font-size: 0.82rem; padding: 6px 8px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
 
   /* ---- dashboard ---- */
-  .dstats { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 10px; margin-bottom: 18px; }
-  .stat { border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px; background: var(--surface); }
-  .stat__label { font-size: 0.66rem; font-weight: 700; color: var(--faint); }
-  .stat__value { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-top: 3px; }
-  .chart { margin-bottom: 18px; }
+  .dash > div { margin-bottom: 32px; }
+  .dstats { display: flex; flex-wrap: nowrap; overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+  .stat { flex: 1 0 0; min-width: 88px; padding: 11px 10px; text-align: center; border-left: 1px solid var(--border); }
+  .stat:first-child { border-left: none; }
+  .stat__label { font-size: 0.64rem; font-weight: 700; color: var(--faint); white-space: nowrap; }
+  .stat__value { font-size: 1rem; font-weight: 700; color: var(--text); margin-top: 4px; white-space: nowrap; }
   .chart svg { width: 100%; height: auto; display: block; }
   .chart__note { color: var(--faint); font-style: italic; font-size: 0.84rem; padding: 26px 0; text-align: center; }
   .chart__legend { display: flex; gap: 18px; justify-content: center; font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
   .chart__legend i { display: inline-block; width: 16px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 5px; }
-  .hist { margin-top: 24px; }
   .hist__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
   .hist__title { font-weight: 700; color: var(--accent-strong); font-size: 0.9rem; }
   .hist select { font-family: inherit; font-size: 0.84rem; padding: 5px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
-  .histrow { display: grid; grid-template-columns: 100px 1fr 36px; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 0.8rem; }
+  .histrow { display: grid; grid-template-columns: 96px 1fr 92px; align-items: center; gap: 8px; margin-bottom: 7px; font-size: 0.8rem; }
   .histrow__lab { color: var(--muted); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .histrow__bar { background: var(--accent-tint); border-radius: 5px; height: 16px; overflow: hidden; }
-  .histrow__bar i { display: block; height: 100%; background: var(--accent); border-radius: 5px; }
-  .histrow__n { font-weight: 700; color: var(--text); text-align: left; }
+  .histrow__bar { display: flex; background: var(--border); border-radius: 5px; height: 16px; overflow: hidden; }
+  .histrow__bar .win { background: #1f8f4e; height: 100%; }
+  .histrow__bar .loss { background: #b3392f; height: 100%; }
+  .histrow__n { font-weight: 700; color: var(--muted); text-align: left; font-size: 0.74rem; }
+  .histrow__n b { color: var(--text); }
   .dash__bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 6px 0 18px; }
   .dash__bar select { font-family: inherit; font-size: 0.9rem; padding: 7px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
   .dash__acctline { font-size: 0.8rem; color: var(--muted); }
@@ -213,10 +228,11 @@
   .cal__pnl { font-size: 0.74rem; font-weight: 700; margin-top: 4px; }
   .cal__cnt { font-size: 0.66rem; color: var(--faint); }
 
-  .dtable { overflow-x: auto; margin-top: 22px; }
+  .dtable { overflow-x: auto; }
   .dtable table { border-collapse: collapse; width: 100%; font-size: 0.78rem; }
-  .dtable th, .dtable td { border: 1px solid var(--border); padding: 6px 9px; text-align: center; white-space: nowrap; }
-  .dtable th { background: var(--accent-tint); color: var(--accent-strong); font-weight: 700; }
+  .dtable th, .dtable td { padding: 7px 9px; text-align: center; white-space: nowrap; border: none; }
+  .dtable td { border-bottom: 1px solid var(--border); }
+  .dtable th { background: var(--accent-tint); color: var(--accent-strong); font-weight: 700; border-bottom: 2px solid var(--border-strong); }
   .dtable tr.daystart td { border-top: 2px solid var(--border-strong); }
   .dtable .empty { color: var(--faint); font-style: italic; padding: 20px; text-align: center; }
 
@@ -317,6 +333,10 @@
       </div>
     </form>
 
+    <div id="feed-bar" class="feed-bar" hidden>
+      <label for="feed-month">月份 · Month</label>
+      <select id="feed-month"></select>
+    </div>
     <div id="feed" class="feed"></div>
 
     <!-- dashboard view -->
@@ -351,6 +371,19 @@
         <div id="set-signals" class="chips"></div>
         <div class="addrow"><input id="set-signal-in" type="text" placeholder="新增信号…" /><button id="set-signal-add" class="btn btn--sm" type="button">添加</button></div>
       </div>
+      <div class="sheet__sec">
+        <h3>日型 · Day types</h3>
+        <div id="set-daytypes" class="chips"></div>
+        <div class="addrow"><input id="set-daytype-in" type="text" placeholder="新增日型…" /><button id="set-daytype-add" class="btn btn--sm" type="button">添加</button></div>
+      </div>
+      <div class="sheet__sec">
+        <h3>配色 · Theme</h3>
+        <div class="swatches">
+          <button class="swatch swatch--green" type="button" data-theme-pick="green" title="绿"></button>
+          <button class="swatch swatch--red" type="button" data-theme-pick="red" title="红"></button>
+          <button class="swatch swatch--blue" type="button" data-theme-pick="blue" title="蓝"></button>
+        </div>
+      </div>
       <div class="sheet__foot">
         <button id="sheet-save" class="btn btn--solid" type="button">保存到仓库 · Save</button>
         <span id="sheet-msg"></span>
@@ -373,6 +406,7 @@
     var PAT_KEY = "plz_gh_pat";
     var DEFAULT_SIGNALS = ["高潮反转", "旗形延续", "二次入场", "突破回踩", "计划外"];
     var DEFAULT_ORDERS = ["stop", "limit", "market"];
+    var DEFAULT_DAYTYPES = ["趋势日", "区间日", "趋势反转日", "数据日"];
     var INSTRS = ["ES", "NQ", "MES", "MNQ"];
     var POINT_VALUE = { ES: 50, MES: 5, NQ: 20, MNQ: 2 }; // $ per point per contract
     var TICK_DIV = 4; // 0.25-pt tick -> points*4 must be integer
@@ -389,6 +423,7 @@
     var DEFAULT_ACCT = { size: 50000, initialBalance: 0, maxDrawdown: 2000, drawdownMode: "Intraday", stage: "Evaluation" };
 
     function signals() { return (journal.config && journal.config.signals) || DEFAULT_SIGNALS; }
+    function dayTypes() { return (journal.config && journal.config.dayTypes) || DEFAULT_DAYTYPES; }
     function orders() { return DEFAULT_ORDERS; } // fixed order types: stop / limit / market
     function accounts() { return (journal.config && journal.config.accounts) || []; }
     function accountNames() { return accounts().map(function (a) { return a.name; }).filter(Boolean); }
@@ -400,6 +435,7 @@
     function ensureConfig() {
       if (!journal.config) journal.config = {};
       if (!journal.config.signals || !journal.config.signals.length) journal.config.signals = DEFAULT_SIGNALS.slice();
+      if (!journal.config.dayTypes || !journal.config.dayTypes.length) journal.config.dayTypes = DEFAULT_DAYTYPES.slice();
       if (!Array.isArray(journal.config.accounts)) journal.config.accounts = [];
       journal.config.accounts = journal.config.accounts.map(function (a) {
         if (typeof a === "string") a = { name: a };
@@ -587,6 +623,7 @@
       }).join("");
     }
     function signalOptions(sel) { return optList(signals(), sel, true); }
+    function dayTypeOptions(sel) { return optList(dayTypes(), sel, true); }
     function orderOptions(sel) { return optList(orders(), sel, false); }
     function accountOptions(sel) {
       var s = accountNames();
@@ -704,7 +741,7 @@
             optList(["long", "short"], data.dir, false) + '</select></div>' +
           '<div class="field"><label>商品 / Instrument</label><select class="t-instr">' +
             optList(INSTRS, di, false) + '</select></div>' +
-          '<div class="field"><label>手数 / Size</label><input class="t-size" type="number" min="1" step="1" value="' + (data.size != null ? data.size : 2) + '" /></div>' +
+          '<div class="field"><label>手数 / Size</label><input class="t-size" type="number" min="1" step="1" value="' + (data.size != null ? data.size : 1) + '" /></div>' +
           '<div class="field"><label>手续费 / Commission</label><input class="t-comm" type="text" readonly /></div>' +
           '<div class="field"><label>净盈亏 / Net P&amp;L</label><input class="t-pnl" type="text" inputmode="decimal" /></div>' +
           '<div class="field"><label>风险 / Risk</label><input class="t-risk" type="text" inputmode="decimal" /></div>' +
@@ -914,7 +951,8 @@
       form.hidden = false;
       var today = new Date().toISOString().slice(0, 10);
       document.getElementById("f_date").value = entry ? (entry.date || today) : today;
-      document.getElementById("f_daytype").value = entry ? (entry.dayType || "趋势日") : "趋势日";
+      var dt0 = entry ? (entry.dayType || dayTypes()[0]) : dayTypes()[0];
+      document.getElementById("f_daytype").innerHTML = dayTypeOptions(dt0);
       document.getElementById("f_account").innerHTML = accountOptions(entry ? (entry.account || "") : "");
       balanceInput.value = (entry && entry.balance != null) ? moneySigned(entry.balance) : "";
       TRADES.forEach(function (b) { b.el.remove(); }); TRADES = [];
@@ -982,6 +1020,7 @@
         Object.keys(anaImg.local).forEach(function (k) { entry._local[k] = anaImg.local[k]; });
 
         editing = null;
+        feedMonth = (entry.date || "").slice(0, 7) || feedMonth; // jump to the saved month
         msg.className = "ok"; msg.textContent = "Saved.";
         form.hidden = true;
         render();
@@ -1032,6 +1071,8 @@
 
     // ---------- render feed ----------
     var feed = document.getElementById("feed");
+    var feedMonth = null; // "YYYY-MM" currently shown
+    document.getElementById("feed-month").addEventListener("change", function () { feedMonth = this.value; render(); });
 
     async function loadImage(imgEl, rec, ph) {
       try {
@@ -1100,12 +1141,24 @@
     }
 
     function render() {
-      var list = journal.entries.slice().sort(function (a, b) {
+      var all = journal.entries.slice().sort(function (a, b) {
         if (a.date !== b.date) return a.date < b.date ? 1 : -1;
         return (b.ts || 0) - (a.ts || 0);
       });
+      // month selector (months present in the data, newest first)
+      var months = [];
+      all.forEach(function (en) { var mk = (en.date || "").slice(0, 7); if (mk && months.indexOf(mk) < 0) months.push(mk); });
+      var bar = document.getElementById("feed-bar"), msel = document.getElementById("feed-month");
+      if (!months.length) { bar.hidden = true; feedMonth = null; }
+      else {
+        bar.hidden = false;
+        if (months.indexOf(feedMonth) < 0) feedMonth = months[0];
+        msel.innerHTML = months.map(function (m) { return '<option' + (m === feedMonth ? ' selected' : '') + '>' + m + '</option>'; }).join("");
+      }
+      var list = feedMonth ? all.filter(function (en) { return (en.date || "").slice(0, 7) === feedMonth; }) : all;
+
       feed.innerHTML = "";
-      if (!list.length) {
+      if (!all.length) {
         var e = document.createElement("div"); e.className = "feed__empty";
         e.textContent = "No entries yet. Click “+ New entry” to add your first day.";
         feed.appendChild(e); return;
@@ -1271,6 +1324,8 @@
       ensureConfig();
       renderAccounts();
       chipList(document.getElementById("set-signals"), signals, "signals", true);
+      chipList(document.getElementById("set-daytypes"), dayTypes, "dayTypes", true);
+      syncSwatches();
     }
     function openSettings() {
       ensureConfig();
@@ -1302,6 +1357,25 @@
       renderAccounts(); refreshAccountSelects();
     });
     wireAdd("set-signal-in", "set-signal-add", "signals");
+    wireAdd("set-daytype-in", "set-daytype-add", "dayTypes");
+
+    // ---------- theme picker ----------
+    var THEME_KEY = "plz_theme";
+    function applyTheme(t) { document.documentElement.setAttribute("data-theme", t); }
+    function syncSwatches() {
+      var cur = document.documentElement.getAttribute("data-theme");
+      document.querySelectorAll("[data-theme-pick]").forEach(function (b) {
+        b.classList.toggle("swatch--on", b.getAttribute("data-theme-pick") === cur);
+      });
+    }
+    document.querySelectorAll("[data-theme-pick]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var t = b.getAttribute("data-theme-pick");
+        applyTheme(t);
+        try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+        syncSwatches();
+      });
+    });
 
     document.getElementById("sheet-save").addEventListener("click", async function () {
       var smsg = document.getElementById("sheet-msg");
@@ -1578,19 +1652,31 @@
     function renderHistogram() {
       var box = document.getElementById("dash-hist");
       var ex = dashEx || [];
-      var sel = '<div class="hist__head"><span class="hist__title">分类统计 · Breakdown</span>' +
+      var sel = '<div class="hist__head"><span class="hist__title">盈亏分类统计 · Win / loss breakdown</span>' +
         '<select id="hist-dim">' + HIST_DIMS.map(function (d) {
           return '<option value="' + d.k + '"' + (d.k === histDim ? ' selected' : '') + '>' + d.label + '</option>';
         }).join('') + '</select></div>';
-      var counts = {};
-      ex.forEach(function (e) { var v = e[histDim] || "—"; counts[v] = (counts[v] || 0) + 1; });
-      var keys = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; });
-      var max = keys.length ? Math.max.apply(null, keys.map(function (k) { return counts[k]; })) : 0;
+      // per category: winning vs losing trade counts (break-even ignored in W/L)
+      var cat = {};
+      ex.forEach(function (e) {
+        var v = e[histDim] || "—";
+        var c = cat[v] || (cat[v] = { win: 0, loss: 0 });
+        var p = e.pnl || 0;
+        if (p > 0) c.win++; else if (p < 0) c.loss++;
+      });
+      var keys = Object.keys(cat).sort(function (a, b) { return (cat[b].win + cat[b].loss) - (cat[a].win + cat[a].loss); });
+      var max = 0;
+      keys.forEach(function (k) { max = Math.max(max, cat[k].win + cat[k].loss); });
       var bars = keys.map(function (k) {
-        var w = max ? Math.round(counts[k] / max * 100) : 0;
+        var c = cat[k], total = c.win + c.loss;
+        var scale = max ? total / max : 0;            // bar length vs busiest category
+        var winW = total ? (c.win / total) * scale * 100 : 0;
+        var lossW = total ? (c.loss / total) * scale * 100 : 0;
+        var wr = total ? Math.round(c.win / total * 100) : 0;
         return '<div class="histrow"><span class="histrow__lab">' + k + '</span>' +
-          '<span class="histrow__bar"><i style="width:' + w + '%"></i></span>' +
-          '<span class="histrow__n">' + counts[k] + '</span></div>';
+          '<span class="histrow__bar"><span class="win" style="width:' + winW.toFixed(1) + '%"></span>' +
+          '<span class="loss" style="width:' + lossW.toFixed(1) + '%"></span></span>' +
+          '<span class="histrow__n"><b>' + c.win + '</b>赢 / <b>' + c.loss + '</b>亏 · ' + wr + '%</span></div>';
       }).join('');
       if (!keys.length) bars = '<div class="empty">无数据</div>';
       box.innerHTML = sel + '<div class="histbars">' + bars + '</div>';
