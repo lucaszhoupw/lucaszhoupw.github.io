@@ -293,6 +293,7 @@
     // ---------- state ----------
     var PASSWORD = null;
     var journal = { entries: [], config: { signals: DEFAULT_SIGNALS.slice(), orders: DEFAULT_ORDERS.slice() } };
+    var journalSha = null; // last known sha of journal.enc (kept fresh from PUT responses)
     var TRADES = [];   // open-form trade blocks: {el, read()}
     var SECS = {};     // open-form image sections
 
@@ -366,6 +367,30 @@
       });
       if (!r.ok) { var t = await r.text(); throw new Error("commit " + r.status + " " + t.slice(0, 140)); }
       return r.json();
+    }
+    function sleep(ms) { return new Promise(function (res) { setTimeout(res, ms); }); }
+    // Commit the journal with optimistic-concurrency handling: reuse the sha
+    // we already know, and on a 409/422 conflict re-read the sha and retry.
+    async function commitJournal(message, token) {
+      var encJ = await encStr(JSON.stringify({ entries: journal.entries, config: journal.config }));
+      var b64 = bytesToB64(encJ);
+      var sha = journalSha;
+      if (sha === null) { try { sha = await ghSha(JOURNAL, token); } catch (e) { sha = null; } }
+      for (var attempt = 0; attempt < 4; attempt++) {
+        try {
+          var res = await ghPut(JOURNAL, b64, message, token, sha);
+          journalSha = (res && res.content && res.content.sha) ? res.content.sha : null;
+          return res;
+        } catch (e) {
+          var conflict = /commit 409|commit 422/.test(e.message || "");
+          if (conflict && attempt < 3) {
+            await sleep(600 * (attempt + 1));
+            try { sha = await ghSha(JOURNAL, token); } catch (e2) {}
+            continue;
+          }
+          throw e;
+        }
+      }
     }
 
     // ---------- token storage ----------
@@ -694,9 +719,7 @@
         var idx = editing ? journal.entries.findIndex(function (x) { return x.id === editing.id; }) : -1;
         if (idx >= 0) journal.entries[idx] = entry; else journal.entries.push(entry);
 
-        var encJ = await encStr(JSON.stringify({ entries: journal.entries, config: journal.config }));
-        var sha = await ghSha(JOURNAL, token);
-        await ghPut(JOURNAL, bytesToB64(encJ), "journal: " + (editing ? "update " : "") + entry.date, token, sha);
+        await commitJournal("journal: " + (editing ? "update " : "") + entry.date, token);
 
         // attach freshly-uploaded urls for instant display (not serialized — set after commit)
         entry._local = {};
@@ -746,6 +769,9 @@
       document.getElementById("app").hidden = false;
       document.title = "Journal";
       loadPat(); render();
+      // prime the known journal sha so the first commit uses a fresh value
+      var tk = currentPat();
+      if (tk) { ghSha(JOURNAL, tk).then(function (s) { journalSha = s; }).catch(function () {}); }
     }
 
     // ---------- render feed ----------
@@ -779,9 +805,7 @@
       var backup = journal.entries.slice();
       journal.entries.splice(idx, 1);
       try {
-        var encJ = await encStr(JSON.stringify({ entries: journal.entries, config: journal.config }));
-        var sha = await ghSha(JOURNAL, token);
-        await ghPut(JOURNAL, bytesToB64(encJ), "journal: delete " + (en.date || ""), token, sha);
+        await commitJournal("journal: delete " + (en.date || ""), token);
         render();
       } catch (e) {
         journal.entries = backup;
@@ -930,9 +954,7 @@
       if (!token) { document.getElementById("tok").open = true; smsg.textContent = "需要 GitHub token"; return; }
       smsg.textContent = "保存中…";
       try {
-        var encJ = await encStr(JSON.stringify({ entries: journal.entries, config: journal.config }));
-        var sha = await ghSha(JOURNAL, token);
-        await ghPut(JOURNAL, bytesToB64(encJ), "journal: update settings", token, sha);
+        await commitJournal("journal: update settings", token);
         smsg.textContent = "已保存 ✓";
       } catch (e) { smsg.textContent = "失败：" + (e && e.message ? e.message : "error"); }
     });
