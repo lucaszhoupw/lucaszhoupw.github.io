@@ -436,6 +436,19 @@
     });
   }
 
+  // Hidden entrance: type the secret word anywhere to open the private page.
+  function initSecretEntrance() {
+    var WORD = "ledger";   // change this to your own secret word
+    var buf = "";
+    document.addEventListener("keydown", function (e) {
+      var tag = (document.activeElement && document.activeElement.tagName) || "";
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (!e.key || e.key.length !== 1 || !/[a-z]/i.test(e.key)) return;
+      buf = (buf + e.key.toLowerCase()).slice(-WORD.length);
+      if (buf === WORD) { window.location.href = "private.html"; }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     applyLang("en");
     initToggle();
@@ -454,5 +467,6 @@
     initTravels();
     initCities();
     initCvDownload();
+    initSecretEntrance();
   });
 })();

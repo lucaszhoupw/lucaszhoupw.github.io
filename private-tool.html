@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="green">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Vault encryptor</title>
+<link rel="icon" href="assets/favicon.svg" />
+<link rel="stylesheet" href="styles.css?v=17" />
+<style>
+  .tool { max-width: 760px; margin: 0 auto; padding: 60px 24px 80px; }
+  .tool h1 { color: var(--accent); font-size: 1.5rem; }
+  .tool p { color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
+  .tool label { display: block; font-weight: 700; margin: 18px 0 6px; }
+  .tool textarea, .tool input {
+    width: 100%; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.9rem;
+    padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: 8px;
+    background: var(--surface); color: var(--text);
+  }
+  .tool textarea { min-height: 160px; resize: vertical; }
+  .tool button {
+    margin-top: 16px; font-family: inherit; font-size: 0.95rem; cursor: pointer;
+    padding: 10px 18px; border: 0; border-radius: 8px; background: var(--accent); color: #fff;
+  }
+  .tool button:hover { background: var(--accent-strong); }
+  #out { margin-top: 16px; word-break: break-all; }
+</style>
+</head>
+<body>
+  <div class="tool">
+    <h1>Vault encryptor</h1>
+    <p>Everything here runs in your browser — nothing is uploaded. Paste the
+      private HTML content and choose a password, click <b>Encrypt</b>, then
+      copy the result and replace the <code>var ENC = "…"</code> value inside
+      <code>private.html</code>. Use the same password to unlock it.</p>
+
+    <label for="content">Private HTML content</label>
+    <textarea id="content" placeholder="&lt;h1&gt;…&lt;/h1&gt; …your trade log markup…"></textarea>
+
+    <label for="pw">Password</label>
+    <input id="pw" type="text" placeholder="a strong password" autocomplete="off" />
+
+    <button id="go" type="button">Encrypt</button>
+
+    <label for="out" style="margin-top:22px">Encrypted blob (paste into private.html)</label>
+    <textarea id="out" readonly placeholder="result appears here"></textarea>
+  </div>
+
+  <script>
+    var ITER = 200000;
+    async function encrypt(content, password) {
+      var enc = new TextEncoder();
+      var salt = crypto.getRandomValues(new Uint8Array(16));
+      var iv = crypto.getRandomValues(new Uint8Array(12));
+      var mat = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+      var key = await crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: salt, iterations: ITER, hash: "SHA-256" },
+        mat, { name: "AES-GCM", length: 256 }, false, ["encrypt"]);
+      var ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, enc.encode(content)));
+      var all = new Uint8Array(28 + ct.length);
+      all.set(salt, 0); all.set(iv, 16); all.set(ct, 28);
+      var bin = "";
+      for (var i = 0; i < all.length; i++) bin += String.fromCharCode(all[i]);
+      return btoa(bin);
+    }
+    document.getElementById("go").addEventListener("click", function () {
+      var c = document.getElementById("content").value;
+      var p = document.getElementById("pw").value;
+      if (!c || !p) { alert("Need both content and a password."); return; }
+      encrypt(c, p).then(function (b) { document.getElementById("out").value = b; });
+    });
+  </script>
+</body>
+</html>

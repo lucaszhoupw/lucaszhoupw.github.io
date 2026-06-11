@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="green">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>·</title>
+<link rel="icon" href="assets/favicon.svg" />
+<link rel="stylesheet" href="styles.css?v=17" />
+<style>
+  .gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .gate__box { width: 100%; max-width: 300px; display: flex; flex-direction: column; gap: 12px; text-align: center; }
+  .gate__title { font-size: 1.2rem; color: var(--accent); font-weight: 700; margin: 0 0 4px; letter-spacing: 0.04em; }
+  .gate__input {
+    font-family: inherit; font-size: 1rem; text-align: center;
+    padding: 11px 14px; border: 1px solid var(--border-strong);
+    border-radius: 10px; background: var(--surface); color: var(--text);
+  }
+  .gate__input:focus { outline: none; border-color: var(--accent); }
+  .gate__btn {
+    font-family: inherit; font-size: 0.92rem; cursor: pointer;
+    padding: 10px 14px; border: 0; border-radius: 10px;
+    background: var(--accent); color: #fff; transition: background .18s;
+  }
+  .gate__btn:hover { background: var(--accent-strong); }
+  .gate__btn:disabled { opacity: .6; cursor: default; }
+  .gate__err { color: #b3392f; font-size: 0.85rem; margin: 2px 0 0; }
+
+  .vault { max-width: 900px; margin: 0 auto; padding: 80px 24px 80px; }
+  .vault__bar { display: flex; justify-content: flex-end; margin-bottom: 18px; }
+  .vault__lock {
+    font-family: inherit; font-size: 0.82rem; color: var(--muted);
+    background: transparent; border: 1px solid var(--border-strong);
+    border-radius: 999px; padding: 5px 14px; cursor: pointer;
+  }
+  .vault__lock:hover { color: var(--text); background: var(--accent-tint); }
+  .vault__title { font-size: 1.6rem; color: var(--accent); margin: 0 0 10px; }
+  .vault__empty { color: var(--faint); font-style: italic; }
+</style>
+</head>
+<body>
+  <section id="gate" class="gate">
+    <form id="gate-form" class="gate__box" autocomplete="off">
+      <p class="gate__title" data-en="Private" data-zh="私密">Private</p>
+      <input id="pw" class="gate__input" type="password" placeholder="Password" aria-label="Password" autocomplete="current-password" autofocus />
+      <button id="go" class="gate__btn" type="submit" data-en="Enter" data-zh="进入">Enter</button>
+      <p id="err" class="gate__err" hidden data-en="Wrong password." data-zh="密码错误。">Wrong password.</p>
+    </form>
+  </section>
+
+  <main id="vault" class="vault" hidden>
+    <div class="vault__bar">
+      <button class="vault__lock" type="button" onclick="location.reload()" data-en="Lock" data-zh="锁定">Lock</button>
+    </div>
+    <div id="vault-body"></div>
+  </main>
+
+  <script>
+    // Content is AES-256-GCM encrypted; the password is the decryption key
+    // (never stored). The repo only ever contains this ciphertext.
+    var ENC = "9SztJqHLq9q5iA1ZL/Yg+VFTbZ28v8tQ9PlFeXMPAGhFFFlb2K8h3GX79+LA9slbhUbos7UKnRr10h9Wfw6KVaemYhiSDPzV4UY+t3T5Aj1FbHZZCmQT/pvMVMjcr9XwJNHbFZD5WfXGyY6S9TgFtRHkGwz/8rzkykTgzRR06kypoi0AWEbnvhdjxSisJYrYThVBPoSnPbmQTuzQktVdoo/56sp3MIzzeM2ARYQKWYDNPzDwcZgUBe8KcjwZ+RlwrvPgj3QXuT/QPTc16ookGMHcSjGjcuDn84GqBdjxHkUDszALV0o7FHx0KuGS9nSyfyD/WxfGDcgtaLctF1+VhZbY";
+    var ITER = 200000;
+
+    function b64ToBytes(b64) {
+      var bin = atob(b64), out = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+      return out;
+    }
+    async function decrypt(b64, password) {
+      var bytes = b64ToBytes(b64);
+      var salt = bytes.slice(0, 16), iv = bytes.slice(16, 28), ct = bytes.slice(28);
+      var mat = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+      var key = await crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: salt, iterations: ITER, hash: "SHA-256" },
+        mat, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+      var pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ct);
+      return new TextDecoder().decode(pt);
+    }
+
+    var form = document.getElementById("gate-form");
+    var err = document.getElementById("err");
+    var go = document.getElementById("go");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      err.hidden = true; go.disabled = true;
+      decrypt(ENC, document.getElementById("pw").value).then(function (html) {
+        document.getElementById("gate").remove();
+        var body = document.getElementById("vault-body");
+        body.innerHTML = html;
+        document.getElementById("vault").hidden = false;
+        document.title = "Journal";
+      }).catch(function () {
+        err.hidden = false; go.disabled = false;
+        document.getElementById("pw").value = "";
+        document.getElementById("pw").focus();
+      });
+    });
+  </script>
+</body>
+</html>
