@@ -436,6 +436,31 @@
     });
   }
 
+  // Load the public schedule from schedule.json (editable from the attic page).
+  function initSchedule() {
+    var list = document.getElementById("sched-list");
+    if (!list) return;
+    fetch("schedule.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || !Array.isArray(data.items)) return; // network fail -> keep static fallback
+        list.innerHTML = "";
+        data.items.forEach(function (it) {
+          var li = document.createElement("li"); li.className = "sched__item";
+          var d = document.createElement("div"); d.className = "sched__date";
+          d.setAttribute("data-en", it.dateEn || ""); d.setAttribute("data-zh", it.dateZh || it.dateEn || "");
+          var p = document.createElement("div"); p.className = "sched__desc";
+          p.setAttribute("data-en", it.descEn || ""); p.setAttribute("data-zh", it.descZh || it.descEn || "");
+          li.appendChild(d); li.appendChild(p); list.appendChild(li);
+        });
+        var lang = document.documentElement.getAttribute("lang") === "zh" ? "zh" : "en";
+        list.querySelectorAll("[data-en]").forEach(function (el) {
+          el.textContent = el.getAttribute(lang === "zh" ? "data-zh" : "data-en") || "";
+        });
+      })
+      .catch(function () {});
+  }
+
   // Hidden entrances: type a secret word anywhere to open a private page.
   function initSecretEntrance() {
     var DOORS = {           // secret word -> page (change these to your own)
@@ -474,6 +499,7 @@
     initTravels();
     initCities();
     initCvDownload();
+    initSchedule();
     initSecretEntrance();
   });
 })();
