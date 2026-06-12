@@ -1,7 +1,40 @@
 {
   "items": [
-    { "id": "seed-zhuozhou", "dateEn": "Jul 11 – 14", "dateZh": "7 月 11 日 – 14 日", "descEn": "Farm work at the Zhuozhou farm.", "descZh": "前往涿州农场种地。", "start": "2026-07-11", "end": "2026-07-14" },
-    { "id": "seed-summer", "dateEn": "Jul 15 – 24", "dateZh": "7 月 15 日 – 24 日", "descEn": "Summer term.", "descZh": "暑期学期。", "start": "2026-07-15", "end": "2026-07-24" },
-    { "id": "seed-vietnam", "dateEn": "Aug 1 – 10", "dateZh": "8 月 1 日 – 10 日", "descEn": "Traveling in Vietnam — Hà Nội, Đà Nẵng, and Hồ Chí Minh City.", "descZh": "前往越南河内、岘港、胡志明市旅行。", "start": "2026-08-01", "end": "2026-08-10" }
+    {
+      "id": "mqaqnobdo66y",
+      "dateEn": "June 13",
+      "dateZh": "6月13日",
+      "descEn": "College Physics Experiments Exam",
+      "descZh": "大物实验考试",
+      "start": "2026-06-13",
+      "end": ""
+    },
+    {
+      "id": "seed-zhuozhou",
+      "dateEn": "Jul 11 – 14",
+      "dateZh": "7 月 11 日 – 14 日",
+      "descEn": "Farm work at the Zhuozhou farm.",
+      "descZh": "前往涿州农场种地。",
+      "start": "2026-07-11",
+      "end": "2026-07-14"
+    },
+    {
+      "id": "seed-summer",
+      "dateEn": "Jul 15 – 24",
+      "dateZh": "7 月 15 日 – 24 日",
+      "descEn": "Summer term.",
+      "descZh": "暑期学期。",
+      "start": "2026-07-15",
+      "end": "2026-07-24"
+    },
+    {
+      "id": "seed-vietnam",
+      "dateEn": "Aug 1 – 10",
+      "dateZh": "8 月 1 日 – 10 日",
+      "descEn": "Traveling in Vietnam — Hà Nội, Đà Nẵng, and Hồ Chí Minh City.",
+      "descZh": "前往越南河内、岘港、胡志明市旅行。",
+      "start": "2026-08-01",
+      "end": "2026-08-10"
+    }
   ]
 }
