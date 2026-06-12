@@ -22,8 +22,8 @@
   .gate__err { color: #b3392f; font-size: 0.85rem; margin: 2px 0 0; }
   .gate__hint { color: var(--faint); font-size: 0.74rem; margin: 6px 0 0; line-height: 1.5; }
 
-  .app { max-width: 720px; margin: 0 auto; padding: 56px 22px 90px; }
-  .app__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+  .app { max-width: 740px; margin: 0 auto; padding: 56px 22px 90px; }
+  .app__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
   .app__title { font-size: 1.5rem; color: var(--accent); margin: 0; }
   .app__actions { display: flex; gap: 8px; }
   .btn { font-family: inherit; font-size: 0.84rem; cursor: pointer; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; color: var(--muted); transition: background .15s, color .15s; }
@@ -33,55 +33,80 @@
   .btn--sm { padding: 4px 10px; font-size: 0.76rem; }
   .btn:disabled { opacity: .55; cursor: default; }
 
-  .tok { border: 1px solid var(--border); border-radius: 12px; margin: 0 0 18px; background: var(--surface); }
-  .tok > summary { cursor: pointer; padding: 11px 16px; font-size: 0.82rem; color: var(--muted); list-style: none; }
-  .tok > summary::-webkit-details-marker { display: none; }
-  .tok > summary::before { content: "⚙ "; }
-  .tok__body { padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
-  .tok__body p { font-size: 0.74rem; color: var(--faint); line-height: 1.6; margin: 0; }
-  .tok__body input[type="password"] { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.82rem; padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); width: 100%; }
-  .tok__row { display: flex; align-items: center; gap: 8px; }
-  .tok__row label { font-size: 0.78rem; color: var(--muted); }
-  .swatches { display: flex; gap: 12px; }
-  .swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-strong); cursor: pointer; padding: 0; }
-  .swatch--on { box-shadow: 0 0 0 3px var(--accent-tint); border-color: var(--accent); }
-  .swatch--green { background: #2f5d4f; } .swatch--red { background: #9a3232; } .swatch--blue { background: #2a4a72; }
-
-  /* stats + chart */
-  .dstats { display: flex; flex-wrap: nowrap; overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); margin-bottom: 24px; scrollbar-width: none; -ms-overflow-style: none; }
-  .dstats::-webkit-scrollbar { display: none; }
-  .stat { flex: 1 0 0; min-width: 80px; padding: 9px 8px; text-align: center; border-left: 1px solid var(--border); }
-  .stat:first-child { border-left: none; }
-  .stat__label { font-size: 0.62rem; font-weight: 700; color: var(--faint); white-space: nowrap; }
-  .stat__value { font-size: 1rem; font-weight: 700; color: var(--text); margin-top: 3px; white-space: nowrap; }
-  .chart { margin-bottom: 26px; }
-  .chart svg { width: 100%; height: auto; display: block; }
-  .chart .note { color: var(--faint); font-style: italic; font-size: 0.84rem; padding: 22px 0; text-align: center; }
-
   /* form */
-  .form { border: 1px solid var(--border-strong); border-radius: 14px; padding: 18px; margin: 0 0 26px; background: var(--surface); }
+  .form { border: 1px solid var(--border-strong); border-radius: 14px; padding: 18px; margin: 0 0 24px; background: var(--surface); }
   .form__row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 12px; }
   .field { display: flex; flex-direction: column; gap: 4px; }
   .field label { font-size: 0.7rem; font-weight: 700; color: var(--muted); }
   .field input[type="date"] { font-family: inherit; font-size: 0.9rem; padding: 7px 9px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); }
-  .moods { display: flex; gap: 6px; }
-  .mood-btn { font-size: 1.3rem; line-height: 1; padding: 5px 8px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--bg); cursor: pointer; filter: grayscale(0.7); opacity: .7; }
-  .mood-btn.on { filter: none; opacity: 1; border-color: var(--accent); background: var(--accent-tint); }
-  .form textarea { width: 100%; min-height: 120px; resize: vertical; font-family: inherit; font-size: 0.95rem; line-height: 1.6; padding: 11px 13px; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg); color: var(--text); }
+  .form textarea { width: 100%; min-height: 130px; resize: vertical; font-family: inherit; font-size: 0.95rem; line-height: 1.6; padding: 11px 13px; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg); color: var(--text); }
   .form__foot { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
   #msg { font-size: 0.8rem; color: var(--muted); }
   #msg.err { color: #b3392f; } #msg.ok { color: var(--accent-strong); }
 
+  /* calendar */
+  .cal { margin-bottom: 26px; }
+  .cal__nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 10px; }
+  .cal__label { font-weight: 700; color: var(--text); min-width: 130px; text-align: center; }
+  .cal__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal__dow { text-align: center; font-size: 0.7rem; color: var(--faint); padding: 4px 0; font-weight: 700; }
+  .cal__cell { min-height: 66px; border: 1px solid var(--border); border-radius: 8px; padding: 3px 5px; cursor: pointer; transition: background .12s; }
+  .cal__cell:hover { background: var(--accent-tint); }
+  .cal__cell.empty { border: none; cursor: default; }
+  .cal__cell.empty:hover { background: transparent; }
+  .cal__cell.diary { border-color: var(--accent); }
+  .cal__day { font-size: 0.72rem; font-weight: 700; color: var(--muted); display: flex; justify-content: space-between; }
+  .cal__pen { color: var(--accent); }
+  .cal__acts { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 3px; }
+  .actpill { font-size: 0.56rem; font-weight: 700; color: #2a2a2a; border-radius: 4px; padding: 1px 3px; line-height: 1.3; }
+  .cal__legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .cal__legend span { font-size: 0.7rem; color: var(--muted); display: inline-flex; align-items: center; gap: 4px; }
+  .cal__legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
   /* feed */
   .feed { display: flex; flex-direction: column; gap: 14px; }
   .entry { border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; background: var(--surface); }
-  .entry__hd { display: flex; align-items: center; gap: 10px; }
-  .entry__mood { font-size: 1.4rem; line-height: 1; }
+  .entry__hd { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .entry__date { font-weight: 700; color: var(--text); }
-  .entry__moodlab { font-size: 0.76rem; color: var(--muted); }
+  .entry__edited { font-size: 0.72rem; color: var(--faint); }
   .entry__tools { display: flex; gap: 6px; margin-left: auto; }
+  .entry__acts { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }
+  .entry__acts .actpill { font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; }
   .entry__text { margin: 10px 0 0; font-size: 0.95rem; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
   .feed__empty { color: var(--faint); font-style: italic; text-align: center; padding: 28px 0; }
+
+  /* sheets (settings + check-in) */
+  .sheet { position: fixed; inset: 0; background: rgba(12,14,13,.5); display: flex; align-items: flex-start; justify-content: center; z-index: 60; padding: 44px 20px; overflow: auto; }
+  .sheet[hidden] { display: none; }
+  .sheet__box { width: 100%; max-width: 440px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 14px; padding: 20px; }
+  .sheet__hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .sheet__title { font-size: 1.1rem; color: var(--accent); margin: 0; }
+  .sheet__sec { margin-top: 18px; }
+  .sheet__sec h3 { font-size: 0.84rem; color: var(--muted); margin: 0 0 8px; }
+  .sheet__sec p { font-size: 0.74rem; color: var(--faint); line-height: 1.6; margin: 0 0 8px; }
+  .sheet input[type="password"] { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.82rem; padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); width: 100%; }
+  .tok__row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .tok__row label { font-size: 0.78rem; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; background: var(--accent-tint); color: var(--text); border-radius: 999px; padding: 4px 6px 4px 12px; font-size: 0.84rem; }
+  .chip button { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 1.05rem; line-height: 1; padding: 0 4px; }
+  .chip button:hover { color: #b3392f; }
+  .addrow { display: flex; gap: 8px; margin-top: 10px; }
+  .addrow input { flex: 1; font-family: inherit; font-size: 0.9rem; padding: 7px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); }
+  .sheet__foot { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+  #set-msg { font-size: 0.8rem; color: var(--muted); }
+
+  /* slim vertical colour bars */
+  .swatches { display: flex; gap: 12px; }
+  .swatch { width: 22px; height: 48px; border-radius: 6px; border: 1px solid var(--border-strong); cursor: pointer; padding: 0; }
+  .swatch--on { box-shadow: 0 0 0 3px var(--accent-tint); border-color: var(--accent); }
+  .swatch--green { background: #2f5d4f; } .swatch--red { background: #9a3232; } .swatch--blue { background: #2a4a72; }
+
+  /* check-in toggles */
+  .acts-pick { display: flex; flex-wrap: wrap; gap: 8px; }
+  .actbtn { font-family: inherit; font-size: 0.84rem; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--bg); color: var(--muted); cursor: pointer; }
+  .actbtn.on { background: var(--accent); color: #fff; border-color: transparent; }
+  .acts-empty { font-size: 0.78rem; color: var(--faint); font-style: italic; }
 </style>
 </head>
 <body>
@@ -97,40 +122,20 @@
 
   <main id="app" class="app" hidden>
     <div class="app__bar">
-      <h1 class="app__title">心情日记 · Attic</h1>
+      <h1 class="app__title">日记 · Attic</h1>
       <div class="app__actions">
         <button id="new-btn" class="btn btn--solid" type="button">+ 写日记</button>
+        <button id="settings-btn" class="btn" type="button">⚙ Settings</button>
         <button class="btn" type="button" onclick="location.reload()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Lock</button>
       </div>
     </div>
 
-    <details class="tok" id="tok">
-      <summary>设置 · token & 配色</summary>
-      <div class="tok__body">
-        <p>保存需要 GitHub fine-grained token（Contents: Read and write，仅本仓库）。只存在本浏览器，与交易日志共用。</p>
-        <input id="pat" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false" />
-        <div class="tok__row">
-          <input id="pat-remember" type="checkbox" />
-          <label for="pat-remember">Remember on this device</label>
-          <button id="pat-clear" class="btn btn--sm" type="button" style="margin-left:auto">Forget</button>
-        </div>
-        <div class="swatches">
-          <button class="swatch swatch--green" type="button" data-theme-pick="green" title="绿"></button>
-          <button class="swatch swatch--red" type="button" data-theme-pick="red" title="红"></button>
-          <button class="swatch swatch--blue" type="button" data-theme-pick="blue" title="蓝"></button>
-        </div>
-      </div>
-    </details>
-
+    <!-- write/edit form (appears above the calendar) -->
     <form id="form" class="form" hidden autocomplete="off">
       <div class="form__row">
         <div class="field">
           <label for="f_date">日期 Date</label>
           <input id="f_date" type="date" required />
-        </div>
-        <div class="field">
-          <label>心情 Mood</label>
-          <div id="moods" class="moods"></div>
         </div>
       </div>
       <textarea id="f_text" placeholder="今天发生了什么？此刻在想什么……"></textarea>
@@ -141,10 +146,64 @@
       </div>
     </form>
 
-    <div id="stats" class="dstats"></div>
-    <div id="chart" class="chart"></div>
+    <div id="cal" class="cal"></div>
     <div id="feed" class="feed"></div>
   </main>
+
+  <!-- settings sheet -->
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet__box">
+      <div class="sheet__hd">
+        <h2 class="sheet__title">设置 · Settings</h2>
+        <button id="sheet-close" class="btn btn--sm" type="button">关闭</button>
+      </div>
+      <div class="sheet__sec">
+        <h3>GitHub token · 保存时需要</h3>
+        <p>fine-grained token（Contents: Read and write，仅本仓库）。只存在本浏览器，与交易日志共用。</p>
+        <input id="pat" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false" />
+        <div class="tok__row">
+          <input id="pat-remember" type="checkbox" />
+          <label for="pat-remember">Remember on this device</label>
+          <button id="pat-clear" class="btn btn--sm" type="button" style="margin-left:auto">Forget</button>
+        </div>
+      </div>
+      <div class="sheet__sec">
+        <h3>打卡项目 · Activities</h3>
+        <div id="set-acts" class="chips"></div>
+        <div class="addrow"><input id="set-act-in" type="text" placeholder="新增打卡项目…" /><button id="set-act-add" class="btn btn--sm" type="button">添加</button></div>
+      </div>
+      <div class="sheet__sec">
+        <h3>配色 · Theme</h3>
+        <div class="swatches">
+          <button class="swatch swatch--green" type="button" data-theme-pick="green" title="绿"></button>
+          <button class="swatch swatch--red" type="button" data-theme-pick="red" title="红"></button>
+          <button class="swatch swatch--blue" type="button" data-theme-pick="blue" title="蓝"></button>
+        </div>
+      </div>
+      <div class="sheet__foot">
+        <button id="set-save" class="btn btn--solid" type="button">保存到仓库 · Save</button>
+        <span id="set-msg"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- check-in sheet -->
+  <div id="checkin" class="sheet" hidden>
+    <div class="sheet__box">
+      <div class="sheet__hd">
+        <h2 class="sheet__title">打卡 · <span id="ci-date"></span></h2>
+        <button id="ci-close" class="btn btn--sm" type="button">关闭</button>
+      </div>
+      <div class="sheet__sec">
+        <h3>今天做了什么？</h3>
+        <div id="ci-acts" class="acts-pick"></div>
+      </div>
+      <div class="sheet__foot">
+        <button id="ci-save" class="btn btn--solid" type="button">保存打卡</button>
+        <span id="ci-msg"></span>
+      </div>
+    </div>
+  </div>
 
   <script>
   (function () {
@@ -156,21 +215,25 @@
     var ITER = 120000;
     var PAT_KEY = "plz_gh_pat";
     var THEME_KEY = "plz_theme";
-    var MOODS = [
-      { v: 1, e: "😞", label: "很差" },
-      { v: 2, e: "🙁", label: "低落" },
-      { v: 3, e: "😐", label: "平静" },
-      { v: 4, e: "🙂", label: "不错" },
-      { v: 5, e: "😄", label: "很好" }
-    ];
-    function moodOf(v) { for (var i = 0; i < MOODS.length; i++) if (MOODS[i].v === v) return MOODS[i]; return MOODS[2]; }
+    var DEFAULT_ACTS = ["Masturbation", "Jogging", "Sex", "Workout", "Game", "Fine-Dining"];
+    var ACT_COLORS = ["#cde7d8", "#f6d6d6", "#d8e2ef", "#efe6cf", "#e6d8ef", "#d6eef0", "#f0d6e8", "#dfeccb", "#e9d9c9", "#d9e9e2"];
 
     var PASSWORD = null, SESSION_SALT = null, diarySha = null, keyCache = {};
-    var diary = { entries: [] };
-    var editing = null, formMood = 3;
+    var diary = { entries: [], config: {} };
+    var editing = null;
+    var calYear, calMonth;
+    var ciTarget = null, ciSel = {};
+
+    function activities() { return (diary.config && diary.config.activities) || DEFAULT_ACTS; }
+    function ensureConfig() {
+      if (!diary.config) diary.config = {};
+      if (!Array.isArray(diary.config.activities) || !diary.config.activities.length) diary.config.activities = DEFAULT_ACTS.slice();
+    }
+    function actColor(name) { var i = activities().indexOf(name); return ACT_COLORS[(i < 0 ? 0 : i) % ACT_COLORS.length]; }
+    function abbr(name) { return name.replace(/[^A-Za-z一-龥]/g, "").slice(0, 3).toUpperCase(); }
 
     // ---------- crypto ----------
-    function bytesToB64(bytes) { var bin = "", CH = 0x8000; for (var i = 0; i < bytes.length; i += CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH)); return btoa(bin); }
+    function bytesToB64(b) { var s = "", CH = 0x8000; for (var i = 0; i < b.length; i += CH) s += String.fromCharCode.apply(null, b.subarray(i, i + CH)); return btoa(s); }
     function saltHex(s) { var o = ""; for (var i = 0; i < s.length; i++) o += ("0" + s[i].toString(16)).slice(-2); return o; }
     async function getKey(salt) {
       var k = saltHex(salt); if (keyCache[k]) return keyCache[k];
@@ -181,43 +244,33 @@
     async function encStr(str) {
       var salt = SESSION_SALT || crypto.getRandomValues(new Uint8Array(16));
       if (!SESSION_SALT) SESSION_SALT = salt;
-      var iv = crypto.getRandomValues(new Uint8Array(12));
-      var key = await getKey(salt);
+      var iv = crypto.getRandomValues(new Uint8Array(12)), key = await getKey(salt);
       var ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, new TextEncoder().encode(str)));
-      var all = new Uint8Array(28 + ct.length); all.set(salt, 0); all.set(iv, 16); all.set(ct, 28);
-      return all;
+      var all = new Uint8Array(28 + ct.length); all.set(salt, 0); all.set(iv, 16); all.set(ct, 28); return all;
     }
     async function decStr(bytes) {
-      var salt = bytes.slice(0, 16), iv = bytes.slice(16, 28), ct = bytes.slice(28);
-      var key = await getKey(salt);
+      var salt = bytes.slice(0, 16), iv = bytes.slice(16, 28), ct = bytes.slice(28), key = await getKey(salt);
       return new TextDecoder().decode(new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, ct)));
     }
 
     // ---------- transport ----------
     async function rawGet(path) {
       var r = await fetch("https://raw.githubusercontent.com/" + REPO + "/" + BRANCH + "/" + path + "?t=" + Date.now(), { cache: "no-store" });
-      if (r.status === 404) return null;
-      if (!r.ok) throw new Error("read " + r.status);
+      if (r.status === 404) return null; if (!r.ok) throw new Error("read " + r.status);
       return new Uint8Array(await r.arrayBuffer());
     }
     async function ghSha(path, token) {
       var r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + path + "?ref=" + BRANCH, { headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" } });
-      if (r.status === 404) return null;
-      if (!r.ok) throw new Error("sha " + r.status);
-      return (await r.json()).sha;
+      if (r.status === 404) return null; if (!r.ok) throw new Error("sha " + r.status); return (await r.json()).sha;
     }
-    async function ghPut(path, contentB64, message, token, sha) {
-      var body = { message: message, content: contentB64, branch: BRANCH };
-      if (sha) body.sha = sha;
-      var r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + path, {
-        method: "PUT", headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "Content-Type": "application/json" }, body: JSON.stringify(body)
-      });
-      if (!r.ok) { var t = await r.text(); throw new Error("commit " + r.status + " " + t.slice(0, 140)); }
-      return r.json();
+    async function ghPut(path, b64, message, token, sha) {
+      var body = { message: message, content: b64, branch: BRANCH }; if (sha) body.sha = sha;
+      var r = await fetch("https://api.github.com/repos/" + REPO + "/contents/" + path, { method: "PUT", headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json", "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      if (!r.ok) { var t = await r.text(); throw new Error("commit " + r.status + " " + t.slice(0, 140)); } return r.json();
     }
     function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
     async function commitDiary(message, token) {
-      var enc = await encStr(JSON.stringify({ entries: diary.entries }));
+      var enc = await encStr(JSON.stringify({ entries: diary.entries, config: diary.config }));
       var b64 = bytesToB64(enc), sha = diarySha;
       if (sha === null) { try { sha = await ghSha(DIARY, token); } catch (e) { sha = null; } }
       for (var a = 0; a < 4; a++) {
@@ -236,12 +289,38 @@
     document.getElementById("pat-clear").addEventListener("click", function () { patInput.value = ""; patRemember.checked = false; try { localStorage.removeItem(PAT_KEY); } catch (e) {} });
 
     // ---------- theme ----------
-    function syncSwatches() {
-      var cur = document.documentElement.getAttribute("data-theme");
-      document.querySelectorAll("[data-theme-pick]").forEach(function (b) { b.classList.toggle("swatch--on", b.getAttribute("data-theme-pick") === cur); });
+    function syncSwatches() { var cur = document.documentElement.getAttribute("data-theme"); document.querySelectorAll("[data-theme-pick]").forEach(function (b) { b.classList.toggle("swatch--on", b.getAttribute("data-theme-pick") === cur); }); }
+    document.querySelectorAll("[data-theme-pick]").forEach(function (b) { b.addEventListener("click", function () { var t = b.getAttribute("data-theme-pick"); document.documentElement.setAttribute("data-theme", t); try { localStorage.setItem(THEME_KEY, t); } catch (e) {} syncSwatches(); }); });
+
+    // ---------- settings sheet ----------
+    var sheet = document.getElementById("sheet");
+    document.getElementById("settings-btn").addEventListener("click", openSettings);
+    document.getElementById("sheet-close").addEventListener("click", function () { sheet.hidden = true; });
+    sheet.addEventListener("click", function (e) { if (e.target === sheet) sheet.hidden = true; });
+    function openSettings() { ensureConfig(); renderActChips(); syncSwatches(); document.getElementById("set-msg").textContent = ""; sheet.hidden = false; }
+    function renderActChips() {
+      var box = document.getElementById("set-acts"); box.innerHTML = "";
+      activities().forEach(function (name) {
+        var c = document.createElement("span"); c.className = "chip"; c.style.background = actColor(name);
+        var t = document.createElement("span"); t.textContent = name; c.appendChild(t);
+        var x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.title = "删除";
+        x.addEventListener("click", function () { var a = diary.config.activities; if (a.length <= 1) { window.alert("至少保留一个。"); return; } var i = a.indexOf(name); if (i >= 0) a.splice(i, 1); renderActChips(); });
+        c.appendChild(x); box.appendChild(c);
+      });
     }
-    document.querySelectorAll("[data-theme-pick]").forEach(function (b) {
-      b.addEventListener("click", function () { var t = b.getAttribute("data-theme-pick"); document.documentElement.setAttribute("data-theme", t); try { localStorage.setItem(THEME_KEY, t); } catch (e) {} syncSwatches(); });
+    function addAct() {
+      var inp = document.getElementById("set-act-in"), v = inp.value.trim(); if (!v) return;
+      ensureConfig(); if (diary.config.activities.indexOf(v) < 0) diary.config.activities.push(v);
+      inp.value = ""; inp.focus(); renderActChips();
+    }
+    document.getElementById("set-act-add").addEventListener("click", addAct);
+    document.getElementById("set-act-in").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); addAct(); } });
+    document.getElementById("set-save").addEventListener("click", async function () {
+      var sm = document.getElementById("set-msg"), token = currentPat();
+      if (!token) { sm.textContent = "需要 GitHub token"; return; }
+      sm.textContent = "保存中…";
+      try { await commitDiary("diary: settings", token); sm.textContent = "已保存 ✓"; render(); }
+      catch (e) { sm.textContent = "失败：" + (e && e.message ? e.message : "error"); }
     });
 
     // ---------- gate ----------
@@ -252,9 +331,9 @@
       errEl.hidden = true; busyEl.hidden = false; goBtn.disabled = true;
       try {
         var bytes = await rawGet(DIARY);
-        if (bytes === null) { PASSWORD = pw; SESSION_SALT = null; keyCache = {}; diary = { entries: [] }; }
-        else { PASSWORD = pw; SESSION_SALT = bytes.slice(0, 16); keyCache = {}; var data = JSON.parse(await decStr(bytes)); diary = { entries: data.entries || [] }; }
-        enterApp();
+        if (bytes === null) { PASSWORD = pw; SESSION_SALT = null; keyCache = {}; diary = { entries: [], config: {} }; }
+        else { PASSWORD = pw; SESSION_SALT = bytes.slice(0, 16); keyCache = {}; var data = JSON.parse(await decStr(bytes)); diary = { entries: data.entries || [], config: data.config || {} }; }
+        ensureConfig(); enterApp();
       } catch (err) {
         PASSWORD = null; SESSION_SALT = null; keyCache = {};
         busyEl.hidden = true; goBtn.disabled = false; errEl.hidden = false;
@@ -266,134 +345,159 @@
       document.getElementById("gate").remove();
       document.getElementById("app").hidden = false;
       document.title = "Attic";
-      loadPat(); syncSwatches(); render();
+      loadPat(); initMonth(); render();
       var tk = currentPat(); if (tk) ghSha(DIARY, tk).then(function (s) { diarySha = s; }).catch(function () {});
     }
 
-    // ---------- form ----------
+    // ---------- write form ----------
     var form = document.getElementById("form"), msg = document.getElementById("msg");
-    var moodsEl = document.getElementById("moods"), fDate = document.getElementById("f_date"), fText = document.getElementById("f_text");
-
-    function buildMoodPicker() {
-      moodsEl.innerHTML = "";
-      MOODS.forEach(function (m) {
-        var b = document.createElement("button"); b.type = "button"; b.className = "mood-btn"; b.textContent = m.e; b.title = m.label; b.setAttribute("data-mood", m.v);
-        b.addEventListener("click", function () { formMood = m.v; paintMoods(); });
-        moodsEl.appendChild(b);
-      });
-    }
-    function paintMoods() {
-      moodsEl.querySelectorAll(".mood-btn").forEach(function (b) { b.classList.toggle("on", parseInt(b.getAttribute("data-mood"), 10) === formMood); });
-    }
-    buildMoodPicker();
-
-    document.getElementById("new-btn").addEventListener("click", function () { openForm(null); });
+    var fDate = document.getElementById("f_date"), fText = document.getElementById("f_text");
+    document.getElementById("new-btn").addEventListener("click", function () { openForm(null, null); });
     document.getElementById("cancel-btn").addEventListener("click", function () { editing = null; form.hidden = true; });
-    function openForm(en) {
+    function entriesOn(date) { return diary.entries.filter(function (e) { return e.date === date; }); }
+    function openForm(en, dateOpt) {
       editing = en || null;
       form.hidden = false;
-      fDate.value = en ? en.date : new Date().toISOString().slice(0, 10);
-      formMood = en ? (en.mood || 3) : 3; paintMoods();
+      fDate.value = en ? en.date : (dateOpt || new Date().toISOString().slice(0, 10));
       fText.value = en ? (en.text || "") : "";
       document.getElementById("save-btn").textContent = en ? "Update & commit" : "Save & commit";
       msg.textContent = ""; msg.className = "";
-      form.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
       fText.focus();
     }
-
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
       var token = currentPat();
-      if (!token) { msg.className = "err"; msg.textContent = "请在 ⚙ 设置里填写 GitHub token 后再保存。"; document.getElementById("tok").open = true; return; }
+      if (!token) { msg.className = "err"; msg.textContent = "请在 ⚙ 设置里填写 GitHub token 后再保存。"; openSettings(); return; }
       if (!fText.value.trim()) { msg.className = "err"; msg.textContent = "写点什么吧。"; return; }
       var btn = document.getElementById("save-btn"); btn.disabled = true; msg.className = ""; msg.textContent = "Committing…";
-      var en = { id: editing ? editing.id : (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)), date: fDate.value, mood: formMood, text: fText.value, ts: editing && editing.ts ? editing.ts : Date.now() };
+      var en = {
+        id: editing ? editing.id : (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
+        date: fDate.value, text: fText.value,
+        acts: editing && editing.acts ? editing.acts : [],
+        ts: editing && editing.ts ? editing.ts : Date.now()
+      };
       if (editing) en.edited = Date.now();
       var idx = editing ? diary.entries.findIndex(function (x) { return x.id === editing.id; }) : -1;
       if (idx >= 0) diary.entries[idx] = en; else diary.entries.push(en);
-      try {
-        await commitDiary("diary: " + (editing ? "update " : "") + en.date, token);
-        editing = null; msg.className = "ok"; msg.textContent = "Saved."; form.hidden = true; render();
-      } catch (err) { msg.className = "err"; msg.textContent = "Failed: " + (err && err.message ? err.message : "error"); }
+      try { await commitDiary("diary: " + (editing ? "update " : "") + en.date, token); editing = null; msg.className = "ok"; msg.textContent = "Saved."; form.hidden = true; render(); }
+      catch (err) { msg.className = "err"; msg.textContent = "Failed: " + (err && err.message ? err.message : "error"); }
       finally { btn.disabled = false; }
     });
-
     async function deleteEntry(en) {
       if (!window.confirm("删除「" + (en.date || "") + "」这篇日记？")) return;
-      var token = currentPat();
-      if (!token) { document.getElementById("tok").open = true; window.alert("需要 GitHub token 才能删除。"); return; }
+      var token = currentPat(); if (!token) { openSettings(); window.alert("需要 GitHub token 才能删除。"); return; }
       var idx = diary.entries.findIndex(function (x) { return x.id === en.id; }); if (idx < 0) return;
       var backup = diary.entries.slice(); diary.entries.splice(idx, 1);
       try { await commitDiary("diary: delete " + (en.date || ""), token); render(); }
       catch (e) { diary.entries = backup; window.alert("删除失败：" + (e && e.message ? e.message : "error")); }
     }
 
-    // ---------- stats + chart ----------
-    function computeStreak(entries) {
-      var days = {}; entries.forEach(function (e) { if (e.date) days[e.date] = true; });
-      var keys = Object.keys(days).sort(); if (!keys.length) return 0;
-      var d = new Date(keys[keys.length - 1] + "T00:00:00"), n = 0;
-      while (true) { var ds = d.toISOString().slice(0, 10); if (days[ds]) { n++; d.setDate(d.getDate() - 1); } else break; }
-      return n;
+    // ---------- check-in sheet ----------
+    var ci = document.getElementById("checkin");
+    document.getElementById("ci-close").addEventListener("click", function () { ci.hidden = true; });
+    ci.addEventListener("click", function (e) { if (e.target === ci) ci.hidden = true; });
+    function openCheckin(en) {
+      ensureConfig(); ciTarget = en; ciSel = {};
+      (en.acts || []).forEach(function (a) { ciSel[a] = true; });
+      document.getElementById("ci-date").textContent = en.date || "";
+      document.getElementById("ci-msg").textContent = "";
+      var box = document.getElementById("ci-acts"); box.innerHTML = "";
+      var list = activities();
+      if (!list.length) { box.innerHTML = '<span class="acts-empty">请先在设置里添加打卡项目</span>'; }
+      list.forEach(function (name) {
+        var b = document.createElement("button"); b.type = "button"; b.className = "actbtn" + (ciSel[name] ? " on" : ""); b.textContent = name;
+        b.addEventListener("click", function () { ciSel[name] = !ciSel[name]; b.classList.toggle("on"); });
+        box.appendChild(b);
+      });
+      ci.hidden = false;
     }
-    function renderStats(list) {
-      var box = document.getElementById("stats");
-      if (!list.length) { box.innerHTML = ""; return; }
-      var sum = 0; list.forEach(function (e) { sum += (e.mood || 0); });
-      var avg = sum / list.length;
-      var thisMonth = new Date().toISOString().slice(0, 7);
-      var mo = list.filter(function (e) { return (e.date || "").slice(0, 7) === thisMonth; }).length;
-      var last = list.slice().sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : (b.ts || 0) - (a.ts || 0); })[0];
-      function card(l, v) { return '<div class="stat"><div class="stat__label">' + l + '</div><div class="stat__value">' + v + '</div></div>'; }
-      box.innerHTML =
-        card("篇数 Entries", list.length) +
-        card("平均心情 Avg", avg.toFixed(1) + " " + moodOf(Math.round(avg)).e) +
-        card("连续天数 Streak", computeStreak(list) + " 天") +
-        card("本月 This mo.", mo) +
-        card("最近 Latest", last ? moodOf(last.mood).e : "—");
+    document.getElementById("ci-save").addEventListener("click", async function () {
+      var cm = document.getElementById("ci-msg"), token = currentPat();
+      if (!token) { cm.textContent = "需要 GitHub token"; return; }
+      var acts = activities().filter(function (a) { return ciSel[a]; });
+      var idx = diary.entries.findIndex(function (x) { return x.id === ciTarget.id; }); if (idx < 0) return;
+      var prev = diary.entries[idx].acts; diary.entries[idx].acts = acts;
+      cm.textContent = "保存中…";
+      try { await commitDiary("diary: checkin " + (ciTarget.date || ""), token); ci.hidden = true; render(); }
+      catch (e) { diary.entries[idx].acts = prev; cm.textContent = "失败：" + (e && e.message ? e.message : "error"); }
+    });
+
+    // ---------- calendar ----------
+    var calEl = document.getElementById("cal");
+    function initMonth() {
+      var ds = diary.entries.map(function (e) { return e.date; }).filter(Boolean).sort();
+      var ref = ds.length ? ds[ds.length - 1] : new Date().toISOString().slice(0, 10);
+      calYear = parseInt(ref.slice(0, 4), 10); calMonth = parseInt(ref.slice(5, 7), 10) - 1;
     }
-    function renderChart(list) {
-      var box = document.getElementById("chart");
-      var asc = list.slice().sort(function (a, b) { if (a.date !== b.date) return a.date < b.date ? -1 : 1; return (a.ts || 0) - (b.ts || 0); });
-      if (asc.length < 2) { box.innerHTML = '<div class="note">写满 2 篇后显示心情曲线</div>'; return; }
-      var W = 640, H = 200, mL = 40, mR = 14, mT = 12, mB = 26, n = asc.length;
-      var pw = W - mL - mR, ph = H - mT - mB;
-      var X = function (i) { return mL + (n === 1 ? 0 : (i / (n - 1)) * pw); };
-      var Y = function (v) { return mT + (1 - (v - 1) / 4) * ph; };
-      var grid = "", labels = "";
-      for (var m = 1; m <= 5; m++) {
-        var yy = Y(m);
-        grid += '<line x1="' + mL + '" y1="' + yy.toFixed(1) + '" x2="' + (W - mR) + '" y2="' + yy.toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
-        labels += '<text x="' + (mL - 6) + '" y="' + (yy + 4).toFixed(1) + '" text-anchor="end" font-size="11">' + moodOf(m).e + '</text>';
+    function pad2(n) { return (n < 10 ? "0" : "") + n; }
+    function shiftMonth(d) { calMonth += d; if (calMonth < 0) { calMonth = 11; calYear--; } else if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
+    function renderCalendar() {
+      // aggregate by date
+      var byDate = {};
+      diary.entries.forEach(function (e) {
+        if (!e.date) return;
+        var d = byDate[e.date] || (byDate[e.date] = { diary: false, acts: {} });
+        d.diary = true;
+        (e.acts || []).forEach(function (a) { d.acts[a] = true; });
+      });
+      var mn = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
+      var html = '<div class="cal__nav"><button class="btn btn--sm" id="cal-prev" type="button">‹</button>' +
+        '<span class="cal__label">' + calYear + " 年 " + mn[calMonth] + '</span>' +
+        '<button class="btn btn--sm" id="cal-next" type="button">›</button></div><div class="cal__grid">';
+      ["日", "一", "二", "三", "四", "五", "六"].forEach(function (d) { html += '<div class="cal__dow">' + d + '</div>'; });
+      var startDow = new Date(calYear, calMonth, 1).getDay();
+      var days = new Date(calYear, calMonth + 1, 0).getDate();
+      for (var i = 0; i < startDow; i++) html += '<div class="cal__cell empty"></div>';
+      for (var dn = 1; dn <= days; dn++) {
+        var ds = calYear + "-" + pad2(calMonth + 1) + "-" + pad2(dn);
+        var info = byDate[ds];
+        var cls = "cal__cell" + (info && info.diary ? " diary" : "");
+        var pen = info && info.diary ? '<span class="cal__pen">✎</span>' : '';
+        var pills = "";
+        if (info) Object.keys(info.acts).forEach(function (a) { pills += '<span class="actpill" style="background:' + actColor(a) + '" title="' + a + '">' + abbr(a) + '</span>'; });
+        html += '<div class="' + cls + '" data-date="' + ds + '"><div class="cal__day"><span>' + dn + '</span>' + pen + '</div><div class="cal__acts">' + pills + '</div></div>';
       }
-      var path = asc.map(function (e, i) { return (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(e.mood).toFixed(1); }).join(" ");
-      var dots = asc.map(function (e, i) { return '<circle cx="' + X(i).toFixed(1) + '" cy="' + Y(e.mood).toFixed(1) + '" r="3" style="fill:var(--accent)"/>'; }).join("");
-      box.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img">' + grid +
-        '<path d="' + path + '" fill="none" stroke-width="2.4" style="stroke:var(--accent)"/>' + dots + labels + '</svg>';
+      html += '</div>';
+      // legend
+      html += '<div class="cal__legend">';
+      activities().forEach(function (a) { html += '<span><i style="background:' + actColor(a) + '"></i>' + abbr(a) + " · " + a + '</span>'; });
+      html += '</div>';
+      calEl.innerHTML = html;
+      document.getElementById("cal-prev").addEventListener("click", function () { shiftMonth(-1); });
+      document.getElementById("cal-next").addEventListener("click", function () { shiftMonth(1); });
+      calEl.querySelectorAll(".cal__cell[data-date]").forEach(function (cell) {
+        cell.addEventListener("click", function () {
+          var date = cell.getAttribute("data-date"), ex = entriesOn(date);
+          if (ex.length) openForm(ex[0], null); else openForm(null, date);
+        });
+      });
     }
 
     // ---------- feed ----------
     var feed = document.getElementById("feed");
     function render() {
-      var list = diary.entries.slice();
-      renderStats(list);
-      renderChart(list);
-      var sorted = list.sort(function (a, b) { if (a.date !== b.date) return a.date < b.date ? 1 : -1; return (b.ts || 0) - (a.ts || 0); });
+      renderCalendar();
+      var sorted = diary.entries.slice().sort(function (a, b) { if (a.date !== b.date) return a.date < b.date ? 1 : -1; return (b.ts || 0) - (a.ts || 0); });
       feed.innerHTML = "";
       if (!sorted.length) { var e = document.createElement("div"); e.className = "feed__empty"; e.textContent = "还没有日记。点「+ 写日记」开始记录吧。"; feed.appendChild(e); return; }
       sorted.forEach(function (en) {
-        var m = moodOf(en.mood);
         var card = document.createElement("div"); card.className = "entry";
         var hd = document.createElement("div"); hd.className = "entry__hd";
-        hd.innerHTML = '<span class="entry__mood"></span><span class="entry__date"></span><span class="entry__moodlab"></span>';
-        hd.querySelector(".entry__mood").textContent = m.e;
-        hd.querySelector(".entry__date").textContent = en.date || "—";
-        hd.querySelector(".entry__moodlab").textContent = m.label + (en.edited ? " · 已编辑" : "");
+        var dt = document.createElement("span"); dt.className = "entry__date"; dt.textContent = en.date || "—"; hd.appendChild(dt);
+        if (en.edited) { var ed = document.createElement("span"); ed.className = "entry__edited"; ed.textContent = "已编辑"; hd.appendChild(ed); }
         var tools = document.createElement("div"); tools.className = "entry__tools";
-        var ed = document.createElement("button"); ed.className = "btn btn--sm"; ed.type = "button"; ed.textContent = "编辑"; ed.addEventListener("click", function () { openForm(en); });
-        var del = document.createElement("button"); del.className = "btn btn--sm"; del.type = "button"; del.textContent = "删除"; del.addEventListener("click", function () { deleteEntry(en); });
-        tools.appendChild(ed); tools.appendChild(del); hd.appendChild(tools);
+        var ckBtn = document.createElement("button"); ckBtn.className = "btn btn--sm"; ckBtn.type = "button"; ckBtn.textContent = "打卡"; ckBtn.addEventListener("click", function () { openCheckin(en); });
+        var edBtn = document.createElement("button"); edBtn.className = "btn btn--sm"; edBtn.type = "button"; edBtn.textContent = "编辑"; edBtn.addEventListener("click", function () { openForm(en, null); });
+        var delBtn = document.createElement("button"); delBtn.className = "btn btn--sm"; delBtn.type = "button"; delBtn.textContent = "删除"; delBtn.addEventListener("click", function () { deleteEntry(en); });
+        tools.appendChild(ckBtn); tools.appendChild(edBtn); tools.appendChild(delBtn);
+        hd.appendChild(tools);
         card.appendChild(hd);
+        if (en.acts && en.acts.length) {
+          var av = document.createElement("div"); av.className = "entry__acts";
+          en.acts.forEach(function (a) { var p = document.createElement("span"); p.className = "actpill"; p.style.background = actColor(a); p.textContent = a; av.appendChild(p); });
+          card.appendChild(av);
+        }
         if (en.text) { var tx = document.createElement("p"); tx.className = "entry__text"; tx.textContent = en.text; card.appendChild(tx); }
         feed.appendChild(card);
       });
