@@ -102,6 +102,24 @@
   .swatch--on { box-shadow: 0 0 0 3px var(--accent-tint); border-color: var(--accent); }
   .swatch--green { background: #2f5d4f; } .swatch--red { background: #9a3232; } .swatch--blue { background: #2a4a72; }
 
+  /* schedule */
+  .sheet__box--wide { max-width: 580px; }
+  .sheet__hint { font-size: 0.74rem; color: var(--faint); margin: 4px 0 0; line-height: 1.6; }
+  .ssform { border: 1px solid var(--border-strong); border-radius: 12px; padding: 14px; margin-bottom: 14px; background: var(--bg); }
+  .ssgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .ssgrid .field input, .ssgrid .field select { font-family: inherit; font-size: 0.86rem; padding: 6px 8px; border: 1px solid var(--border-strong); border-radius: 7px; background: var(--surface); color: var(--text); }
+  .sslist { display: flex; flex-direction: column; gap: 8px; }
+  .ssitem { display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .ssitem__main { flex: 1; min-width: 0; }
+  .ssitem__date { font-weight: 700; color: var(--text); font-size: 0.88rem; }
+  .ssitem__desc { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+  .ssitem__badge { font-size: 0.64rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .badge-pub { background: #1f8f4e; color: #fff; }
+  .badge-pri { background: var(--accent-tint); color: var(--muted); }
+  .ssitem__tools { display: flex; gap: 6px; }
+  .sslist__empty { font-size: 0.82rem; color: var(--faint); font-style: italic; padding: 10px 0; }
+  .cal__schedbar { height: 3px; border-radius: 2px; margin-top: 2px; }
+
   /* check-in toggles */
   .acts-pick { display: flex; flex-wrap: wrap; gap: 8px; }
   .actbtn { font-family: inherit; font-size: 0.84rem; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--bg); color: var(--muted); cursor: pointer; }
@@ -125,6 +143,7 @@
       <h1 class="app__title">日记 · Attic</h1>
       <div class="app__actions">
         <button id="new-btn" class="btn btn--solid" type="button">+ 写日记</button>
+        <button id="sched-btn" class="btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Schedule</button>
         <button id="settings-btn" class="btn" type="button">⚙ Settings</button>
         <button class="btn" type="button" onclick="location.reload()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Lock</button>
       </div>
@@ -205,6 +224,35 @@
     </div>
   </div>
 
+  <!-- schedule sheet -->
+  <div id="sched-sheet" class="sheet" hidden>
+    <div class="sheet__box sheet__box--wide">
+      <div class="sheet__hd">
+        <h2 class="sheet__title">日程 · Schedule</h2>
+        <button id="ss-close" class="btn btn--sm" type="button">关闭</button>
+      </div>
+      <p class="sheet__hint">公开日程会发布到主页「近期日程」，须填中英文；私密日程仅本人可见。带开始日期的日程会标在日历上。</p>
+      <button id="ss-add" class="btn btn--solid btn--sm" type="button" style="margin:10px 0 14px">+ 添加日程</button>
+      <form id="ss-form" class="ssform" hidden autocomplete="off">
+        <div class="ssgrid">
+          <div class="field"><label>时间(英) Date EN</label><input id="sf_dateEn" type="text" placeholder="July 7 – 8 / 14:00–18:00" /></div>
+          <div class="field"><label>时间(中) Date ZH</label><input id="sf_dateZh" type="text" placeholder="7 月 7 – 8 日" /></div>
+          <div class="field"><label>内容(英) Desc EN</label><input id="sf_descEn" type="text" /></div>
+          <div class="field"><label>内容(中) Desc ZH</label><input id="sf_descZh" type="text" /></div>
+          <div class="field"><label>开始日期 Start（用于日历，可空）</label><input id="sf_start" type="date" /></div>
+          <div class="field"><label>结束日期 End（可空）</label><input id="sf_end" type="date" /></div>
+          <div class="field"><label>性质 Visibility</label><select id="sf_vis"><option value="private">🔒 私密 Private</option><option value="public">🌐 公开 Public</option></select></div>
+        </div>
+        <div class="form__foot">
+          <button id="sf_save" class="btn btn--solid" type="submit">保存 Save</button>
+          <button id="sf_cancel" class="btn" type="button">Cancel</button>
+          <span id="sf_msg"></span>
+        </div>
+      </form>
+      <div id="ss-list" class="sslist"></div>
+    </div>
+  </div>
+
   <script>
   (function () {
     "use strict";
@@ -218,9 +266,10 @@
     var DEFAULT_ACTS = ["Masturbation", "Jogging", "Sex", "Workout", "Game", "Fine-Dining"];
     var ACT_COLORS = ["#cde7d8", "#f6d6d6", "#d8e2ef", "#efe6cf", "#e6d8ef", "#d6eef0", "#f0d6e8", "#dfeccb", "#e9d9c9", "#d9e9e2"];
 
-    var PASSWORD = null, SESSION_SALT = null, diarySha = null, keyCache = {};
-    var diary = { entries: [], config: {} };
-    var editing = null;
+    var SCHEDULE = "schedule.json";
+    var PASSWORD = null, SESSION_SALT = null, diarySha = null, scheduleSha = null, keyCache = {};
+    var diary = { entries: [], config: {}, schedule: [] };
+    var editing = null, ssEditing = null;
     var calYear, calMonth;
     var ciTarget = null, ciSel = {};
 
@@ -228,6 +277,7 @@
     function ensureConfig() {
       if (!diary.config) diary.config = {};
       if (!Array.isArray(diary.config.activities) || !diary.config.activities.length) diary.config.activities = DEFAULT_ACTS.slice();
+      if (!Array.isArray(diary.schedule)) diary.schedule = [];
     }
     function actColor(name) { var i = activities().indexOf(name); return ACT_COLORS[(i < 0 ? 0 : i) % ACT_COLORS.length]; }
     function abbr(name) { return name.replace(/[^A-Za-z一-龥]/g, "").slice(0, 3).toUpperCase(); }
@@ -270,7 +320,7 @@
     }
     function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
     async function commitDiary(message, token) {
-      var enc = await encStr(JSON.stringify({ entries: diary.entries, config: diary.config }));
+      var enc = await encStr(JSON.stringify({ entries: diary.entries, config: diary.config, schedule: diary.schedule || [] }));
       var b64 = bytesToB64(enc), sha = diarySha;
       if (sha === null) { try { sha = await ghSha(DIARY, token); } catch (e) { sha = null; } }
       for (var a = 0; a < 4; a++) {
@@ -331,8 +381,8 @@
       errEl.hidden = true; busyEl.hidden = false; goBtn.disabled = true;
       try {
         var bytes = await rawGet(DIARY);
-        if (bytes === null) { PASSWORD = pw; SESSION_SALT = null; keyCache = {}; diary = { entries: [], config: {} }; }
-        else { PASSWORD = pw; SESSION_SALT = bytes.slice(0, 16); keyCache = {}; var data = JSON.parse(await decStr(bytes)); diary = { entries: data.entries || [], config: data.config || {} }; }
+        if (bytes === null) { PASSWORD = pw; SESSION_SALT = null; keyCache = {}; diary = { entries: [], config: {}, schedule: [] }; }
+        else { PASSWORD = pw; SESSION_SALT = bytes.slice(0, 16); keyCache = {}; var data = JSON.parse(await decStr(bytes)); diary = { entries: data.entries || [], config: data.config || {}, schedule: data.schedule || [] }; }
         ensureConfig(); enterApp();
       } catch (err) {
         PASSWORD = null; SESSION_SALT = null; keyCache = {};
@@ -345,8 +395,30 @@
       document.getElementById("gate").remove();
       document.getElementById("app").hidden = false;
       document.title = "Attic";
-      loadPat(); initMonth(); render();
+      loadPat(); initMonth(); render(); syncPublicSchedule();
       var tk = currentPat(); if (tk) ghSha(DIARY, tk).then(function (s) { diarySha = s; }).catch(function () {});
+    }
+
+    // pull public schedule items (from schedule.json) into the master list so
+    // the attic always has them and re-publishing never drops existing items
+    async function syncPublicSchedule() {
+      try {
+        var r = await fetch(SCHEDULE + "?t=" + Date.now(), { cache: "no-store" });
+        if (!r.ok) return;
+        var data = await r.json();
+        if (!data || !Array.isArray(data.items)) return;
+        ensureConfig();
+        var have = {}; diary.schedule.forEach(function (s) { if (s.id) have[s.id] = true; });
+        var added = false;
+        data.items.forEach(function (it) {
+          var id = it.id || ("pub-" + (it.start || "") + "-" + (it.descEn || it.descZh || "").slice(0, 10));
+          if (!have[id]) {
+            diary.schedule.push({ id: id, dateEn: it.dateEn || "", dateZh: it.dateZh || "", descEn: it.descEn || "", descZh: it.descZh || "", start: it.start || "", end: it.end || "", visibility: "public", ts: Date.now() });
+            added = true;
+          }
+        });
+        if (added) { renderCalendar(); if (!schedSheet.hidden) renderSchedList(); }
+      } catch (e) {}
     }
 
     // ---------- write form ----------
@@ -423,6 +495,104 @@
       catch (e) { diary.entries[idx].acts = prev; cm.textContent = "失败：" + (e && e.message ? e.message : "error"); }
     });
 
+    // ---------- schedule ----------
+    var schedSheet = document.getElementById("sched-sheet"), ssForm = document.getElementById("ss-form"), ssList = document.getElementById("ss-list");
+    var sf = { dateEn: document.getElementById("sf_dateEn"), dateZh: document.getElementById("sf_dateZh"), descEn: document.getElementById("sf_descEn"), descZh: document.getElementById("sf_descZh"), start: document.getElementById("sf_start"), end: document.getElementById("sf_end"), vis: document.getElementById("sf_vis"), msg: document.getElementById("sf_msg") };
+    document.getElementById("sched-btn").addEventListener("click", openSchedSheet);
+    document.getElementById("ss-close").addEventListener("click", function () { schedSheet.hidden = true; });
+    schedSheet.addEventListener("click", function (e) { if (e.target === schedSheet) schedSheet.hidden = true; });
+    document.getElementById("ss-add").addEventListener("click", function () { openSchedForm(null); });
+    document.getElementById("sf_cancel").addEventListener("click", function () { ssEditing = null; ssForm.hidden = true; });
+
+    function openSchedSheet() { ensureConfig(); ssForm.hidden = true; ssEditing = null; renderSchedList(); schedSheet.hidden = false; }
+    function schedById(id) { return (diary.schedule || []).filter(function (x) { return x.id === id; })[0]; }
+    function schedLabel(s) { return (s.dateZh || s.dateEn || "（无日期）"); }
+    function schedDesc(s) { return (s.descZh || s.descEn || ""); }
+    function renderSchedList() {
+      var list = (diary.schedule || []).slice().sort(function (a, b) {
+        var ka = a.start || "9999", kb = b.start || "9999";
+        if (ka !== kb) return ka < kb ? -1 : 1; return (a.ts || 0) - (b.ts || 0);
+      });
+      ssList.innerHTML = "";
+      if (!list.length) { ssList.innerHTML = '<div class="sslist__empty">还没有日程。点「+ 添加日程」开始。</div>'; return; }
+      list.forEach(function (s) {
+        var row = document.createElement("div"); row.className = "ssitem";
+        var main = document.createElement("div"); main.className = "ssitem__main";
+        var d = document.createElement("div"); d.className = "ssitem__date"; d.textContent = schedLabel(s); main.appendChild(d);
+        var p = document.createElement("div"); p.className = "ssitem__desc"; p.textContent = schedDesc(s); main.appendChild(p);
+        var badge = document.createElement("span"); badge.className = "ssitem__badge " + (s.visibility === "public" ? "badge-pub" : "badge-pri"); badge.textContent = s.visibility === "public" ? "🌐 公开" : "🔒 私密";
+        var tools = document.createElement("div"); tools.className = "ssitem__tools";
+        var ed = document.createElement("button"); ed.className = "btn btn--sm"; ed.type = "button"; ed.textContent = "编辑"; ed.addEventListener("click", function () { openSchedForm(s); });
+        var del = document.createElement("button"); del.className = "btn btn--sm"; del.type = "button"; del.textContent = "删除"; del.addEventListener("click", function () { deleteSched(s); });
+        tools.appendChild(ed); tools.appendChild(del);
+        row.appendChild(main); row.appendChild(badge); row.appendChild(tools);
+        ssList.appendChild(row);
+      });
+    }
+    function openSchedForm(s) {
+      ssEditing = s || null;
+      ssForm.hidden = false;
+      sf.dateEn.value = s ? (s.dateEn || "") : "";
+      sf.dateZh.value = s ? (s.dateZh || "") : "";
+      sf.descEn.value = s ? (s.descEn || "") : "";
+      sf.descZh.value = s ? (s.descZh || "") : "";
+      sf.start.value = s ? (s.start || "") : "";
+      sf.end.value = s ? (s.end || "") : "";
+      sf.vis.value = s ? (s.visibility || "private") : "private";
+      sf.msg.textContent = ""; sf.msg.className = "";
+      ssForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+    ssForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var token = currentPat();
+      if (!token) { sf.msg.className = "err"; sf.msg.textContent = "请在 ⚙ 设置里填写 GitHub token。"; return; }
+      var vis = sf.vis.value;
+      var item = {
+        id: ssEditing ? ssEditing.id : (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
+        dateEn: sf.dateEn.value.trim(), dateZh: sf.dateZh.value.trim(),
+        descEn: sf.descEn.value.trim(), descZh: sf.descZh.value.trim(),
+        start: sf.start.value || "", end: sf.end.value || "", visibility: vis,
+        ts: ssEditing && ssEditing.ts ? ssEditing.ts : Date.now()
+      };
+      if (vis === "public") {
+        if (!item.dateEn || !item.dateZh || !item.descEn || !item.descZh) { sf.msg.className = "err"; sf.msg.textContent = "公开日程必须填写中英文的时间和内容。"; return; }
+      } else if (!item.descEn && !item.descZh) { sf.msg.className = "err"; sf.msg.textContent = "请填写内容。"; return; }
+      var btn = document.getElementById("sf_save"); btn.disabled = true; sf.msg.className = ""; sf.msg.textContent = "Committing…";
+      ensureConfig();
+      var idx = ssEditing ? diary.schedule.findIndex(function (x) { return x.id === ssEditing.id; }) : -1;
+      if (idx >= 0) diary.schedule[idx] = item; else diary.schedule.push(item);
+      try {
+        await commitDiary("diary: schedule", token);
+        await commitSchedulePublic(token);
+        ssEditing = null; sf.msg.className = "ok"; sf.msg.textContent = "Saved."; ssForm.hidden = true;
+        renderSchedList(); renderCalendar();
+      } catch (err) { sf.msg.className = "err"; sf.msg.textContent = "Failed: " + (err && err.message ? err.message : "error"); }
+      finally { btn.disabled = false; }
+    });
+    async function deleteSched(s) {
+      if (!window.confirm("删除这条日程？" + (s.visibility === "public" ? "（也会从主页移除）" : ""))) return;
+      var token = currentPat(); if (!token) { window.alert("需要 GitHub token 才能删除。"); return; }
+      var idx = diary.schedule.findIndex(function (x) { return x.id === s.id; }); if (idx < 0) return;
+      var backup = diary.schedule.slice(); diary.schedule.splice(idx, 1);
+      try { await commitDiary("diary: schedule delete", token); await commitSchedulePublic(token); renderSchedList(); renderCalendar(); }
+      catch (e) { diary.schedule = backup; window.alert("删除失败：" + (e && e.message ? e.message : "error")); }
+    }
+    function publicScheduleJson() {
+      var items = (diary.schedule || []).filter(function (s) { return s.visibility === "public"; })
+        .sort(function (a, b) { var ka = a.start || "9999", kb = b.start || "9999"; return ka < kb ? -1 : ka > kb ? 1 : 0; })
+        .map(function (s) { return { id: s.id, dateEn: s.dateEn, dateZh: s.dateZh, descEn: s.descEn, descZh: s.descZh, start: s.start || "", end: s.end || "" }; });
+      return JSON.stringify({ items: items }, null, 2) + "\n";
+    }
+    async function commitSchedulePublic(token) {
+      var b64 = bytesToB64(new TextEncoder().encode(publicScheduleJson()));
+      var sha = scheduleSha;
+      if (sha === null) { try { sha = await ghSha(SCHEDULE, token); } catch (e) { sha = null; } }
+      for (var a = 0; a < 4; a++) {
+        try { var res = await ghPut(SCHEDULE, b64, "schedule: update public", token, sha); scheduleSha = (res && res.content && res.content.sha) || null; return res; }
+        catch (e) { if (/commit 409|commit 422/.test(e.message || "") && a < 3) { await sleep(600 * (a + 1)); try { sha = await ghSha(SCHEDULE, token); } catch (e2) {} continue; } throw e; }
+      }
+    }
+
     // ---------- calendar ----------
     var calEl = document.getElementById("cal");
     function initMonth() {
@@ -441,6 +611,15 @@
         d.diary = true;
         (e.acts || []).forEach(function (a) { d.acts[a] = true; });
       });
+      // schedule items spanning each day (those with a start date)
+      var schedByDate = {};
+      (diary.schedule || []).forEach(function (s) {
+        if (!s.start) return;
+        var d = new Date(s.start + "T00:00:00"), endD = new Date((s.end || s.start) + "T00:00:00"), guard = 0;
+        if (isNaN(d) || isNaN(endD)) return;
+        while (d <= endD && guard < 400) { var ds = d.toISOString().slice(0, 10); (schedByDate[ds] || (schedByDate[ds] = [])).push(s); d.setDate(d.getDate() + 1); guard++; }
+      });
+      function schedTitle(s) { return (schedLabel(s) + " · " + schedDesc(s)).replace(/"/g, "'"); }
       var mn = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
       var html = '<div class="cal__nav"><button class="btn btn--sm" id="cal-prev" type="button">‹</button>' +
         '<span class="cal__label">' + calYear + " 年 " + mn[calMonth] + '</span>' +
@@ -456,7 +635,12 @@
         var pen = info && info.diary ? '<span class="cal__pen">✎</span>' : '';
         var pills = "";
         if (info) Object.keys(info.acts).forEach(function (a) { pills += '<span class="actpill" style="background:' + actColor(a) + '" title="' + a + '">' + abbr(a) + '</span>'; });
-        html += '<div class="' + cls + '" data-date="' + ds + '"><div class="cal__day"><span>' + dn + '</span>' + pen + '</div><div class="cal__acts">' + pills + '</div></div>';
+        var bars = "";
+        (schedByDate[ds] || []).slice(0, 3).forEach(function (s) {
+          var col = s.visibility === "public" ? "#1f8f4e" : "var(--accent)";
+          bars += '<div class="cal__schedbar" style="background:' + col + '" title="' + schedTitle(s) + '"></div>';
+        });
+        html += '<div class="' + cls + '" data-date="' + ds + '"><div class="cal__day"><span>' + dn + '</span>' + pen + '</div><div class="cal__acts">' + pills + '</div>' + bars + '</div>';
       }
       html += '</div>';
       // legend
