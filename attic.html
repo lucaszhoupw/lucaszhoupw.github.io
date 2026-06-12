@@ -25,7 +25,7 @@
   .app { max-width: 740px; margin: 0 auto; padding: 56px 22px 90px; }
   .app__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
   .app__title { font-size: 1.5rem; color: var(--accent); margin: 0; }
-  .app__actions { display: flex; gap: 8px; }
+  .app__actions { display: flex; gap: 8px; flex-wrap: wrap; }
   .btn { font-family: inherit; font-size: 0.84rem; cursor: pointer; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; color: var(--muted); transition: background .15s, color .15s; }
   .btn:hover { color: var(--text); background: var(--accent-tint); }
   .btn--solid { background: var(--accent); color: #fff; border-color: transparent; }
@@ -33,16 +33,17 @@
   .btn--sm { padding: 4px 10px; font-size: 0.76rem; }
   .btn:disabled { opacity: .55; cursor: default; }
 
-  /* form */
-  .form { border: 1px solid var(--border-strong); border-radius: 14px; padding: 18px; margin: 0 0 24px; background: var(--surface); }
-  .form__row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 12px; }
   .field { display: flex; flex-direction: column; gap: 4px; }
   .field label { font-size: 0.7rem; font-weight: 700; color: var(--muted); }
-  .field input[type="date"] { font-family: inherit; font-size: 0.9rem; padding: 7px 9px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); }
-  .form textarea { width: 100%; min-height: 130px; resize: vertical; font-family: inherit; font-size: 0.95rem; line-height: 1.6; padding: 11px 13px; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg); color: var(--text); }
   .form__foot { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
   #msg { font-size: 0.8rem; color: var(--muted); }
   #msg.err { color: #b3392f; } #msg.ok { color: var(--accent-strong); }
+
+  /* schedule form */
+  .ssform { border: 1px solid var(--border-strong); border-radius: 14px; padding: 18px; margin: 0 0 24px; background: var(--surface); }
+  .ssgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+  .ssgrid .field input, .ssgrid .field select { font-family: inherit; font-size: 0.88rem; padding: 7px 9px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); }
+  .ssform__hint { font-size: 0.74rem; color: var(--faint); margin: 0 0 12px; line-height: 1.6; }
 
   /* calendar */
   .cal { margin-bottom: 26px; }
@@ -50,32 +51,30 @@
   .cal__label { font-weight: 700; color: var(--text); min-width: 130px; text-align: center; }
   .cal__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
   .cal__dow { text-align: center; font-size: 0.7rem; color: var(--faint); padding: 4px 0; font-weight: 700; }
-  .cal__cell { min-height: 66px; border: 1px solid var(--border); border-radius: 8px; padding: 3px 5px; cursor: pointer; transition: background .12s; }
+  .cal__cell { min-height: 62px; border: 1px solid var(--border); border-radius: 8px; padding: 3px 5px; cursor: pointer; transition: background .12s; }
   .cal__cell:hover { background: var(--accent-tint); }
   .cal__cell.empty { border: none; cursor: default; }
   .cal__cell.empty:hover { background: transparent; }
-  .cal__cell.diary { border-color: var(--accent); }
-  .cal__day { font-size: 0.72rem; font-weight: 700; color: var(--muted); display: flex; justify-content: space-between; }
-  .cal__pen { color: var(--accent); }
-  .cal__acts { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 3px; }
-  .actpill { font-size: 0.56rem; font-weight: 700; color: #2a2a2a; border-radius: 4px; padding: 1px 3px; line-height: 1.3; }
-  .cal__legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-  .cal__legend span { font-size: 0.7rem; color: var(--muted); display: inline-flex; align-items: center; gap: 4px; }
-  .cal__legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .cal__day { font-size: 0.72rem; font-weight: 700; color: var(--muted); }
+  .cal__schedbar { height: 4px; border-radius: 2px; margin-top: 3px; }
+  .cal__legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; font-size: 0.72rem; color: var(--muted); }
+  .cal__legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .cal__legend i { width: 14px; height: 4px; border-radius: 2px; display: inline-block; }
 
-  /* feed */
-  .feed { display: flex; flex-direction: column; gap: 14px; }
-  .entry { border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; background: var(--surface); }
-  .entry__hd { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .entry__date { font-weight: 700; color: var(--text); }
-  .entry__edited { font-size: 0.72rem; color: var(--faint); }
-  .entry__tools { display: flex; gap: 6px; margin-left: auto; }
-  .entry__acts { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }
-  .entry__acts .actpill { font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; }
-  .entry__text { margin: 10px 0 0; font-size: 0.95rem; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
-  .feed__empty { color: var(--faint); font-style: italic; text-align: center; padding: 28px 0; }
+  /* schedule list */
+  .sslist { display: flex; flex-direction: column; gap: 8px; }
+  .sslist__h { font-size: 0.9rem; font-weight: 700; color: var(--accent-strong); margin: 0 0 10px; }
+  .ssitem { display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; background: var(--surface); }
+  .ssitem__main { flex: 1; min-width: 0; }
+  .ssitem__date { font-weight: 700; color: var(--text); font-size: 0.92rem; }
+  .ssitem__desc { color: var(--muted); font-size: 0.84rem; margin-top: 3px; }
+  .ssitem__badge { font-size: 0.64rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .badge-pub { background: #1f8f4e; color: #fff; }
+  .badge-pri { background: var(--accent-tint); color: var(--muted); }
+  .ssitem__tools { display: flex; gap: 6px; }
+  .sslist__empty { color: var(--faint); font-style: italic; text-align: center; padding: 26px 0; }
 
-  /* sheets (settings + check-in) */
+  /* settings sheet */
   .sheet { position: fixed; inset: 0; background: rgba(12,14,13,.5); display: flex; align-items: flex-start; justify-content: center; z-index: 60; padding: 44px 20px; overflow: auto; }
   .sheet[hidden] { display: none; }
   .sheet__box { width: 100%; max-width: 440px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 14px; padding: 20px; }
@@ -87,44 +86,10 @@
   .sheet input[type="password"] { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.82rem; padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); width: 100%; }
   .tok__row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
   .tok__row label { font-size: 0.78rem; color: var(--muted); }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip { display: inline-flex; align-items: center; gap: 4px; background: var(--accent-tint); color: var(--text); border-radius: 999px; padding: 4px 6px 4px 12px; font-size: 0.84rem; }
-  .chip button { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 1.05rem; line-height: 1; padding: 0 4px; }
-  .chip button:hover { color: #b3392f; }
-  .addrow { display: flex; gap: 8px; margin-top: 10px; }
-  .addrow input { flex: 1; font-family: inherit; font-size: 0.9rem; padding: 7px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); }
-  .sheet__foot { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
-  #set-msg { font-size: 0.8rem; color: var(--muted); }
-
-  /* slim vertical colour bars */
   .swatches { display: flex; gap: 12px; }
   .swatch { width: 22px; height: 48px; border-radius: 6px; border: 1px solid var(--border-strong); cursor: pointer; padding: 0; }
   .swatch--on { box-shadow: 0 0 0 3px var(--accent-tint); border-color: var(--accent); }
   .swatch--green { background: #2f5d4f; } .swatch--red { background: #9a3232; } .swatch--blue { background: #2a4a72; }
-
-  /* schedule */
-  .sheet__box--wide { max-width: 580px; }
-  .sheet__hint { font-size: 0.74rem; color: var(--faint); margin: 4px 0 0; line-height: 1.6; }
-  .ssform { border: 1px solid var(--border-strong); border-radius: 12px; padding: 14px; margin-bottom: 14px; background: var(--bg); }
-  .ssgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-  .ssgrid .field input, .ssgrid .field select { font-family: inherit; font-size: 0.86rem; padding: 6px 8px; border: 1px solid var(--border-strong); border-radius: 7px; background: var(--surface); color: var(--text); }
-  .sslist { display: flex; flex-direction: column; gap: 8px; }
-  .ssitem { display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
-  .ssitem__main { flex: 1; min-width: 0; }
-  .ssitem__date { font-weight: 700; color: var(--text); font-size: 0.88rem; }
-  .ssitem__desc { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
-  .ssitem__badge { font-size: 0.64rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
-  .badge-pub { background: #1f8f4e; color: #fff; }
-  .badge-pri { background: var(--accent-tint); color: var(--muted); }
-  .ssitem__tools { display: flex; gap: 6px; }
-  .sslist__empty { font-size: 0.82rem; color: var(--faint); font-style: italic; padding: 10px 0; }
-  .cal__schedbar { height: 3px; border-radius: 2px; margin-top: 2px; }
-
-  /* check-in toggles */
-  .acts-pick { display: flex; flex-wrap: wrap; gap: 8px; }
-  .actbtn { font-family: inherit; font-size: 0.84rem; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--bg); color: var(--muted); cursor: pointer; }
-  .actbtn.on { background: var(--accent); color: #fff; border-color: transparent; }
-  .acts-empty { font-size: 0.78rem; color: var(--faint); font-style: italic; }
 </style>
 </head>
 <body>
@@ -140,24 +105,26 @@
 
   <main id="app" class="app" hidden>
     <div class="app__bar">
-      <h1 class="app__title">日记 · Attic</h1>
+      <h1 class="app__title">日程 · Schedule</h1>
       <div class="app__actions">
-        <button id="new-btn" class="btn btn--solid" type="button">+ 写日记</button>
-        <button id="sched-btn" class="btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Schedule</button>
+        <button id="add-btn" class="btn btn--solid" type="button">+ 添加日程</button>
         <button id="settings-btn" class="btn" type="button">⚙ Settings</button>
         <button class="btn" type="button" onclick="location.reload()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Lock</button>
       </div>
     </div>
 
-    <!-- write/edit form (appears above the calendar) -->
-    <form id="form" class="form" hidden autocomplete="off">
-      <div class="form__row">
-        <div class="field">
-          <label for="f_date">日期 Date</label>
-          <input id="f_date" type="date" required />
-        </div>
+    <!-- add/edit form (appears above the calendar) -->
+    <form id="form" class="ssform" hidden autocomplete="off">
+      <p class="ssform__hint">公开日程会发布到主页「近期日程」，须填中英文；私密日程仅本人可见。填了开始日期会标在日历上。</p>
+      <div class="ssgrid">
+        <div class="field"><label>时间(英) Date EN</label><input id="sf_dateEn" type="text" placeholder="July 7 – 8 / 14:00–18:00" /></div>
+        <div class="field"><label>时间(中) Date ZH</label><input id="sf_dateZh" type="text" placeholder="7 月 7 – 8 日" /></div>
+        <div class="field"><label>内容(英) Desc EN</label><input id="sf_descEn" type="text" /></div>
+        <div class="field"><label>内容(中) Desc ZH</label><input id="sf_descZh" type="text" /></div>
+        <div class="field"><label>开始日期 Start（可空）</label><input id="sf_start" type="date" /></div>
+        <div class="field"><label>结束日期 End（可空）</label><input id="sf_end" type="date" /></div>
+        <div class="field"><label>性质 Visibility</label><select id="sf_vis"><option value="private">🔒 私密 Private</option><option value="public">🌐 公开 Public</option></select></div>
       </div>
-      <textarea id="f_text" placeholder="今天发生了什么？此刻在想什么……"></textarea>
       <div class="form__foot">
         <button id="save-btn" class="btn btn--solid" type="submit">Save &amp; commit</button>
         <button id="cancel-btn" class="btn" type="button">Cancel</button>
@@ -166,7 +133,7 @@
     </form>
 
     <div id="cal" class="cal"></div>
-    <div id="feed" class="feed"></div>
+    <div id="list" class="sslist"></div>
   </main>
 
   <!-- settings sheet -->
@@ -187,11 +154,6 @@
         </div>
       </div>
       <div class="sheet__sec">
-        <h3>打卡项目 · Activities</h3>
-        <div id="set-acts" class="chips"></div>
-        <div class="addrow"><input id="set-act-in" type="text" placeholder="新增打卡项目…" /><button id="set-act-add" class="btn btn--sm" type="button">添加</button></div>
-      </div>
-      <div class="sheet__sec">
         <h3>配色 · Theme</h3>
         <div class="swatches">
           <button class="swatch swatch--green" type="button" data-theme-pick="green" title="绿"></button>
@@ -199,57 +161,6 @@
           <button class="swatch swatch--blue" type="button" data-theme-pick="blue" title="蓝"></button>
         </div>
       </div>
-      <div class="sheet__foot">
-        <button id="set-save" class="btn btn--solid" type="button">保存到仓库 · Save</button>
-        <span id="set-msg"></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- check-in sheet -->
-  <div id="checkin" class="sheet" hidden>
-    <div class="sheet__box">
-      <div class="sheet__hd">
-        <h2 class="sheet__title">打卡 · <span id="ci-date"></span></h2>
-        <button id="ci-close" class="btn btn--sm" type="button">关闭</button>
-      </div>
-      <div class="sheet__sec">
-        <h3>今天做了什么？</h3>
-        <div id="ci-acts" class="acts-pick"></div>
-      </div>
-      <div class="sheet__foot">
-        <button id="ci-save" class="btn btn--solid" type="button">保存打卡</button>
-        <span id="ci-msg"></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- schedule sheet -->
-  <div id="sched-sheet" class="sheet" hidden>
-    <div class="sheet__box sheet__box--wide">
-      <div class="sheet__hd">
-        <h2 class="sheet__title">日程 · Schedule</h2>
-        <button id="ss-close" class="btn btn--sm" type="button">关闭</button>
-      </div>
-      <p class="sheet__hint">公开日程会发布到主页「近期日程」，须填中英文；私密日程仅本人可见。带开始日期的日程会标在日历上。</p>
-      <button id="ss-add" class="btn btn--solid btn--sm" type="button" style="margin:10px 0 14px">+ 添加日程</button>
-      <form id="ss-form" class="ssform" hidden autocomplete="off">
-        <div class="ssgrid">
-          <div class="field"><label>时间(英) Date EN</label><input id="sf_dateEn" type="text" placeholder="July 7 – 8 / 14:00–18:00" /></div>
-          <div class="field"><label>时间(中) Date ZH</label><input id="sf_dateZh" type="text" placeholder="7 月 7 – 8 日" /></div>
-          <div class="field"><label>内容(英) Desc EN</label><input id="sf_descEn" type="text" /></div>
-          <div class="field"><label>内容(中) Desc ZH</label><input id="sf_descZh" type="text" /></div>
-          <div class="field"><label>开始日期 Start（用于日历，可空）</label><input id="sf_start" type="date" /></div>
-          <div class="field"><label>结束日期 End（可空）</label><input id="sf_end" type="date" /></div>
-          <div class="field"><label>性质 Visibility</label><select id="sf_vis"><option value="private">🔒 私密 Private</option><option value="public">🌐 公开 Public</option></select></div>
-        </div>
-        <div class="form__foot">
-          <button id="sf_save" class="btn btn--solid" type="submit">保存 Save</button>
-          <button id="sf_cancel" class="btn" type="button">Cancel</button>
-          <span id="sf_msg"></span>
-        </div>
-      </form>
-      <div id="ss-list" class="sslist"></div>
     </div>
   </div>
 
@@ -259,28 +170,18 @@
 
     var REPO = "lucaszhoupw/lucaszhoupw.github.io";
     var BRANCH = "main";
-    var DIARY = "private/diary.enc";
+    var STORE = "private/attic.enc";   // private schedule items (encrypted)
+    var SCHEDULE = "schedule.json";    // public schedule items (homepage reads this)
     var ITER = 120000;
     var PAT_KEY = "plz_gh_pat";
     var THEME_KEY = "plz_theme";
-    var DEFAULT_ACTS = ["Masturbation", "Jogging", "Sex", "Workout", "Game", "Fine-Dining"];
-    var ACT_COLORS = ["#cde7d8", "#f6d6d6", "#d8e2ef", "#efe6cf", "#e6d8ef", "#d6eef0", "#f0d6e8", "#dfeccb", "#e9d9c9", "#d9e9e2"];
 
-    var SCHEDULE = "schedule.json";
-    var PASSWORD = null, SESSION_SALT = null, diarySha = null, scheduleSha = null, keyCache = {};
-    var diary = { entries: [], config: {}, schedule: [] };
-    var editing = null, ssEditing = null;
+    var PASSWORD = null, SESSION_SALT = null, storeSha = null, scheduleSha = null, keyCache = {};
+    var store = { schedule: [] };
+    var editing = null;
     var calYear, calMonth;
-    var ciTarget = null, ciSel = {};
 
-    function activities() { return (diary.config && diary.config.activities) || DEFAULT_ACTS; }
-    function ensureConfig() {
-      if (!diary.config) diary.config = {};
-      if (!Array.isArray(diary.config.activities) || !diary.config.activities.length) diary.config.activities = DEFAULT_ACTS.slice();
-      if (!Array.isArray(diary.schedule)) diary.schedule = [];
-    }
-    function actColor(name) { var i = activities().indexOf(name); return ACT_COLORS[(i < 0 ? 0 : i) % ACT_COLORS.length]; }
-    function abbr(name) { return name.replace(/[^A-Za-z一-龥]/g, "").slice(0, 3).toUpperCase(); }
+    function schedule() { return store.schedule || (store.schedule = []); }
 
     // ---------- crypto ----------
     function bytesToB64(b) { var s = "", CH = 0x8000; for (var i = 0; i < b.length; i += CH) s += String.fromCharCode.apply(null, b.subarray(i, i + CH)); return btoa(s); }
@@ -319,15 +220,29 @@
       if (!r.ok) { var t = await r.text(); throw new Error("commit " + r.status + " " + t.slice(0, 140)); } return r.json();
     }
     function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
-    async function commitDiary(message, token) {
-      var enc = await encStr(JSON.stringify({ entries: diary.entries, config: diary.config, schedule: diary.schedule || [] }));
-      var b64 = bytesToB64(enc), sha = diarySha;
-      if (sha === null) { try { sha = await ghSha(DIARY, token); } catch (e) { sha = null; } }
+    async function putRetry(path, b64, message, token, getSha, setSha) {
+      var sha = getSha();
+      if (sha === null) { try { sha = await ghSha(path, token); } catch (e) { sha = null; } }
       for (var a = 0; a < 4; a++) {
-        try { var res = await ghPut(DIARY, b64, message, token, sha); diarySha = (res && res.content && res.content.sha) || null; return res; }
-        catch (e) { if (/commit 409|commit 422/.test(e.message || "") && a < 3) { await sleep(600 * (a + 1)); try { sha = await ghSha(DIARY, token); } catch (e2) {} continue; } throw e; }
+        try { var res = await ghPut(path, b64, message, token, sha); setSha((res && res.content && res.content.sha) || null); return res; }
+        catch (e) { if (/commit 409|commit 422/.test(e.message || "") && a < 3) { await sleep(600 * (a + 1)); try { sha = await ghSha(path, token); } catch (e2) {} continue; } throw e; }
       }
     }
+    async function commitStore(token) {
+      var enc = await encStr(JSON.stringify({ schedule: store.schedule }));
+      return putRetry(STORE, bytesToB64(enc), "attic: update", token, function () { return storeSha; }, function (s) { storeSha = s; });
+    }
+    function publicScheduleJson() {
+      var items = schedule().filter(function (s) { return s.visibility === "public"; })
+        .sort(function (a, b) { var ka = a.start || "9999", kb = b.start || "9999"; return ka < kb ? -1 : ka > kb ? 1 : 0; })
+        .map(function (s) { return { id: s.id, dateEn: s.dateEn, dateZh: s.dateZh, descEn: s.descEn, descZh: s.descZh, start: s.start || "", end: s.end || "" }; });
+      return JSON.stringify({ items: items }, null, 2) + "\n";
+    }
+    async function commitSchedulePublic(token) {
+      var b64 = bytesToB64(new TextEncoder().encode(publicScheduleJson()));
+      return putRetry(SCHEDULE, b64, "schedule: update public", token, function () { return scheduleSha; }, function (s) { scheduleSha = s; });
+    }
+    async function saveAll(token) { await commitStore(token); await commitSchedulePublic(token); }
 
     // ---------- token ----------
     var patInput = document.getElementById("pat"), patRemember = document.getElementById("pat-remember");
@@ -338,40 +253,13 @@
     patRemember.addEventListener("change", syncPat);
     document.getElementById("pat-clear").addEventListener("click", function () { patInput.value = ""; patRemember.checked = false; try { localStorage.removeItem(PAT_KEY); } catch (e) {} });
 
-    // ---------- theme ----------
+    // ---------- theme + settings ----------
     function syncSwatches() { var cur = document.documentElement.getAttribute("data-theme"); document.querySelectorAll("[data-theme-pick]").forEach(function (b) { b.classList.toggle("swatch--on", b.getAttribute("data-theme-pick") === cur); }); }
     document.querySelectorAll("[data-theme-pick]").forEach(function (b) { b.addEventListener("click", function () { var t = b.getAttribute("data-theme-pick"); document.documentElement.setAttribute("data-theme", t); try { localStorage.setItem(THEME_KEY, t); } catch (e) {} syncSwatches(); }); });
-
-    // ---------- settings sheet ----------
     var sheet = document.getElementById("sheet");
-    document.getElementById("settings-btn").addEventListener("click", openSettings);
+    document.getElementById("settings-btn").addEventListener("click", function () { syncSwatches(); sheet.hidden = false; });
     document.getElementById("sheet-close").addEventListener("click", function () { sheet.hidden = true; });
     sheet.addEventListener("click", function (e) { if (e.target === sheet) sheet.hidden = true; });
-    function openSettings() { ensureConfig(); renderActChips(); syncSwatches(); document.getElementById("set-msg").textContent = ""; sheet.hidden = false; }
-    function renderActChips() {
-      var box = document.getElementById("set-acts"); box.innerHTML = "";
-      activities().forEach(function (name) {
-        var c = document.createElement("span"); c.className = "chip"; c.style.background = actColor(name);
-        var t = document.createElement("span"); t.textContent = name; c.appendChild(t);
-        var x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.title = "删除";
-        x.addEventListener("click", function () { var a = diary.config.activities; if (a.length <= 1) { window.alert("至少保留一个。"); return; } var i = a.indexOf(name); if (i >= 0) a.splice(i, 1); renderActChips(); });
-        c.appendChild(x); box.appendChild(c);
-      });
-    }
-    function addAct() {
-      var inp = document.getElementById("set-act-in"), v = inp.value.trim(); if (!v) return;
-      ensureConfig(); if (diary.config.activities.indexOf(v) < 0) diary.config.activities.push(v);
-      inp.value = ""; inp.focus(); renderActChips();
-    }
-    document.getElementById("set-act-add").addEventListener("click", addAct);
-    document.getElementById("set-act-in").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); addAct(); } });
-    document.getElementById("set-save").addEventListener("click", async function () {
-      var sm = document.getElementById("set-msg"), token = currentPat();
-      if (!token) { sm.textContent = "需要 GitHub token"; return; }
-      sm.textContent = "保存中…";
-      try { await commitDiary("diary: settings", token); sm.textContent = "已保存 ✓"; render(); }
-      catch (e) { sm.textContent = "失败：" + (e && e.message ? e.message : "error"); }
-    });
 
     // ---------- gate ----------
     var gateForm = document.getElementById("gate-form"), errEl = document.getElementById("err"), busyEl = document.getElementById("gate-busy"), goBtn = document.getElementById("go");
@@ -380,10 +268,10 @@
       var pw = document.getElementById("pw").value; if (!pw) return;
       errEl.hidden = true; busyEl.hidden = false; goBtn.disabled = true;
       try {
-        var bytes = await rawGet(DIARY);
-        if (bytes === null) { PASSWORD = pw; SESSION_SALT = null; keyCache = {}; diary = { entries: [], config: {}, schedule: [] }; }
-        else { PASSWORD = pw; SESSION_SALT = bytes.slice(0, 16); keyCache = {}; var data = JSON.parse(await decStr(bytes)); diary = { entries: data.entries || [], config: data.config || {}, schedule: data.schedule || [] }; }
-        ensureConfig(); enterApp();
+        var bytes = await rawGet(STORE);
+        if (bytes === null) { PASSWORD = pw; SESSION_SALT = null; keyCache = {}; store = { schedule: [] }; }
+        else { PASSWORD = pw; SESSION_SALT = bytes.slice(0, 16); keyCache = {}; var data = JSON.parse(await decStr(bytes)); store = { schedule: data.schedule || [] }; }
+        enterApp();
       } catch (err) {
         PASSWORD = null; SESSION_SALT = null; keyCache = {};
         busyEl.hidden = true; goBtn.disabled = false; errEl.hidden = false;
@@ -394,232 +282,98 @@
     function enterApp() {
       document.getElementById("gate").remove();
       document.getElementById("app").hidden = false;
-      document.title = "Attic";
+      document.title = "Schedule";
       loadPat(); initMonth(); render(); syncPublicSchedule();
-      var tk = currentPat(); if (tk) ghSha(DIARY, tk).then(function (s) { diarySha = s; }).catch(function () {});
+      var tk = currentPat(); if (tk) ghSha(STORE, tk).then(function (s) { storeSha = s; }).catch(function () {});
     }
 
-    // pull public schedule items (from schedule.json) into the master list so
-    // the attic always has them and re-publishing never drops existing items
+    // merge public items from schedule.json so re-publishing never drops them
     async function syncPublicSchedule() {
       try {
         var r = await fetch(SCHEDULE + "?t=" + Date.now(), { cache: "no-store" });
-        if (!r.ok) return;
-        var data = await r.json();
+        if (!r.ok) return; var data = await r.json();
         if (!data || !Array.isArray(data.items)) return;
-        ensureConfig();
-        var have = {}; diary.schedule.forEach(function (s) { if (s.id) have[s.id] = true; });
+        var have = {}; schedule().forEach(function (s) { if (s.id) have[s.id] = true; });
         var added = false;
         data.items.forEach(function (it) {
           var id = it.id || ("pub-" + (it.start || "") + "-" + (it.descEn || it.descZh || "").slice(0, 10));
-          if (!have[id]) {
-            diary.schedule.push({ id: id, dateEn: it.dateEn || "", dateZh: it.dateZh || "", descEn: it.descEn || "", descZh: it.descZh || "", start: it.start || "", end: it.end || "", visibility: "public", ts: Date.now() });
-            added = true;
-          }
+          if (!have[id]) { schedule().push({ id: id, dateEn: it.dateEn || "", dateZh: it.dateZh || "", descEn: it.descEn || "", descZh: it.descZh || "", start: it.start || "", end: it.end || "", visibility: "public", ts: Date.now() }); added = true; }
         });
-        if (added) { renderCalendar(); if (!schedSheet.hidden) renderSchedList(); }
+        if (added) render();
       } catch (e) {}
     }
 
-    // ---------- write form ----------
+    // ---------- form ----------
     var form = document.getElementById("form"), msg = document.getElementById("msg");
-    var fDate = document.getElementById("f_date"), fText = document.getElementById("f_text");
-    document.getElementById("new-btn").addEventListener("click", function () { openForm(null, null); });
+    var sf = { dateEn: document.getElementById("sf_dateEn"), dateZh: document.getElementById("sf_dateZh"), descEn: document.getElementById("sf_descEn"), descZh: document.getElementById("sf_descZh"), start: document.getElementById("sf_start"), end: document.getElementById("sf_end"), vis: document.getElementById("sf_vis") };
+    document.getElementById("add-btn").addEventListener("click", function () { openForm(null, null); });
     document.getElementById("cancel-btn").addEventListener("click", function () { editing = null; form.hidden = true; });
-    function entriesOn(date) { return diary.entries.filter(function (e) { return e.date === date; }); }
-    function openForm(en, dateOpt) {
-      editing = en || null;
-      form.hidden = false;
-      fDate.value = en ? en.date : (dateOpt || new Date().toISOString().slice(0, 10));
-      fText.value = en ? (en.text || "") : "";
-      document.getElementById("save-btn").textContent = en ? "Update & commit" : "Save & commit";
-      msg.textContent = ""; msg.className = "";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      fText.focus();
-    }
-    form.addEventListener("submit", async function (e) {
-      e.preventDefault();
-      var token = currentPat();
-      if (!token) { msg.className = "err"; msg.textContent = "请在 ⚙ 设置里填写 GitHub token 后再保存。"; openSettings(); return; }
-      if (!fText.value.trim()) { msg.className = "err"; msg.textContent = "写点什么吧。"; return; }
-      var btn = document.getElementById("save-btn"); btn.disabled = true; msg.className = ""; msg.textContent = "Committing…";
-      var en = {
-        id: editing ? editing.id : (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
-        date: fDate.value, text: fText.value,
-        acts: editing && editing.acts ? editing.acts : [],
-        ts: editing && editing.ts ? editing.ts : Date.now()
-      };
-      if (editing) en.edited = Date.now();
-      var idx = editing ? diary.entries.findIndex(function (x) { return x.id === editing.id; }) : -1;
-      if (idx >= 0) diary.entries[idx] = en; else diary.entries.push(en);
-      try { await commitDiary("diary: " + (editing ? "update " : "") + en.date, token); editing = null; msg.className = "ok"; msg.textContent = "Saved."; form.hidden = true; render(); }
-      catch (err) { msg.className = "err"; msg.textContent = "Failed: " + (err && err.message ? err.message : "error"); }
-      finally { btn.disabled = false; }
-    });
-    async function deleteEntry(en) {
-      if (!window.confirm("删除「" + (en.date || "") + "」这篇日记？")) return;
-      var token = currentPat(); if (!token) { openSettings(); window.alert("需要 GitHub token 才能删除。"); return; }
-      var idx = diary.entries.findIndex(function (x) { return x.id === en.id; }); if (idx < 0) return;
-      var backup = diary.entries.slice(); diary.entries.splice(idx, 1);
-      try { await commitDiary("diary: delete " + (en.date || ""), token); render(); }
-      catch (e) { diary.entries = backup; window.alert("删除失败：" + (e && e.message ? e.message : "error")); }
-    }
-
-    // ---------- check-in sheet ----------
-    var ci = document.getElementById("checkin");
-    document.getElementById("ci-close").addEventListener("click", function () { ci.hidden = true; });
-    ci.addEventListener("click", function (e) { if (e.target === ci) ci.hidden = true; });
-    function openCheckin(en) {
-      ensureConfig(); ciTarget = en; ciSel = {};
-      (en.acts || []).forEach(function (a) { ciSel[a] = true; });
-      document.getElementById("ci-date").textContent = en.date || "";
-      document.getElementById("ci-msg").textContent = "";
-      var box = document.getElementById("ci-acts"); box.innerHTML = "";
-      var list = activities();
-      if (!list.length) { box.innerHTML = '<span class="acts-empty">请先在设置里添加打卡项目</span>'; }
-      list.forEach(function (name) {
-        var b = document.createElement("button"); b.type = "button"; b.className = "actbtn" + (ciSel[name] ? " on" : ""); b.textContent = name;
-        b.addEventListener("click", function () { ciSel[name] = !ciSel[name]; b.classList.toggle("on"); });
-        box.appendChild(b);
-      });
-      ci.hidden = false;
-    }
-    document.getElementById("ci-save").addEventListener("click", async function () {
-      var cm = document.getElementById("ci-msg"), token = currentPat();
-      if (!token) { cm.textContent = "需要 GitHub token"; return; }
-      var acts = activities().filter(function (a) { return ciSel[a]; });
-      var idx = diary.entries.findIndex(function (x) { return x.id === ciTarget.id; }); if (idx < 0) return;
-      var prev = diary.entries[idx].acts; diary.entries[idx].acts = acts;
-      cm.textContent = "保存中…";
-      try { await commitDiary("diary: checkin " + (ciTarget.date || ""), token); ci.hidden = true; render(); }
-      catch (e) { diary.entries[idx].acts = prev; cm.textContent = "失败：" + (e && e.message ? e.message : "error"); }
-    });
-
-    // ---------- schedule ----------
-    var schedSheet = document.getElementById("sched-sheet"), ssForm = document.getElementById("ss-form"), ssList = document.getElementById("ss-list");
-    var sf = { dateEn: document.getElementById("sf_dateEn"), dateZh: document.getElementById("sf_dateZh"), descEn: document.getElementById("sf_descEn"), descZh: document.getElementById("sf_descZh"), start: document.getElementById("sf_start"), end: document.getElementById("sf_end"), vis: document.getElementById("sf_vis"), msg: document.getElementById("sf_msg") };
-    document.getElementById("sched-btn").addEventListener("click", openSchedSheet);
-    document.getElementById("ss-close").addEventListener("click", function () { schedSheet.hidden = true; });
-    schedSheet.addEventListener("click", function (e) { if (e.target === schedSheet) schedSheet.hidden = true; });
-    document.getElementById("ss-add").addEventListener("click", function () { openSchedForm(null); });
-    document.getElementById("sf_cancel").addEventListener("click", function () { ssEditing = null; ssForm.hidden = true; });
-
-    function openSchedSheet() { ensureConfig(); ssForm.hidden = true; ssEditing = null; renderSchedList(); schedSheet.hidden = false; }
-    function schedById(id) { return (diary.schedule || []).filter(function (x) { return x.id === id; })[0]; }
+    function schedById(id) { return schedule().filter(function (x) { return x.id === id; })[0]; }
     function schedLabel(s) { return (s.dateZh || s.dateEn || "（无日期）"); }
     function schedDesc(s) { return (s.descZh || s.descEn || ""); }
-    function renderSchedList() {
-      var list = (diary.schedule || []).slice().sort(function (a, b) {
-        var ka = a.start || "9999", kb = b.start || "9999";
-        if (ka !== kb) return ka < kb ? -1 : 1; return (a.ts || 0) - (b.ts || 0);
-      });
-      ssList.innerHTML = "";
-      if (!list.length) { ssList.innerHTML = '<div class="sslist__empty">还没有日程。点「+ 添加日程」开始。</div>'; return; }
-      list.forEach(function (s) {
-        var row = document.createElement("div"); row.className = "ssitem";
-        var main = document.createElement("div"); main.className = "ssitem__main";
-        var d = document.createElement("div"); d.className = "ssitem__date"; d.textContent = schedLabel(s); main.appendChild(d);
-        var p = document.createElement("div"); p.className = "ssitem__desc"; p.textContent = schedDesc(s); main.appendChild(p);
-        var badge = document.createElement("span"); badge.className = "ssitem__badge " + (s.visibility === "public" ? "badge-pub" : "badge-pri"); badge.textContent = s.visibility === "public" ? "🌐 公开" : "🔒 私密";
-        var tools = document.createElement("div"); tools.className = "ssitem__tools";
-        var ed = document.createElement("button"); ed.className = "btn btn--sm"; ed.type = "button"; ed.textContent = "编辑"; ed.addEventListener("click", function () { openSchedForm(s); });
-        var del = document.createElement("button"); del.className = "btn btn--sm"; del.type = "button"; del.textContent = "删除"; del.addEventListener("click", function () { deleteSched(s); });
-        tools.appendChild(ed); tools.appendChild(del);
-        row.appendChild(main); row.appendChild(badge); row.appendChild(tools);
-        ssList.appendChild(row);
-      });
-    }
-    function openSchedForm(s) {
-      ssEditing = s || null;
-      ssForm.hidden = false;
+    function openForm(s, startDate) {
+      editing = s || null;
+      form.hidden = false;
       sf.dateEn.value = s ? (s.dateEn || "") : "";
       sf.dateZh.value = s ? (s.dateZh || "") : "";
       sf.descEn.value = s ? (s.descEn || "") : "";
       sf.descZh.value = s ? (s.descZh || "") : "";
-      sf.start.value = s ? (s.start || "") : "";
+      sf.start.value = s ? (s.start || "") : (startDate || "");
       sf.end.value = s ? (s.end || "") : "";
       sf.vis.value = s ? (s.visibility || "private") : "private";
-      sf.msg.textContent = ""; sf.msg.className = "";
-      ssForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      document.getElementById("save-btn").textContent = s ? "Update & commit" : "Save & commit";
+      msg.textContent = ""; msg.className = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-    ssForm.addEventListener("submit", async function (e) {
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
       var token = currentPat();
-      if (!token) { sf.msg.className = "err"; sf.msg.textContent = "请在 ⚙ 设置里填写 GitHub token。"; return; }
+      if (!token) { msg.className = "err"; msg.textContent = "请在 ⚙ 设置里填写 GitHub token。"; sheet.hidden = false; return; }
       var vis = sf.vis.value;
       var item = {
-        id: ssEditing ? ssEditing.id : (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
+        id: editing ? editing.id : (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
         dateEn: sf.dateEn.value.trim(), dateZh: sf.dateZh.value.trim(),
         descEn: sf.descEn.value.trim(), descZh: sf.descZh.value.trim(),
         start: sf.start.value || "", end: sf.end.value || "", visibility: vis,
-        ts: ssEditing && ssEditing.ts ? ssEditing.ts : Date.now()
+        ts: editing && editing.ts ? editing.ts : Date.now()
       };
       if (vis === "public") {
-        if (!item.dateEn || !item.dateZh || !item.descEn || !item.descZh) { sf.msg.className = "err"; sf.msg.textContent = "公开日程必须填写中英文的时间和内容。"; return; }
-      } else if (!item.descEn && !item.descZh) { sf.msg.className = "err"; sf.msg.textContent = "请填写内容。"; return; }
-      var btn = document.getElementById("sf_save"); btn.disabled = true; sf.msg.className = ""; sf.msg.textContent = "Committing…";
-      ensureConfig();
-      var idx = ssEditing ? diary.schedule.findIndex(function (x) { return x.id === ssEditing.id; }) : -1;
-      if (idx >= 0) diary.schedule[idx] = item; else diary.schedule.push(item);
-      try {
-        await commitDiary("diary: schedule", token);
-        await commitSchedulePublic(token);
-        ssEditing = null; sf.msg.className = "ok"; sf.msg.textContent = "Saved."; ssForm.hidden = true;
-        renderSchedList(); renderCalendar();
-      } catch (err) { sf.msg.className = "err"; sf.msg.textContent = "Failed: " + (err && err.message ? err.message : "error"); }
+        if (!item.dateEn || !item.dateZh || !item.descEn || !item.descZh) { msg.className = "err"; msg.textContent = "公开日程必须填写中英文的时间和内容。"; return; }
+      } else if (!item.descEn && !item.descZh) { msg.className = "err"; msg.textContent = "请填写内容。"; return; }
+      var btn = document.getElementById("save-btn"); btn.disabled = true; msg.className = ""; msg.textContent = "Committing…";
+      var idx = editing ? schedule().findIndex(function (x) { return x.id === editing.id; }) : -1;
+      if (idx >= 0) schedule()[idx] = item; else schedule().push(item);
+      try { await saveAll(token); editing = null; msg.className = "ok"; msg.textContent = "Saved."; form.hidden = true; render(); }
+      catch (err) { msg.className = "err"; msg.textContent = "Failed: " + (err && err.message ? err.message : "error"); }
       finally { btn.disabled = false; }
     });
     async function deleteSched(s) {
       if (!window.confirm("删除这条日程？" + (s.visibility === "public" ? "（也会从主页移除）" : ""))) return;
-      var token = currentPat(); if (!token) { window.alert("需要 GitHub token 才能删除。"); return; }
-      var idx = diary.schedule.findIndex(function (x) { return x.id === s.id; }); if (idx < 0) return;
-      var backup = diary.schedule.slice(); diary.schedule.splice(idx, 1);
-      try { await commitDiary("diary: schedule delete", token); await commitSchedulePublic(token); renderSchedList(); renderCalendar(); }
-      catch (e) { diary.schedule = backup; window.alert("删除失败：" + (e && e.message ? e.message : "error")); }
-    }
-    function publicScheduleJson() {
-      var items = (diary.schedule || []).filter(function (s) { return s.visibility === "public"; })
-        .sort(function (a, b) { var ka = a.start || "9999", kb = b.start || "9999"; return ka < kb ? -1 : ka > kb ? 1 : 0; })
-        .map(function (s) { return { id: s.id, dateEn: s.dateEn, dateZh: s.dateZh, descEn: s.descEn, descZh: s.descZh, start: s.start || "", end: s.end || "" }; });
-      return JSON.stringify({ items: items }, null, 2) + "\n";
-    }
-    async function commitSchedulePublic(token) {
-      var b64 = bytesToB64(new TextEncoder().encode(publicScheduleJson()));
-      var sha = scheduleSha;
-      if (sha === null) { try { sha = await ghSha(SCHEDULE, token); } catch (e) { sha = null; } }
-      for (var a = 0; a < 4; a++) {
-        try { var res = await ghPut(SCHEDULE, b64, "schedule: update public", token, sha); scheduleSha = (res && res.content && res.content.sha) || null; return res; }
-        catch (e) { if (/commit 409|commit 422/.test(e.message || "") && a < 3) { await sleep(600 * (a + 1)); try { sha = await ghSha(SCHEDULE, token); } catch (e2) {} continue; } throw e; }
-      }
+      var token = currentPat(); if (!token) { sheet.hidden = false; window.alert("需要 GitHub token 才能删除。"); return; }
+      var idx = schedule().findIndex(function (x) { return x.id === s.id; }); if (idx < 0) return;
+      var backup = schedule().slice(); schedule().splice(idx, 1);
+      try { await saveAll(token); render(); }
+      catch (e) { store.schedule = backup; window.alert("删除失败：" + (e && e.message ? e.message : "error")); }
     }
 
     // ---------- calendar ----------
     var calEl = document.getElementById("cal");
     function initMonth() {
-      var ds = diary.entries.map(function (e) { return e.date; }).filter(Boolean).sort();
+      var ds = schedule().map(function (s) { return s.start; }).filter(Boolean).sort();
       var ref = ds.length ? ds[ds.length - 1] : new Date().toISOString().slice(0, 10);
       calYear = parseInt(ref.slice(0, 4), 10); calMonth = parseInt(ref.slice(5, 7), 10) - 1;
     }
     function pad2(n) { return (n < 10 ? "0" : "") + n; }
     function shiftMonth(d) { calMonth += d; if (calMonth < 0) { calMonth = 11; calYear--; } else if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
     function renderCalendar() {
-      // aggregate by date
       var byDate = {};
-      diary.entries.forEach(function (e) {
-        if (!e.date) return;
-        var d = byDate[e.date] || (byDate[e.date] = { diary: false, acts: {} });
-        d.diary = true;
-        (e.acts || []).forEach(function (a) { d.acts[a] = true; });
-      });
-      // schedule items spanning each day (those with a start date)
-      var schedByDate = {};
-      (diary.schedule || []).forEach(function (s) {
+      schedule().forEach(function (s) {
         if (!s.start) return;
         var d = new Date(s.start + "T00:00:00"), endD = new Date((s.end || s.start) + "T00:00:00"), guard = 0;
         if (isNaN(d) || isNaN(endD)) return;
-        while (d <= endD && guard < 400) { var ds = d.toISOString().slice(0, 10); (schedByDate[ds] || (schedByDate[ds] = [])).push(s); d.setDate(d.getDate() + 1); guard++; }
+        while (d <= endD && guard < 400) { var ds = d.toISOString().slice(0, 10); (byDate[ds] || (byDate[ds] = [])).push(s); d.setDate(d.getDate() + 1); guard++; }
       });
-      function schedTitle(s) { return (schedLabel(s) + " · " + schedDesc(s)).replace(/"/g, "'"); }
+      function title(s) { return (schedLabel(s) + " · " + schedDesc(s)).replace(/"/g, "'"); }
       var mn = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
       var html = '<div class="cal__nav"><button class="btn btn--sm" id="cal-prev" type="button">‹</button>' +
         '<span class="cal__label">' + calYear + " 年 " + mn[calMonth] + '</span>' +
@@ -630,60 +384,44 @@
       for (var i = 0; i < startDow; i++) html += '<div class="cal__cell empty"></div>';
       for (var dn = 1; dn <= days; dn++) {
         var ds = calYear + "-" + pad2(calMonth + 1) + "-" + pad2(dn);
-        var info = byDate[ds];
-        var cls = "cal__cell" + (info && info.diary ? " diary" : "");
-        var pen = info && info.diary ? '<span class="cal__pen">✎</span>' : '';
-        var pills = "";
-        if (info) Object.keys(info.acts).forEach(function (a) { pills += '<span class="actpill" style="background:' + actColor(a) + '" title="' + a + '">' + abbr(a) + '</span>'; });
         var bars = "";
-        (schedByDate[ds] || []).slice(0, 3).forEach(function (s) {
+        (byDate[ds] || []).slice(0, 4).forEach(function (s) {
           var col = s.visibility === "public" ? "#1f8f4e" : "var(--accent)";
-          bars += '<div class="cal__schedbar" style="background:' + col + '" title="' + schedTitle(s) + '"></div>';
+          bars += '<div class="cal__schedbar" style="background:' + col + '" title="' + title(s) + '"></div>';
         });
-        html += '<div class="' + cls + '" data-date="' + ds + '"><div class="cal__day"><span>' + dn + '</span>' + pen + '</div><div class="cal__acts">' + pills + '</div>' + bars + '</div>';
+        html += '<div class="cal__cell" data-date="' + ds + '"><div class="cal__day">' + dn + '</div>' + bars + '</div>';
       }
-      html += '</div>';
-      // legend
-      html += '<div class="cal__legend">';
-      activities().forEach(function (a) { html += '<span><i style="background:' + actColor(a) + '"></i>' + abbr(a) + " · " + a + '</span>'; });
-      html += '</div>';
+      html += '</div><div class="cal__legend"><span><i style="background:#1f8f4e"></i>公开 Public</span><span><i style="background:var(--accent)"></i>私密 Private</span></div>';
       calEl.innerHTML = html;
       document.getElementById("cal-prev").addEventListener("click", function () { shiftMonth(-1); });
       document.getElementById("cal-next").addEventListener("click", function () { shiftMonth(1); });
       calEl.querySelectorAll(".cal__cell[data-date]").forEach(function (cell) {
-        cell.addEventListener("click", function () {
-          var date = cell.getAttribute("data-date"), ex = entriesOn(date);
-          if (ex.length) openForm(ex[0], null); else openForm(null, date);
-        });
+        cell.addEventListener("click", function () { openForm(null, cell.getAttribute("data-date")); });
       });
     }
 
-    // ---------- feed ----------
-    var feed = document.getElementById("feed");
+    // ---------- list ----------
+    var listEl = document.getElementById("list");
     function render() {
       renderCalendar();
-      var sorted = diary.entries.slice().sort(function (a, b) { if (a.date !== b.date) return a.date < b.date ? 1 : -1; return (b.ts || 0) - (a.ts || 0); });
-      feed.innerHTML = "";
-      if (!sorted.length) { var e = document.createElement("div"); e.className = "feed__empty"; e.textContent = "还没有日记。点「+ 写日记」开始记录吧。"; feed.appendChild(e); return; }
-      sorted.forEach(function (en) {
-        var card = document.createElement("div"); card.className = "entry";
-        var hd = document.createElement("div"); hd.className = "entry__hd";
-        var dt = document.createElement("span"); dt.className = "entry__date"; dt.textContent = en.date || "—"; hd.appendChild(dt);
-        if (en.edited) { var ed = document.createElement("span"); ed.className = "entry__edited"; ed.textContent = "已编辑"; hd.appendChild(ed); }
-        var tools = document.createElement("div"); tools.className = "entry__tools";
-        var ckBtn = document.createElement("button"); ckBtn.className = "btn btn--sm"; ckBtn.type = "button"; ckBtn.textContent = "打卡"; ckBtn.addEventListener("click", function () { openCheckin(en); });
-        var edBtn = document.createElement("button"); edBtn.className = "btn btn--sm"; edBtn.type = "button"; edBtn.textContent = "编辑"; edBtn.addEventListener("click", function () { openForm(en, null); });
-        var delBtn = document.createElement("button"); delBtn.className = "btn btn--sm"; delBtn.type = "button"; delBtn.textContent = "删除"; delBtn.addEventListener("click", function () { deleteEntry(en); });
-        tools.appendChild(ckBtn); tools.appendChild(edBtn); tools.appendChild(delBtn);
-        hd.appendChild(tools);
-        card.appendChild(hd);
-        if (en.acts && en.acts.length) {
-          var av = document.createElement("div"); av.className = "entry__acts";
-          en.acts.forEach(function (a) { var p = document.createElement("span"); p.className = "actpill"; p.style.background = actColor(a); p.textContent = a; av.appendChild(p); });
-          card.appendChild(av);
-        }
-        if (en.text) { var tx = document.createElement("p"); tx.className = "entry__text"; tx.textContent = en.text; card.appendChild(tx); }
-        feed.appendChild(card);
+      var list = schedule().slice().sort(function (a, b) {
+        var ka = a.start || "9999", kb = b.start || "9999"; if (ka !== kb) return ka < kb ? -1 : 1; return (a.ts || 0) - (b.ts || 0);
+      });
+      listEl.innerHTML = "";
+      var h = document.createElement("div"); h.className = "sslist__h"; h.textContent = "全部日程 · All items"; listEl.appendChild(h);
+      if (!list.length) { var e = document.createElement("div"); e.className = "sslist__empty"; e.textContent = "还没有日程。点「+ 添加日程」或点日历某天开始。"; listEl.appendChild(e); return; }
+      list.forEach(function (s) {
+        var row = document.createElement("div"); row.className = "ssitem";
+        var main = document.createElement("div"); main.className = "ssitem__main";
+        var d = document.createElement("div"); d.className = "ssitem__date"; d.textContent = schedLabel(s); main.appendChild(d);
+        var p = document.createElement("div"); p.className = "ssitem__desc"; p.textContent = schedDesc(s); main.appendChild(p);
+        var badge = document.createElement("span"); badge.className = "ssitem__badge " + (s.visibility === "public" ? "badge-pub" : "badge-pri"); badge.textContent = s.visibility === "public" ? "🌐 公开" : "🔒 私密";
+        var tools = document.createElement("div"); tools.className = "ssitem__tools";
+        var ed = document.createElement("button"); ed.className = "btn btn--sm"; ed.type = "button"; ed.textContent = "编辑"; ed.addEventListener("click", function () { openForm(s, null); });
+        var del = document.createElement("button"); del.className = "btn btn--sm"; del.type = "button"; del.textContent = "删除"; del.addEventListener("click", function () { deleteSched(s); });
+        tools.appendChild(ed); tools.appendChild(del);
+        row.appendChild(main); row.appendChild(badge); row.appendChild(tools);
+        listEl.appendChild(row);
       });
     }
   })();
