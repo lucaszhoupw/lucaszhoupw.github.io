@@ -240,6 +240,7 @@
   .dtable td { border-bottom: 1px solid var(--border); }
   .dtable th { background: var(--accent-tint); color: var(--accent-strong); font-weight: 700; border-bottom: 2px solid var(--border-strong); }
   .dtable tr.daystart td { border-top: 2px solid var(--border-strong); }
+  .dtable td.led-note { text-align: left; white-space: normal; max-width: 220px; color: var(--muted); }
   .dtable .empty { color: var(--faint); font-style: italic; padding: 20px; text-align: center; }
 
   /* ---- lightbox ---- */
@@ -268,6 +269,7 @@
         <select id="feed-month" class="topsel" hidden title="月份 · Month"></select>
         <button id="new-btn" class="btn btn--solid" type="button">+ New entry</button>
         <button id="dash-btn" class="btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><polyline points="3 17 9 11 13 15 21 6"/></svg>Dashboard</button>
+        <button id="ledger-btn" class="btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M9 8h6M9 12h6"/></svg>账本</button>
         <button id="settings-btn" class="btn" type="button" title="设置 · Settings">⚙ Settings</button>
         <button class="btn" type="button" onclick="location.reload()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Lock</button>
       </div>
@@ -343,6 +345,35 @@
       <div id="dash-hist" class="hist"></div>
       <div id="dash-table" class="dtable"></div>
     </section>
+
+    <!-- ledger view -->
+    <section id="ledger" class="dash" hidden>
+      <div class="dash__bar">
+        <button id="ledger-back" class="btn">← 返回日志 · Back</button>
+        <button id="ledger-add" class="btn btn--solid" type="button">+ 添加记录</button>
+      </div>
+
+      <form id="ledger-form" class="form" hidden autocomplete="off">
+        <div class="form__grid">
+          <div class="field"><label for="lf_date">日期 Date</label><input id="lf_date" type="date" required /></div>
+          <div class="field"><label for="lf_type">类型 Type</label><select id="lf_type">
+            <option value="expense">支出 Expense</option><option value="income">收入 Income</option></select></div>
+          <div class="field"><label for="lf_cat">类别 Category</label><select id="lf_cat"></select></div>
+          <div class="field"><label for="lf_amount">金额 Amount ($)</label><input id="lf_amount" type="text" inputmode="decimal" /></div>
+          <div class="field"><label for="lf_account">关联账户 Account</label><select id="lf_account"></select></div>
+          <div class="field field--wide"><label for="lf_note">备注 Note</label><input id="lf_note" type="text" placeholder="可选 · optional" /></div>
+        </div>
+        <div class="form__foot">
+          <button id="lf_save" class="btn btn--solid" type="submit">Save &amp; commit</button>
+          <button id="lf_cancel" class="btn" type="button">Cancel</button>
+          <span id="lf_msg"></span>
+        </div>
+      </form>
+
+      <div id="ledger-stats" class="dstats"></div>
+      <div id="ledger-cats" class="hist"></div>
+      <div id="ledger-table" class="dtable"></div>
+    </section>
   </main>
 
   <!-- settings sheet -->
@@ -383,6 +414,16 @@
         <div class="addrow"><input id="set-daytype-in" type="text" placeholder="新增日型…" /><button id="set-daytype-add" class="btn btn--sm" type="button">添加</button></div>
       </div>
       <div class="sheet__sec">
+        <h3>支出类别 · Expense categories</h3>
+        <div id="set-expcats" class="chips"></div>
+        <div class="addrow"><input id="set-expcat-in" type="text" placeholder="新增支出类别…" /><button id="set-expcat-add" class="btn btn--sm" type="button">添加</button></div>
+      </div>
+      <div class="sheet__sec">
+        <h3>收入类别 · Income categories</h3>
+        <div id="set-inccats" class="chips"></div>
+        <div class="addrow"><input id="set-inccat-in" type="text" placeholder="新增收入类别…" /><button id="set-inccat-add" class="btn btn--sm" type="button">添加</button></div>
+      </div>
+      <div class="sheet__sec">
         <h3>配色 · Theme</h3>
         <div class="swatches">
           <button class="swatch swatch--green" type="button" data-theme-pick="green" title="绿"></button>
@@ -413,6 +454,8 @@
     var DEFAULT_SIGNALS = ["高潮反转", "旗形延续", "二次入场", "突破回踩", "计划外"];
     var DEFAULT_ORDERS = ["stop", "limit", "market"];
     var DEFAULT_DAYTYPES = ["趋势日", "区间日", "趋势反转日", "数据日"];
+    var DEFAULT_EXP_CATS = ["Prop firm 考试号", "CME 实时数据", "TradingView", "价格行为课程", "其他"];
+    var DEFAULT_INC_CATS = ["Prop firm 出金", "其他"];
     var INSTRS = ["ES", "NQ", "MES", "MNQ"];
     var POINT_VALUE = { ES: 50, MES: 5, NQ: 20, MNQ: 2 }; // $ per point per contract
     var TICK_DIV = 4; // 0.25-pt tick -> points*4 must be integer
@@ -430,6 +473,8 @@
 
     function signals() { return (journal.config && journal.config.signals) || DEFAULT_SIGNALS; }
     function dayTypes() { return (journal.config && journal.config.dayTypes) || DEFAULT_DAYTYPES; }
+    function expenseCats() { return (journal.config && journal.config.expenseCats) || DEFAULT_EXP_CATS; }
+    function incomeCats() { return (journal.config && journal.config.incomeCats) || DEFAULT_INC_CATS; }
     function orders() { return DEFAULT_ORDERS; } // fixed order types: stop / limit / market
     function accounts() { return (journal.config && journal.config.accounts) || []; }
     function accountNames() { return accounts().map(function (a) { return a.name; }).filter(Boolean); }
@@ -442,6 +487,9 @@
       if (!journal.config) journal.config = {};
       if (!journal.config.signals || !journal.config.signals.length) journal.config.signals = DEFAULT_SIGNALS.slice();
       if (!journal.config.dayTypes || !journal.config.dayTypes.length) journal.config.dayTypes = DEFAULT_DAYTYPES.slice();
+      if (!journal.config.expenseCats || !journal.config.expenseCats.length) journal.config.expenseCats = DEFAULT_EXP_CATS.slice();
+      if (!journal.config.incomeCats || !journal.config.incomeCats.length) journal.config.incomeCats = DEFAULT_INC_CATS.slice();
+      if (!Array.isArray(journal.ledger)) journal.ledger = [];
       if (!Array.isArray(journal.config.accounts)) journal.config.accounts = [];
       journal.config.accounts = journal.config.accounts.map(function (a) {
         if (typeof a === "string") a = { name: a };
@@ -528,7 +576,7 @@
     }
     function sleep(ms) { return new Promise(function (res) { setTimeout(res, ms); }); }
     async function commitJournal(message, token) {
-      var encJ = await encStr(JSON.stringify({ entries: journal.entries, config: journal.config }));
+      var encJ = await encStr(JSON.stringify({ entries: journal.entries, config: journal.config, ledger: journal.ledger || [] }));
       var b64 = bytesToB64(encJ);
       var sha = journalSha;
       if (sha === null) { try { sha = await ghSha(JOURNAL, token); } catch (e) { sha = null; } }
@@ -975,6 +1023,7 @@
       editing = entry || null;
       ensureConfig();
       closeDashboard();
+      document.getElementById("ledger").hidden = true;
       form.hidden = false;
       var today = new Date().toISOString().slice(0, 10);
       document.getElementById("f_date").value = entry ? (entry.date || today) : today;
@@ -1071,12 +1120,12 @@
         var bytes = await rawGet(JOURNAL);
         if (bytes === null) {
           PASSWORD = pw; SESSION_SALT = null; keyCache = {};
-          journal = { entries: [], config: {} };
+          journal = { entries: [], config: {}, ledger: [] };
         } else {
           PASSWORD = pw; SESSION_SALT = bytes.slice(0, 16); keyCache = {};
           var txt = await decStr(bytes);
           var data = JSON.parse(txt);
-          journal = { entries: data.entries || [], config: data.config || {} };
+          journal = { entries: data.entries || [], config: data.config || {}, ledger: data.ledger || [] };
         }
         ensureConfig();
         enterApp();
@@ -1358,6 +1407,8 @@
       renderAccounts();
       chipList(document.getElementById("set-signals"), signals, "signals", true);
       chipList(document.getElementById("set-daytypes"), dayTypes, "dayTypes", true);
+      chipList(document.getElementById("set-expcats"), expenseCats, "expenseCats", true);
+      chipList(document.getElementById("set-inccats"), incomeCats, "incomeCats", true);
       syncSwatches();
     }
     function openSettings() {
@@ -1392,6 +1443,8 @@
     });
     wireAdd("set-signal-in", "set-signal-add", "signals");
     wireAdd("set-daytype-in", "set-daytype-add", "dayTypes");
+    wireAdd("set-expcat-in", "set-expcat-add", "expenseCats");
+    wireAdd("set-inccat-in", "set-inccat-add", "incomeCats");
 
     // ---------- theme picker ----------
     var THEME_KEY = "plz_theme";
@@ -1445,6 +1498,7 @@
     function openDashboard() {
       ensureConfig();
       form.hidden = true;
+      document.getElementById("ledger").hidden = true;
       feed.style.display = "none";
       document.getElementById("feed-month").style.display = "none";
       dash.hidden = false;
@@ -1716,6 +1770,166 @@
       box.innerHTML = sel + '<div class="histbars">' + bars + '</div>';
       document.getElementById("hist-dim").addEventListener("change", function () { histDim = this.value; renderHistogram(); });
     }
+
+    // ---------- ledger ----------
+    var ledger = document.getElementById("ledger");
+    var ledgerForm = document.getElementById("ledger-form");
+    var ledgerStats = document.getElementById("ledger-stats");
+    var ledgerCats = document.getElementById("ledger-cats");
+    var ledgerTable = document.getElementById("ledger-table");
+    var lfDate = document.getElementById("lf_date"), lfType = document.getElementById("lf_type"),
+        lfCat = document.getElementById("lf_cat"), lfAmount = document.getElementById("lf_amount"),
+        lfAccount = document.getElementById("lf_account"), lfNote = document.getElementById("lf_note"),
+        lfMsg = document.getElementById("lf_msg");
+    var editingLedger = null;
+    attachMoney(lfAmount, null);
+
+    document.getElementById("ledger-btn").addEventListener("click", openLedger);
+    document.getElementById("ledger-back").addEventListener("click", closeLedger);
+    document.getElementById("ledger-add").addEventListener("click", function () { openLedgerForm(null); });
+    document.getElementById("lf_cancel").addEventListener("click", function () { editingLedger = null; ledgerForm.hidden = true; });
+    lfType.addEventListener("change", function () { lfCat.innerHTML = catOptions(lfType.value, ""); });
+
+    function openLedger() {
+      ensureConfig();
+      form.hidden = true; feed.style.display = "none"; dash.hidden = true;
+      document.getElementById("feed-month").style.display = "none";
+      ledgerForm.hidden = true; editingLedger = null;
+      ledger.hidden = false;
+      renderLedger();
+    }
+    function closeLedger() {
+      ledger.hidden = true;
+      feed.style.display = "";
+      document.getElementById("feed-month").style.display = "";
+    }
+    function catOptions(type, sel) {
+      var list = (type === "income") ? incomeCats() : expenseCats();
+      return optList(list, sel, false);
+    }
+    function ledgerAccountOptions(sel) {
+      var s = accountNames();
+      var opts = '<option value=""' + (!sel ? ' selected' : '') + '>（无 None）</option>';
+      return opts + s.map(function (x) { return '<option' + (x === sel ? ' selected' : '') + '>' + x + '</option>'; }).join('');
+    }
+    function openLedgerForm(rec) {
+      ensureConfig();
+      editingLedger = rec || null;
+      ledgerForm.hidden = false;
+      lfDate.value = rec ? rec.date : new Date().toISOString().slice(0, 10);
+      lfType.value = rec ? rec.type : "expense";
+      lfCat.innerHTML = catOptions(lfType.value, rec ? rec.category : "");
+      lfAmount.value = rec && rec.amount != null ? money(rec.amount) : "";
+      lfAccount.innerHTML = ledgerAccountOptions(rec ? (rec.account || "") : "");
+      lfNote.value = rec ? (rec.note || "") : "";
+      document.getElementById("lf_save").textContent = rec ? "Update & commit" : "Save & commit";
+      lfMsg.textContent = ""; lfMsg.className = "";
+      ledgerForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    ledgerForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      var token = currentPat();
+      if (!token) { lfMsg.className = "err"; lfMsg.textContent = "请在 ⚙ 设置中填写 GitHub token 后再保存。"; openTokenHelp(); return; }
+      var amt = num(lfAmount.value);
+      if (amt === null || amt < 0) { lfMsg.className = "err"; lfMsg.textContent = "请输入有效金额。"; return; }
+      var btn = document.getElementById("lf_save");
+      btn.disabled = true; lfMsg.className = ""; lfMsg.textContent = "Committing…";
+      var rec = {
+        id: editingLedger ? editingLedger.id : uid(),
+        date: lfDate.value, type: lfType.value, category: lfCat.value,
+        amount: amt, account: lfAccount.value || "", note: lfNote.value,
+        ts: editingLedger && editingLedger.ts ? editingLedger.ts : Date.now()
+      };
+      if (!Array.isArray(journal.ledger)) journal.ledger = [];
+      var idx = editingLedger ? journal.ledger.findIndex(function (x) { return x.id === editingLedger.id; }) : -1;
+      if (idx >= 0) journal.ledger[idx] = rec; else journal.ledger.push(rec);
+      try {
+        await commitJournal("ledger: " + (editingLedger ? "update " : "") + rec.date, token);
+        editingLedger = null;
+        lfMsg.className = "ok"; lfMsg.textContent = "Saved.";
+        ledgerForm.hidden = true;
+        renderLedger();
+      } catch (err) {
+        lfMsg.className = "err"; lfMsg.textContent = "Failed: " + (err && err.message ? err.message : "error");
+      } finally { btn.disabled = false; }
+    });
+
+    async function deleteLedger(rec) {
+      if (!window.confirm("删除这条账本记录？")) return;
+      var token = currentPat();
+      if (!token) { openTokenHelp(); window.alert("需要 GitHub token 才能删除。"); return; }
+      var idx = journal.ledger.findIndex(function (x) { return x.id === rec.id; });
+      if (idx < 0) return;
+      var backup = journal.ledger.slice();
+      journal.ledger.splice(idx, 1);
+      try { await commitJournal("ledger: delete " + (rec.date || ""), token); renderLedger(); }
+      catch (e) { journal.ledger = backup; window.alert("删除失败：" + (e && e.message ? e.message : "error")); }
+    }
+
+    function renderLedger() {
+      var rows = (journal.ledger || []).slice().sort(function (a, b) {
+        if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+        return (b.ts || 0) - (a.ts || 0);
+      });
+      var thisMonth = new Date().toISOString().slice(0, 7);
+      var inc = 0, exp = 0, mInc = 0, mExp = 0;
+      rows.forEach(function (r) {
+        var a = num(r.amount) || 0;
+        if (r.type === "income") { inc += a; if ((r.date || "").slice(0, 7) === thisMonth) mInc += a; }
+        else { exp += a; if ((r.date || "").slice(0, 7) === thisMonth) mExp += a; }
+      });
+      var net = inc - exp;
+      ledgerStats.innerHTML =
+        statCard("总收入 Income", '<span class="up">+' + money(inc) + '</span>') +
+        statCard("总支出 Expense", '<span class="down">−' + money(exp) + '</span>') +
+        statCard("净现金流 Net", (net >= 0 ? '<span class="up">+' : '<span class="down">−') + money(net) + '</span>') +
+        statCard("本月支出 Mo. exp", money(mExp)) +
+        statCard("本月收入 Mo. inc", money(mInc)) +
+        statCard("条数 Records", rows.length);
+
+      // expense breakdown by category
+      var cat = {};
+      rows.forEach(function (r) { if (r.type === "expense") { var k = r.category || "—"; cat[k] = (cat[k] || 0) + (num(r.amount) || 0); } });
+      var keys = Object.keys(cat).sort(function (a, b) { return cat[b] - cat[a]; });
+      var max = 0; keys.forEach(function (k) { max = Math.max(max, cat[k]); });
+      var bars = keys.map(function (k) {
+        var w = max ? Math.round(cat[k] / max * 100) : 0;
+        return '<div class="histrow"><span class="histrow__lab">' + k + '</span>' +
+          '<span class="histrow__bar"><span class="loss" style="width:' + w + '%"></span></span>' +
+          '<span class="histrow__n"><b>' + money(cat[k]) + '</b></span></div>';
+      }).join('');
+      ledgerCats.innerHTML = '<div class="hist__head"><span class="hist__title">支出分类 · Expense by category</span></div>' +
+        (keys.length ? '<div class="histbars">' + bars + '</div>' : '<div class="empty">暂无支出</div>');
+
+      // table
+      if (!rows.length) { ledgerTable.innerHTML = '<div class="empty">暂无账本记录。点击「+ 添加记录」开始。</div>'; return; }
+      var head = '<tr><th>日期</th><th>类型</th><th>类别</th><th>金额</th><th>账户</th><th>备注</th><th>操作</th></tr>';
+      var body = rows.map(function (r) {
+        var a = num(r.amount) || 0;
+        var isInc = r.type === "income";
+        var amtCell = '<span class="' + (isInc ? "up" : "down") + '">' + (isInc ? "+" : "−") + money(a) + '</span>';
+        return '<tr>' +
+          '<td>' + (r.date || "") + '</td>' +
+          '<td>' + (isInc ? "收入" : "支出") + '</td>' +
+          '<td>' + (r.category || "") + '</td>' +
+          '<td>' + amtCell + '</td>' +
+          '<td>' + (r.account || "—") + '</td>' +
+          '<td class="led-note">' + (r.note ? escapeHtml(r.note) : "") + '</td>' +
+          '<td><button class="btn btn--sm" data-led-edit="' + r.id + '" type="button">编辑</button> ' +
+          '<button class="btn btn--sm" data-led-del="' + r.id + '" type="button">删除</button></td>' +
+          '</tr>';
+      }).join('');
+      ledgerTable.innerHTML = '<table>' + head + body + '</table>';
+      ledgerTable.querySelectorAll("[data-led-edit]").forEach(function (b) {
+        b.addEventListener("click", function () { var r = ledgerById(b.getAttribute("data-led-edit")); if (r) openLedgerForm(r); });
+      });
+      ledgerTable.querySelectorAll("[data-led-del]").forEach(function (b) {
+        b.addEventListener("click", function () { var r = ledgerById(b.getAttribute("data-led-del")); if (r) deleteLedger(r); });
+      });
+    }
+    function ledgerById(id) { return (journal.ledger || []).filter(function (x) { return x.id === id; })[0]; }
+    function escapeHtml(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
     // ---------- lightbox ----------
     var lbx = document.getElementById("lbx"), lbxImg = document.getElementById("lbx-img");
