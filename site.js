@@ -436,16 +436,23 @@
     });
   }
 
-  // Hidden entrance: type the secret word anywhere to open the private page.
+  // Hidden entrances: type a secret word anywhere to open a private page.
   function initSecretEntrance() {
-    var WORD = "ledger";   // change this to your own secret word
+    var DOORS = {           // secret word -> page (change these to your own)
+      "ledger": "private.html",
+      "attic": "attic.html"
+    };
+    var maxLen = 0, w;
+    for (w in DOORS) maxLen = Math.max(maxLen, w.length);
     var buf = "";
     document.addEventListener("keydown", function (e) {
       var tag = (document.activeElement && document.activeElement.tagName) || "";
       if (tag === "INPUT" || tag === "TEXTAREA") return;
       if (!e.key || e.key.length !== 1 || !/[a-z]/i.test(e.key)) return;
-      buf = (buf + e.key.toLowerCase()).slice(-WORD.length);
-      if (buf === WORD) { window.location.href = "private.html"; }
+      buf = (buf + e.key.toLowerCase()).slice(-maxLen);
+      for (var word in DOORS) {
+        if (buf.slice(-word.length) === word) { window.location.href = DOORS[word]; return; }
+      }
     });
   }
 
