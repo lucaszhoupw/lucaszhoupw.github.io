@@ -220,6 +220,13 @@
   .histrow__bar .loss { background: #b3392f; height: 100%; }
   .histrow__n { font-weight: 700; color: var(--muted); text-align: left; font-size: 0.74rem; }
   .histrow__n b { color: var(--text); }
+  .stack { margin-bottom: 18px; }
+  .stack__title { font-weight: 700; color: var(--accent-strong); font-size: 0.9rem; margin: 0 0 8px; }
+  .stackbar { display: flex; height: 26px; border-radius: 7px; overflow: hidden; background: var(--border); }
+  .stackbar__seg { height: 100%; min-width: 2px; }
+  .stacklegend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; font-size: 0.74rem; color: var(--muted); }
+  .stacklegend span { display: inline-flex; align-items: center; gap: 5px; }
+  .stacklegend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
   .dash__bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 6px 0 18px; }
   .dash__bar select { font-family: inherit; font-size: 0.9rem; padding: 7px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
   .dash__acctline { font-size: 0.8rem; color: var(--muted); }
@@ -455,7 +462,9 @@
     var DEFAULT_ORDERS = ["stop", "limit", "market"];
     var DEFAULT_DAYTYPES = ["趋势日", "区间日", "趋势反转日", "数据日"];
     var DEFAULT_EXP_CATS = ["Prop firm 考试号", "CME 实时数据", "TradingView", "价格行为课程", "其他"];
-    var DEFAULT_INC_CATS = ["Prop firm 出金", "其他"];
+    var DEFAULT_INC_CATS = ["Prop firm 出金", "其他", "税收"];
+    var TAX_CAT = "税收"; // recorded but excluded from income/net; counted in payout
+    var EXP_COLORS = ["#b3392f", "#d2691e", "#b8860b", "#6b8e23", "#4682b4", "#8a6d9e", "#5f9ea0", "#c2698d"];
     var INSTRS = ["ES", "NQ", "MES", "MNQ"];
     var POINT_VALUE = { ES: 50, MES: 5, NQ: 20, MNQ: 2 }; // $ per point per contract
     var TICK_DIV = 4; // 0.25-pt tick -> points*4 must be integer
@@ -489,6 +498,7 @@
       if (!journal.config.dayTypes || !journal.config.dayTypes.length) journal.config.dayTypes = DEFAULT_DAYTYPES.slice();
       if (!journal.config.expenseCats || !journal.config.expenseCats.length) journal.config.expenseCats = DEFAULT_EXP_CATS.slice();
       if (!journal.config.incomeCats || !journal.config.incomeCats.length) journal.config.incomeCats = DEFAULT_INC_CATS.slice();
+      if (journal.config.incomeCats.indexOf(TAX_CAT) < 0) journal.config.incomeCats.push(TAX_CAT);
       if (!Array.isArray(journal.ledger)) journal.ledger = [];
       if (!Array.isArray(journal.config.accounts)) journal.config.accounts = [];
       journal.config.accounts = journal.config.accounts.map(function (a) {
@@ -1867,40 +1877,58 @@
       catch (e) { journal.ledger = backup; window.alert("删除失败：" + (e && e.message ? e.message : "error")); }
     }
 
+    function expColor(k) { var i = expenseCats().indexOf(k); if (i < 0) i = 0; return EXP_COLORS[i % EXP_COLORS.length]; }
+    function stackBar(title, segs, total) {
+      var head = '<div class="stack"><div class="stack__title">' + title + '</div>';
+      if (!total || !segs.length) return head + '<div class="empty">暂无数据</div></div>';
+      var bar = segs.map(function (s) {
+        var w = (s.amount / total * 100);
+        return '<div class="stackbar__seg" style="width:' + w.toFixed(2) + '%;background:' + s.color + '" title="' + s.label + ' ' + money(s.amount) + '"></div>';
+      }).join('');
+      var leg = segs.map(function (s) {
+        var pct = Math.round(s.amount / total * 100);
+        return '<span><i style="background:' + s.color + '"></i>' + s.label + ' ' + money(s.amount) + ' · ' + pct + '%</span>';
+      }).join('');
+      return head + '<div class="stackbar">' + bar + '</div><div class="stacklegend">' + leg + '</div></div>';
+    }
     function renderLedger() {
       var rows = (journal.ledger || []).slice().sort(function (a, b) {
         if (a.date !== b.date) return a.date < b.date ? 1 : -1;
         return (b.ts || 0) - (a.ts || 0);
       });
       var thisMonth = new Date().toISOString().slice(0, 7);
-      var inc = 0, exp = 0, mInc = 0, mExp = 0;
+      var inc = 0, tax = 0, exp = 0, mInc = 0, mExp = 0;
       rows.forEach(function (r) {
         var a = num(r.amount) || 0;
-        if (r.type === "income") { inc += a; if ((r.date || "").slice(0, 7) === thisMonth) mInc += a; }
-        else { exp += a; if ((r.date || "").slice(0, 7) === thisMonth) mExp += a; }
+        var inMonth = (r.date || "").slice(0, 7) === thisMonth;
+        if (r.type === "income") {
+          if (r.category === TAX_CAT) { tax += a; }       // tax: recorded only
+          else { inc += a; if (inMonth) mInc += a; }
+        } else { exp += a; if (inMonth) mExp += a; }
       });
-      var net = inc - exp;
+      var payout = inc + tax;     // 总出金 includes tax
+      var net = inc - exp;        // net cash flow excludes tax
       ledgerStats.innerHTML =
+        statCard("总出金 Payout", '<span class="up">+' + money(payout) + '</span>') +
         statCard("总收入 Income", '<span class="up">+' + money(inc) + '</span>') +
+        statCard("税收 Tax", money(tax)) +
         statCard("总支出 Expense", '<span class="down">−' + money(exp) + '</span>') +
         statCard("净现金流 Net", (net >= 0 ? '<span class="up">+' : '<span class="down">−') + money(net) + '</span>') +
         statCard("本月支出 Mo. exp", money(mExp)) +
         statCard("本月收入 Mo. inc", money(mInc)) +
         statCard("条数 Records", rows.length);
 
-      // expense breakdown by category
+      // one stacked bar for expenses (segmented by category, share of total
+      // expense) and one for income (Income vs Tax, share of total payout)
       var cat = {};
       rows.forEach(function (r) { if (r.type === "expense") { var k = r.category || "—"; cat[k] = (cat[k] || 0) + (num(r.amount) || 0); } });
-      var keys = Object.keys(cat).sort(function (a, b) { return cat[b] - cat[a]; });
-      var max = 0; keys.forEach(function (k) { max = Math.max(max, cat[k]); });
-      var bars = keys.map(function (k) {
-        var w = max ? Math.round(cat[k] / max * 100) : 0;
-        return '<div class="histrow"><span class="histrow__lab">' + k + '</span>' +
-          '<span class="histrow__bar"><span class="loss" style="width:' + w + '%"></span></span>' +
-          '<span class="histrow__n"><b>' + money(cat[k]) + '</b></span></div>';
-      }).join('');
-      ledgerCats.innerHTML = '<div class="hist__head"><span class="hist__title">支出分类 · Expense by category</span></div>' +
-        (keys.length ? '<div class="histbars">' + bars + '</div>' : '<div class="empty">暂无支出</div>');
+      var expSegs = Object.keys(cat).filter(function (k) { return cat[k] > 0; })
+        .sort(function (a, b) { return cat[b] - cat[a]; })
+        .map(function (k) { return { label: k, amount: cat[k], color: expColor(k) }; });
+      var incSegs = [];
+      if (inc > 0) incSegs.push({ label: "总收入 Income", amount: inc, color: "#1f8f4e" });
+      if (tax > 0) incSegs.push({ label: "税收 Tax", amount: tax, color: "#b8860b" });
+      ledgerCats.innerHTML = stackBar("支出分类 · Expense", expSegs, exp) + stackBar("收入分类 · Payout", incSegs, payout);
 
       // table
       if (!rows.length) { ledgerTable.innerHTML = '<div class="empty">暂无账本记录。点击「+ 添加记录」开始。</div>'; return; }
