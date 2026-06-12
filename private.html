@@ -157,9 +157,13 @@
 
   /* ---- empty-day hint ---- */
   .trades-empty { color: var(--faint); font-size: 0.84rem; font-style: italic; padding: 6px 2px; }
-  .feed-bar { display: flex; align-items: center; gap: 10px; margin: 6px 0 14px; }
-  .feed-bar label { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
-  .feed-bar select { font-family: inherit; font-size: 0.9rem; padding: 6px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
+  .topsel { font-family: inherit; font-size: 0.82rem; padding: 6px 10px; border: 1px solid var(--border-strong); border-radius: 999px; background: var(--surface); color: var(--text); cursor: pointer; }
+  #trade-notes { margin-top: 4px; }
+  .tnote__h { font-size: 0.72rem; font-weight: 700; color: var(--muted); margin: 6px 0; }
+  .tnote { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .tnote__lab { font-size: 0.74rem; color: var(--muted); white-space: nowrap; min-width: 50px; }
+  .tnote__in { flex: 1; font-family: inherit; font-size: 0.86rem; padding: 6px 8px; border: 1px solid var(--border-strong); border-radius: 7px; background: var(--bg); color: var(--text); }
+  .trow__note { font-size: 0.82rem; color: var(--text); margin-top: 6px; font-style: italic; }
 
   /* ---- settings sheet ---- */
   .sheet { position: fixed; inset: 0; background: rgba(12,14,13,.5); display: flex; align-items: flex-start; justify-content: center; z-index: 60; padding: 44px 20px; overflow: auto; }
@@ -261,25 +265,13 @@
     <div class="app__bar">
       <h1 class="app__title">Trading Journal</h1>
       <div class="app__actions">
+        <select id="feed-month" class="topsel" hidden title="月份 · Month"></select>
         <button id="new-btn" class="btn btn--solid" type="button">+ New entry</button>
         <button id="dash-btn" class="btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><polyline points="3 17 9 11 13 15 21 6"/></svg>Dashboard</button>
         <button id="settings-btn" class="btn" type="button" title="设置 · Settings">⚙ Settings</button>
-        <button class="btn" type="button" onclick="location.reload()">Lock</button>
+        <button class="btn" type="button" onclick="location.reload()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Lock</button>
       </div>
     </div>
-
-    <details class="tok" id="tok">
-      <summary>GitHub token (needed only to save)</summary>
-      <div class="tok__body">
-        <p>Create a fine-grained personal access token scoped to <b>this repository only</b>, with <b>Contents: Read and write</b>. It is stored in this browser only (never committed) and lets the page push encrypted records to your repo.</p>
-        <input id="pat" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false" />
-        <div class="tok__row">
-          <input id="pat-remember" type="checkbox" />
-          <label for="pat-remember">Remember on this device</label>
-          <button id="pat-clear" class="btn" type="button" style="margin-left:auto">Forget</button>
-        </div>
-      </div>
-    </details>
 
     <!-- entry form (hidden until +New) -->
     <form id="form" class="form" hidden autocomplete="off">
@@ -324,6 +316,7 @@
 
       <div class="sec-title">行情分析及交易 / Analysis &amp; execution</div>
       <div id="sec-analysis"></div>
+      <div id="trade-notes"></div>
 
       <div class="sec-title">盘中心理及总结 / Psychology &amp; review</div>
       <div id="sec-psych"></div>
@@ -335,10 +328,6 @@
       </div>
     </form>
 
-    <div id="feed-bar" class="feed-bar" hidden>
-      <label for="feed-month">月份 · Month</label>
-      <select id="feed-month"></select>
-    </div>
     <div id="feed" class="feed"></div>
 
     <!-- dashboard view -->
@@ -362,6 +351,21 @@
       <div class="sheet__hd">
         <h2 class="sheet__title">设置 · Settings</h2>
         <button id="sheet-close" class="btn btn--sm" type="button">关闭</button>
+      </div>
+      <div class="sheet__sec">
+        <h3>GitHub token · 保存时需要</h3>
+        <details class="tok" id="tok">
+          <summary>展开填写 token</summary>
+          <div class="tok__body">
+            <p>Create a fine-grained personal access token scoped to <b>this repository only</b>, with <b>Contents: Read and write</b>. It is stored in this browser only (never committed) and lets the page push encrypted records to your repo.</p>
+            <input id="pat" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false" />
+            <div class="tok__row">
+              <input id="pat-remember" type="checkbox" />
+              <label for="pat-remember">Remember on this device</label>
+              <button id="pat-clear" class="btn" type="button" style="margin-left:auto">Forget</button>
+            </div>
+          </div>
+        </details>
       </div>
       <div class="sheet__sec">
         <h3>账户 · Accounts</h3>
@@ -884,6 +888,7 @@
 
       var block = {
         el: el,
+        note: data.note || "", // per-trade short evaluation (edited in the Analysis section)
         read: function () {
           var p = num(pnl.value), rk = num(risk.value), sz = num(size.value);
           var g = (p === null) ? null : p + (num(comm.value) || 0);
@@ -898,6 +903,7 @@
             r: (p === null || rk === null || rk === 0) ? null : p / rk,
             points: (g === null || !pv || !sz) ? null : g / pv / sz,
             grade: $(".t-grade").value,
+            note: block.note,
             subs: subBlocks.map(function (s) { return s.read(); })
           };
         }
@@ -936,6 +942,25 @@
       if (TRADES.length === 0) {
         if (!ex) { var d = document.createElement("div"); d.className = "trades-empty"; d.textContent = "空仓日 · no-trade day（0 笔）"; tradesEl.appendChild(d); }
       } else if (ex) { ex.remove(); }
+      renderTradeNotes();
+    }
+    // one short-evaluation box per trade, shown under 行情分析及交易
+    function renderTradeNotes() {
+      var box = document.getElementById("trade-notes");
+      if (!box) return;
+      box.innerHTML = "";
+      if (!TRADES.length) return;
+      var h = document.createElement("div"); h.className = "tnote__h"; h.textContent = "每笔点评 · Per-trade notes";
+      box.appendChild(h);
+      TRADES.forEach(function (b, i) {
+        var row = document.createElement("div"); row.className = "tnote";
+        var lab = document.createElement("span"); lab.className = "tnote__lab"; lab.textContent = "第 " + (i + 1) + " 笔";
+        var inp = document.createElement("input"); inp.type = "text"; inp.className = "tnote__in";
+        inp.value = b.note || ""; inp.placeholder = "对这笔交易的简短评价…";
+        inp.addEventListener("input", function () { b.note = inp.value; });
+        row.appendChild(lab); row.appendChild(inp);
+        box.appendChild(row);
+      });
     }
 
     // ---------- new-entry lifecycle ----------
@@ -989,7 +1014,7 @@
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
       var token = currentPat();
-      if (!token) { msg.className = "err"; msg.textContent = "Add a GitHub token above to save."; document.getElementById("tok").open = true; return; }
+      if (!token) { msg.className = "err"; msg.textContent = "请在 ⚙ 设置中填写 GitHub token 后再保存。"; openTokenHelp(); return; }
       var saveBtn = document.getElementById("save-btn");
       saveBtn.disabled = true; msg.className = ""; msg.textContent = "Encrypting & committing…";
       try {
@@ -1097,7 +1122,7 @@
     async function deleteEntry(en) {
       if (!window.confirm("删除「" + (en.date || "") + "」这一天的记录？此操作不可撤销。")) return;
       var token = currentPat();
-      if (!token) { document.getElementById("tok").open = true; window.alert("需要 GitHub token 才能删除（请在上方 ⚙ 填写）。"); return; }
+      if (!token) { openTokenHelp(); window.alert("需要 GitHub token 才能删除（请在 ⚙ 设置中填写）。"); return; }
       var idx = journal.entries.findIndex(function (x) { return x.id === en.id; });
       if (idx < 0) return;
       var backup = journal.entries.slice();
@@ -1150,10 +1175,10 @@
       // month selector (months present in the data, newest first)
       var months = [];
       all.forEach(function (en) { var mk = (en.date || "").slice(0, 7); if (mk && months.indexOf(mk) < 0) months.push(mk); });
-      var bar = document.getElementById("feed-bar"), msel = document.getElementById("feed-month");
-      if (!months.length) { bar.hidden = true; feedMonth = null; }
+      var msel = document.getElementById("feed-month");
+      if (!months.length) { msel.hidden = true; feedMonth = null; }
       else {
-        bar.hidden = false;
+        msel.hidden = false;
         if (months.indexOf(feedMonth) < 0) feedMonth = months[0];
         msel.innerHTML = months.map(function (m) { return '<option' + (m === feedMonth ? ' selected' : '') + '>' + m + '</option>'; }).join("");
       }
@@ -1232,6 +1257,12 @@
             sr.innerHTML = parts.map(function (x) { return "<span>" + x + "</span>"; }).join("");
             row.appendChild(sr);
           });
+
+          if (t.note) {
+            var nt = document.createElement("div"); nt.className = "trow__note";
+            nt.textContent = "点评：" + t.note;
+            row.appendChild(nt);
+          }
 
           body.appendChild(row);
         });
@@ -1335,6 +1366,7 @@
       document.getElementById("sheet-msg").textContent = "";
       sheet.hidden = false;
     }
+    function openTokenHelp() { openSettings(); var t = document.getElementById("tok"); if (t) t.open = true; }
     function addToList(key, val) {
       val = (val || "").trim(); if (!val) return;
       ensureConfig();
@@ -1413,8 +1445,8 @@
     function openDashboard() {
       ensureConfig();
       form.hidden = true;
-      tokEl.style.display = "none";
       feed.style.display = "none";
+      document.getElementById("feed-month").style.display = "none";
       dash.hidden = false;
       dashAcctSel.innerHTML = accountOptions(dashAcctSel.value || "");
       initMonthForAccount();
@@ -1422,8 +1454,8 @@
     }
     function closeDashboard() {
       dash.hidden = true;
-      tokEl.style.display = "";
       feed.style.display = "";
+      document.getElementById("feed-month").style.display = "";
     }
 
     function pad2(n) { return (n < 10 ? "0" : "") + n; }
