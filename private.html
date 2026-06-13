@@ -220,6 +220,14 @@
   .histrow__bar .loss { background: #b3392f; height: 100%; }
   .histrow__n { font-weight: 700; color: var(--muted); text-align: left; font-size: 0.74rem; }
   .histrow__n b { color: var(--text); }
+  /* export */
+  .sheet__box--wide { max-width: 760px; }
+  .ex-hint { font-size: 0.76rem; color: var(--faint); line-height: 1.6; margin: 6px 0 0; }
+  .ex-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 14px; }
+  .ex-controls label { font-size: 0.7rem; font-weight: 700; color: var(--muted); }
+  .ex-controls select, .ex-controls input { font-family: inherit; font-size: 0.9rem; padding: 7px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); }
+  .ex-out { width: 100%; min-height: 340px; margin-top: 14px; resize: vertical; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.78rem; line-height: 1.5; padding: 12px; border: 1px solid var(--border-strong); border-radius: 10px; background: var(--bg); color: var(--text); white-space: pre; }
+  #ex-msg { font-size: 0.8rem; color: var(--muted); }
   .stack { margin-bottom: 18px; }
   .stack__title { font-weight: 700; color: var(--accent-strong); font-size: 0.9rem; margin: 0 0 8px; }
   .stackbar { display: flex; height: 26px; border-radius: 7px; overflow: hidden; background: var(--border); }
@@ -277,6 +285,7 @@
         <button id="new-btn" class="btn btn--solid" type="button">+ New entry</button>
         <button id="dash-btn" class="btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><polyline points="3 17 9 11 13 15 21 6"/></svg>Dashboard</button>
         <button id="ledger-btn" class="btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M9 8h6M9 12h6"/></svg>账本</button>
+        <button id="export-btn" class="btn" type="button"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>导出</button>
         <button id="settings-btn" class="btn" type="button" title="设置 · Settings">⚙ Settings</button>
         <button class="btn" type="button" onclick="location.reload()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Lock</button>
       </div>
@@ -442,6 +451,29 @@
         <button id="sheet-save" class="btn btn--solid" type="button">保存到仓库 · Save</button>
         <span id="sheet-msg"></span>
       </div>
+    </div>
+  </div>
+
+  <!-- export sheet -->
+  <div id="export-sheet" class="sheet" hidden>
+    <div class="sheet__box sheet__box--wide">
+      <div class="sheet__hd">
+        <h2 class="sheet__title">导出 · Export</h2>
+        <button id="ex-close" class="btn btn--sm" type="button">关闭</button>
+      </div>
+      <p class="ex-hint">选择账户与时段，生成 Markdown（含字段说明），可复制或下载后直接喂给 AI 做分析。日期留空表示不限。</p>
+      <div class="ex-controls">
+        <div class="field"><label>账户 Account</label><select id="ex-acct" class="acct-select"></select></div>
+        <div class="field"><label>开始日期 From</label><input id="ex-from" type="date" /></div>
+        <div class="field"><label>结束日期 To</label><input id="ex-to" type="date" /></div>
+      </div>
+      <div class="form__foot">
+        <button id="ex-gen" class="btn btn--solid" type="button">生成 Generate</button>
+        <button id="ex-copy" class="btn" type="button">复制 Copy</button>
+        <button id="ex-dl" class="btn" type="button">下载 .md</button>
+        <span id="ex-msg"></span>
+      </div>
+      <textarea id="ex-out" class="ex-out" readonly placeholder="点击「生成」后这里会出现 Markdown…"></textarea>
     </div>
   </div>
 
@@ -1958,6 +1990,173 @@
     }
     function ledgerById(id) { return (journal.ledger || []).filter(function (x) { return x.id === id; })[0]; }
     function escapeHtml(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+    // ---------- export (Markdown) ----------
+    var exportSheet = document.getElementById("export-sheet");
+    var exAcct = document.getElementById("ex-acct"), exFrom = document.getElementById("ex-from"), exTo = document.getElementById("ex-to"), exOut = document.getElementById("ex-out"), exMsg = document.getElementById("ex-msg");
+    document.getElementById("export-btn").addEventListener("click", openExport);
+    document.getElementById("ex-close").addEventListener("click", function () { exportSheet.hidden = true; });
+    exportSheet.addEventListener("click", function (e) { if (e.target === exportSheet) exportSheet.hidden = true; });
+    function openExport() { ensureConfig(); exAcct.innerHTML = accountOptions(exAcct.value || ""); exMsg.textContent = ""; exportSheet.hidden = false; }
+
+    function n2(v) { v = num(v); return v == null ? "" : v.toFixed(2); }
+    function sgn$(v) { v = num(v); if (v == null) return "—"; return (v >= 0 ? "+$" : "-$") + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function sgnR(v) { v = num(v); if (v == null) return "—"; return (v >= 0 ? "+" : "") + v.toFixed(2) + "R"; }
+    function sgnPt(v) { v = num(v); if (v == null) return "—"; return (v >= 0 ? "+" : "") + v.toFixed(2); }
+    function cell(s) { return String(s == null ? "" : s).replace(/\|/g, "/").replace(/\s*\n\s*/g, " ").trim(); }
+
+    function buildExport(account, from, to) {
+      var acc = accountByName(account);
+      var exAll = executionsFor(account);          // chronological, incl. sub-account copies
+      var rowsAll = computeRows(exAll, acc);        // same order: cumulative / limit / safety
+      function inR(d) { return (!from || d >= from) && (!to || d <= to); }
+      var idx = []; for (var i = 0; i < exAll.length; i++) if (inR(exAll[i].date)) idx.push(i);
+
+      var n = idx.length, wins = 0, net = 0, comm = 0, gw = 0, gl = 0, pts = 0, rs = [], best = null, worst = null;
+      idx.forEach(function (i) {
+        var e = exAll[i], p = num(e.pnl) || 0;
+        net += p; comm += (num(e.comm) || 0); pts += (num(e.points) || 0);
+        if (p > 0) { wins++; gw += p; } else if (p < 0) { gl += Math.abs(p); }
+        if (e.r != null) rs.push(e.r);
+        if (best == null || p > best) best = p; if (worst == null || p < worst) worst = p;
+      });
+      var winRate = n ? wins / n * 100 : 0;
+      var pf = gl ? gw / gl : (gw > 0 ? Infinity : null);
+      var avgR = rs.length ? rs.reduce(function (a, v) { return a + v; }, 0) / rs.length : null;
+      var lastRow = idx.length ? rowsAll[idx[idx.length - 1]] : null;
+
+      var L = [];
+      L.push("# Trading Journal Export");
+      L.push("");
+      L.push("> Generated " + new Date().toISOString() + " · Currency: USD · CME futures (ES/NQ/MES/MNQ).");
+      L.push("");
+      L.push("## How to read this file");
+      L.push("This is an export of one prop-firm futures day-trading account. It contains a field dictionary, the account's risk configuration, a period summary, a flat table of every execution, and the full daily journal (numbers + the trader's written notes). You can analyse it directly.");
+      L.push("");
+      L.push("**Instrument economics** — USD per 1.00 point per contract: ES 50, NQ 20, MES 5, MNQ 2. One tick = 0.25 point. Commission per contract per side: ES/NQ $3.50, MES/MNQ $1.00.");
+      L.push("");
+      L.push("**Per-trade fields**");
+      L.push("- `instrument`: ES/NQ/MES/MNQ. `direction`: long or short. `size`: number of contracts.");
+      L.push("- `signal`: the setup/pattern the trade was based on (trader-defined vocabulary).");
+      L.push("- `order`: entry order type — stop, limit or market.");
+      L.push("- `pnl`: net profit/loss in USD, already net of commission. `commission`: total commission USD.");
+      L.push("- `risk`: planned USD risk. `R`: R-multiple = pnl / risk.");
+      L.push("- `points`: per-contract points captured = (pnl + commission) / pointValue / size.");
+      L.push("- `grade`: trader's self-rating of execution quality, A (best) … C.");
+      L.push("- `note`: short per-trade comment.");
+      L.push("- A **sub-account** line is the same trade copied into another funded account: size = main size × multiplier, pnl entered manually (slippage differs).");
+      L.push("");
+      L.push("**Account-level running risk (computed)**");
+      L.push("- `equity` = initialBalance + cumulative net P&L.");
+      L.push("- `maxLossLimit`: the trailing blow-up line. It ratchets UP with profit and never down. Mode **Intraday** = rises with each new equity high; **EOD** = updates only at each day's close.");
+      L.push("- `safety` = equity − maxLossLimit = USD that can still be lost before the account blows.");
+      L.push("");
+      L.push("**Daily fields** — `dayType`: trader's classification of the day's market character (e.g. 趋势日 trend day, 区间日 range day, 趋势反转日 trend-reversal day, 数据日 news/data day). `balance`: recorded closing account balance. Narrative: 盘前计划 (pre-market plan) · 行情分析及交易 (analysis & execution) · 盘中心理及总结 (psychology & review).");
+      L.push("");
+
+      L.push("## Account: " + account);
+      if (acc) {
+        L.push("- Nominal size: " + (acc.size / 1000) + "k USD");
+        L.push("- Stage: " + (acc.stage || "—"));
+        L.push("- Initial balance: " + sgn$(acc.initialBalance));
+        L.push("- Max drawdown (blow-up buffer): " + sgn$(acc.maxDrawdown));
+        L.push("- Drawdown mode: " + (acc.drawdownMode || "—"));
+      } else { L.push("- (account configuration not found)"); }
+      L.push("");
+
+      L.push("## Period");
+      L.push("From " + (from || "(beginning)") + " to " + (to || "(latest)") + ".");
+      L.push("");
+      L.push("## Summary");
+      L.push("Covers this account over the period, **including copy-trades where this account is the sub-account**.");
+      L.push("");
+      L.push("- Trades: " + n);
+      L.push("- Win rate: " + winRate.toFixed(1) + "% (" + wins + "/" + n + ")");
+      L.push("- Net P&L: " + sgn$(net));
+      L.push("- Average P&L per trade: " + (n ? sgn$(net / n) : "—"));
+      L.push("- Average R: " + (avgR == null ? "—" : sgnR(avgR)));
+      L.push("- Profit factor (gross win / gross loss): " + (pf == null ? "—" : (pf === Infinity ? "∞ (no losses)" : pf.toFixed(2))));
+      L.push("- Total commission: $" + comm.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      L.push("- Total points: " + sgnPt(pts));
+      L.push("- Best / worst trade: " + sgn$(best) + " / " + sgn$(worst));
+      if (lastRow) L.push("- Ending equity: " + sgn$(lastRow.total) + " · Max-loss limit: " + sgn$(lastRow.limit) + " · Safety distance: " + sgn$(lastRow.safety) + " (as of last trade in range)");
+      L.push("");
+
+      L.push("## Executions");
+      L.push("Every execution in range, chronological. Monetary columns in USD.");
+      L.push("");
+      L.push("| Date | Instr | Dir | Signal | Order | Size | PnL | R | Points | Comm | Grade | Equity | MaxLossLimit | Safety |");
+      L.push("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|");
+      if (!idx.length) L.push("| (no trades in range) |  |  |  |  |  |  |  |  |  |  |  |  |  |");
+      idx.forEach(function (i) {
+        var e = exAll[i], rr = rowsAll[i];
+        L.push("| " + [e.date, e.instr || "", e.dir || "", cell(e.signal), e.order || "", (e.size == null ? "" : e.size),
+          n2(e.pnl), n2(e.r), n2(e.points), n2(e.comm), e.grade || "", n2(rr.total), n2(rr.limit), n2(rr.safety)].join(" | ") + " |");
+      });
+      L.push("");
+
+      // daily journal (entries whose MAIN account is this one, in range)
+      var entries = journal.entries.filter(function (en) { return en.account === account && inR(en.date); })
+        .sort(function (a, b) { if (a.date !== b.date) return a.date < b.date ? -1 : 1; return (a.ts || 0) - (b.ts || 0); });
+      L.push("## Daily records");
+      L.push("Full journal for days where " + account + " was the main account.");
+      L.push("");
+      if (!entries.length) L.push("_(no daily records in range)_");
+      entries.forEach(function (en) {
+        var dayPnl = (en.trades || []).reduce(function (a, t) { return a + (num(t.pnl) || 0); }, 0);
+        var hasPnl = (en.trades || []).some(function (t) { return num(t.pnl) != null; });
+        L.push("### " + (en.date || "—") + " · " + (en.dayType || "—") + (en.balance != null ? " · balance " + sgn$(en.balance) : "") + (hasPnl ? " · day P&L " + sgn$(dayPnl) : "") + (en.tradeCount != null ? " · " + en.tradeCount + " trade(s)" : ""));
+        if (en.trades && en.trades.length) {
+          L.push("");
+          L.push("**Trades**");
+          en.trades.forEach(function (t, ti) {
+            L.push((ti + 1) + ". " + [t.instr || "—", t.dir || "—", "signal " + (t.signal || "—"), "order " + (t.order || "—"), "size " + (t.size == null ? "—" : t.size), "P&L " + sgn$(t.pnl), "R " + sgnR(t.r), "points " + sgnPt(t.points), "comm $" + (num(t.comm) || 0).toFixed(2), "grade " + (t.grade || "—")].join(" · "));
+            if (t.note) L.push("   - note: " + cell(t.note));
+            (t.subs || []).forEach(function (s) {
+              L.push("   - sub-account " + (s.account || "—") + " ×" + (s.multiplier == null ? "?" : s.multiplier) + " · size " + (s.size == null ? "—" : s.size) + " · P&L " + sgn$(s.pnl) + " · R " + sgnR(s.r) + " · points " + sgnPt(s.points));
+            });
+          });
+        } else {
+          L.push("");
+          L.push("_No trades (flat day)._");
+        }
+        var secs = [["盘前计划 / Pre-market plan", en.plan], ["行情分析及交易 / Analysis & execution", en.analysis], ["盘中心理及总结 / Psychology & review", en.psych]];
+        secs.forEach(function (pair) {
+          var sec = pair[1] || {};
+          L.push("");
+          L.push("**" + pair[0] + "**");
+          L.push("");
+          L.push(sec.text ? sec.text : "_(none)_");
+          if (sec.images && sec.images.length) L.push("_[" + sec.images.length + " screenshot(s) attached — not included in this text export]_");
+        });
+        L.push("");
+      });
+
+      return L.join("\n");
+    }
+
+    document.getElementById("ex-gen").addEventListener("click", function () {
+      var acct = exAcct.value;
+      if (!acct) { exMsg.textContent = "请先在设置里添加账户。"; return; }
+      try { exOut.value = buildExport(acct, exFrom.value || "", exTo.value || ""); exMsg.textContent = "已生成 ✓"; }
+      catch (e) { exMsg.textContent = "失败：" + (e && e.message ? e.message : "error"); }
+    });
+    document.getElementById("ex-copy").addEventListener("click", function () {
+      if (!exOut.value) { exMsg.textContent = "请先生成。"; return; }
+      var done = function () { exMsg.textContent = "已复制 ✓"; };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(exOut.value).then(done).catch(function () { exOut.select(); document.execCommand("copy"); done(); });
+      } else { exOut.select(); document.execCommand("copy"); done(); }
+    });
+    document.getElementById("ex-dl").addEventListener("click", function () {
+      if (!exOut.value) { exMsg.textContent = "请先生成。"; return; }
+      var name = (exAcct.value || "account") + "_" + (exFrom.value || "all") + "_" + (exTo.value || "all") + ".md";
+      var blob = new Blob([exOut.value], { type: "text/markdown" });
+      var url = URL.createObjectURL(blob), a = document.createElement("a");
+      a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      exMsg.textContent = "已下载 ✓";
+    });
 
     // ---------- lightbox ----------
     var lbx = document.getElementById("lbx"), lbxImg = document.getElementById("lbx-img");
