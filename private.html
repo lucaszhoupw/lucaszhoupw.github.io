@@ -318,7 +318,6 @@
           <button id="menu-btn" class="btn btn--plain" type="button" aria-haspopup="true" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="vertical-align:-3px;margin-right:5px"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>More</button>
           <div id="menu-dd" class="menu__dd" hidden role="menu">
             <button id="ledger-btn" class="menu__item" type="button" role="menuitem">Ledger</button>
-            <button id="export-btn" class="menu__item" type="button" role="menuitem">Export</button>
             <button id="settings-btn" class="menu__item" type="button" role="menuitem">Settings</button>
             <div class="menu__sep"></div>
             <button id="lock-btn" class="menu__item" type="button" role="menuitem" onclick="location.reload()">Lock</button>
@@ -439,6 +438,7 @@
         <nav class="set-tabs">
           <button class="set-tab is-active" type="button" data-tab="accounts">Accounts</button>
           <button class="set-tab" type="button" data-tab="vocab">Vocabulary</button>
+          <button class="set-tab" type="button" data-tab="export">Export</button>
           <button class="set-tab" type="button" data-tab="system">System</button>
         </nav>
         <div class="set-panes">
@@ -471,6 +471,22 @@
               </div>
             </div>
           </div>
+          <div class="set-pane" data-pane="export">
+            <h3>Export to Markdown</h3>
+            <p style="font-size:0.74rem;color:var(--faint);line-height:1.6;margin:0 0 12px">Pick an account and an optional date range, then generate a Markdown report (with a field dictionary) to copy or download and feed to an AI for analysis. Empty dates = no limit.</p>
+            <div class="ex-controls">
+              <div class="field"><label>Account</label><select id="ex-acct" class="acct-select"></select></div>
+              <div class="field"><label>From</label><input id="ex-from" type="date" /></div>
+              <div class="field"><label>To</label><input id="ex-to" type="date" /></div>
+            </div>
+            <div class="form__foot">
+              <button id="ex-gen" class="btn btn--solid" type="button">Generate</button>
+              <button id="ex-copy" class="btn" type="button">Copy</button>
+              <button id="ex-dl" class="btn" type="button">Download .md</button>
+              <span id="ex-msg"></span>
+            </div>
+            <textarea id="ex-out" class="ex-out" readonly placeholder="Generated Markdown appears here…"></textarea>
+          </div>
           <div class="set-pane" data-pane="system">
             <h3>Theme</h3>
             <div class="swatches">
@@ -493,29 +509,6 @@
         <button id="sheet-save" class="btn btn--solid" type="button">Save to repo</button>
         <span id="sheet-msg"></span>
       </div>
-    </div>
-  </div>
-
-  <!-- export sheet -->
-  <div id="export-sheet" class="sheet" hidden>
-    <div class="sheet__box sheet__box--wide">
-      <div class="sheet__hd">
-        <h2 class="sheet__title">Export</h2>
-        <button id="ex-close" class="btn btn--sm" type="button">关闭</button>
-      </div>
-      <p class="ex-hint">选择账户与时段，生成 Markdown（含字段说明），可复制或下载后直接喂给 AI 做分析。日期留空表示不限。</p>
-      <div class="ex-controls">
-        <div class="field"><label>账户 Account</label><select id="ex-acct" class="acct-select"></select></div>
-        <div class="field"><label>开始日期 From</label><input id="ex-from" type="date" /></div>
-        <div class="field"><label>结束日期 To</label><input id="ex-to" type="date" /></div>
-      </div>
-      <div class="form__foot">
-        <button id="ex-gen" class="btn btn--solid" type="button">生成 Generate</button>
-        <button id="ex-copy" class="btn" type="button">复制 Copy</button>
-        <button id="ex-dl" class="btn" type="button">下载 .md</button>
-        <span id="ex-msg"></span>
-      </div>
-      <textarea id="ex-out" class="ex-out" readonly placeholder="点击「生成」后这里会出现 Markdown…"></textarea>
     </div>
   </div>
 
@@ -1504,11 +1497,13 @@
     function setActiveTab(name) {
       document.querySelectorAll(".set-tab").forEach(function (t) { t.classList.toggle("is-active", t.getAttribute("data-tab") === name); });
       document.querySelectorAll(".set-pane").forEach(function (p) { p.classList.toggle("is-active", p.getAttribute("data-pane") === name); });
+      if (name === "export") fillExportAccounts();
     }
     document.querySelectorAll(".set-tab").forEach(function (t) { t.addEventListener("click", function () { setActiveTab(t.getAttribute("data-tab")); }); });
     function openSettings() {
       ensureConfig();
       renderSettings();
+      fillExportAccounts();
       document.getElementById("sheet-msg").textContent = "";
       setActiveTab("accounts");
       sheet.hidden = false;
@@ -2044,13 +2039,9 @@
     function ledgerById(id) { return (journal.ledger || []).filter(function (x) { return x.id === id; })[0]; }
     function escapeHtml(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
-    // ---------- export (Markdown) ----------
-    var exportSheet = document.getElementById("export-sheet");
+    // ---------- export (Markdown) — lives in the Settings "Export" tab ----------
     var exAcct = document.getElementById("ex-acct"), exFrom = document.getElementById("ex-from"), exTo = document.getElementById("ex-to"), exOut = document.getElementById("ex-out"), exMsg = document.getElementById("ex-msg");
-    document.getElementById("export-btn").addEventListener("click", openExport);
-    document.getElementById("ex-close").addEventListener("click", function () { exportSheet.hidden = true; });
-    exportSheet.addEventListener("click", function (e) { if (e.target === exportSheet) exportSheet.hidden = true; });
-    function openExport() { ensureConfig(); exAcct.innerHTML = accountOptions(exAcct.value || ""); exMsg.textContent = ""; exportSheet.hidden = false; }
+    function fillExportAccounts() { exAcct.innerHTML = accountOptions(exAcct.value || ""); }
 
     function n2(v) { v = num(v); return v == null ? "" : v.toFixed(2); }
     function sgn$(v) { v = num(v); if (v == null) return "—"; return (v >= 0 ? "+$" : "-$") + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
