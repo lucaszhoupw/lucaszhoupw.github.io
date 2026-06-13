@@ -58,22 +58,23 @@
   .menu__item:hover { background: var(--accent-tint); color: var(--accent-strong); }
   .menu__sep { height: 1px; background: var(--border); margin: 4px 4px; }
 
-  /* tabbed settings */
-  .sheet__box--settings { max-width: 840px; }
-  .setwrap { display: flex; gap: 20px; margin-top: 14px; }
-  .set-tabs { display: flex; flex-direction: column; gap: 4px; flex: 0 0 148px; border-right: 1px solid var(--border); padding-right: 10px; }
+  /* tabbed settings — fixed-size wide window, right pane scrolls.
+     Compound selector wins over the later base .sheet__box rule. */
+  .sheet__box.sheet__box--settings { width: 100%; max-width: 960px; height: 600px; max-height: calc(100vh - 100px); display: flex; flex-direction: column; box-sizing: border-box; }
+  .setwrap { display: flex; gap: 20px; margin-top: 14px; flex: 1; min-height: 0; }
+  .set-tabs { display: flex; flex-direction: column; gap: 4px; flex: 0 0 150px; border-right: 1px solid var(--border); padding-right: 10px; overflow-y: auto; }
   .set-tab { text-align: left; font-family: inherit; font-size: 0.86rem; color: var(--muted); background: transparent; border: 0; border-radius: 8px; padding: 9px 12px; cursor: pointer; }
   .set-tab:hover { background: var(--accent-tint); }
   .set-tab.is-active { background: var(--accent); color: #fff; }
-  .set-panes { flex: 1; min-width: 0; }
+  .set-panes { flex: 1; min-width: 0; overflow-y: auto; padding-right: 8px; }
   .set-pane { display: none; }
   .set-pane.is-active { display: block; }
   .set-pane h3 { font-size: 0.84rem; color: var(--muted); margin: 0 0 8px; }
-  .set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; }
   .set-grid > div { min-width: 0; }
   @media (max-width: 580px) {
     .setwrap { flex-direction: column; gap: 12px; }
-    .set-tabs { flex-direction: row; flex-wrap: wrap; flex-basis: auto; border-right: 0; border-bottom: 1px solid var(--border); padding: 0 0 8px; }
+    .set-tabs { flex-direction: row; flex-wrap: wrap; flex-basis: auto; border-right: 0; border-bottom: 1px solid var(--border); padding: 0 0 8px; overflow: visible; }
     .set-grid { grid-template-columns: 1fr; }
   }
 
