@@ -240,9 +240,13 @@
   .chart__note { color: var(--faint); font-style: italic; font-size: 0.84rem; padding: 26px 0; text-align: center; }
   .chart__legend { display: flex; gap: 18px; justify-content: center; font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
   .chart__legend i { display: inline-block; width: 16px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 5px; }
-  .hist__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .hist__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
   .hist__title { font-weight: 700; color: var(--accent-strong); font-size: 0.9rem; }
+  .hist__ctrls { display: flex; gap: 8px; }
   .hist select { font-family: inherit; font-size: 0.84rem; padding: 5px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
+  .hist svg { width: 100%; height: auto; display: block; }
+  .hist__legend { display: flex; gap: 16px; justify-content: center; font-size: 0.74rem; color: var(--muted); margin-top: 8px; }
+  .hist__legend i.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; margin-right: 5px; vertical-align: -1px; }
   .histrow { display: grid; grid-template-columns: 96px 1fr 92px; align-items: center; gap: 8px; margin-bottom: 7px; font-size: 0.8rem; }
   .histrow__lab { color: var(--muted); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .histrow__bar { display: flex; background: var(--border); border-radius: 5px; height: 16px; overflow: hidden; }
@@ -1572,7 +1576,7 @@
     var dashCal = document.getElementById("dash-cal");
     var dashTable = document.getElementById("dash-table");
     var dashAcctLine = document.getElementById("dash-acctline");
-    var dashMonthKey = null, dashMonthsCache = [], dashEx = [], histDim = "instr";
+    var dashMonthKey = null, dashMonthsCache = [], dashEx = [], histDim = "instr", histMetric = "count";
     var HIST_DIMS = [
       { k: "instr", label: "商品 Instrument" },
       { k: "dir", label: "方向 Direction" },
@@ -1636,7 +1640,7 @@
         if (!d || d.date !== e.date) { d = { date: e.date, list: [] }; days.push(d); }
         d.list.push(e);
       });
-      var rows = [], cumBefore = 0, intradayPeak = initBal, eodPeak = initBal;
+      var rows = [], cumBefore = 0, intradayPeak = initBal, eodPeak = initBal, chartPeak = initBal;
       days.forEach(function (day) {
         // a recorded day is already over, so its EOD line reflects this day's
         // close: it floats up with the day's profit and never drops
@@ -1649,9 +1653,10 @@
           var equity = initBal + run, line;
           if (mode === "EOD") line = lineEOD;
           else { intradayPeak = Math.max(intradayPeak, equity); line = intradayPeak - D; }
+          chartPeak = Math.max(chartPeak, equity); // per-trade high-water-mark, for the chart line
           rows.push({
             date: e.date, instr: e.instr, size: e.size, pnl: e.pnl, points: e.points,
-            dayCum: dayCum, total: equity, limit: line, safety: equity - line, dayStart: first
+            dayCum: dayCum, total: equity, limit: line, chartLimit: chartPeak - D, safety: equity - line, dayStart: first
           });
           first = false;
         });
@@ -1723,6 +1728,8 @@
     }
 
     function fmtAxis(v) { return (v < 0 ? "-$" : "$") + Math.round(Math.abs(v)).toLocaleString(); }
+    function niceNum(x) { if (x <= 0) return 1; var e = Math.pow(10, Math.floor(Math.log10(x))); var f = x / e; var nf = f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10; return nf * e; }
+    function shortLab(s) { s = String(s); return s.length > 7 ? s.slice(0, 6) + "…" : s; }
     function renderChart(rows) {
       var box = document.getElementById("dash-chart");
       box.className = "chart";
@@ -1732,7 +1739,7 @@
       }
       var W = 640, H = 260, mL = 78, mR = 14, mT = 14, mB = 30;
       var pw = W - mL - mR, ph = H - mT - mB, n = rows.length;
-      var ys = []; rows.forEach(function (r) { ys.push(r.total); ys.push(r.limit); });
+      var ys = []; rows.forEach(function (r) { ys.push(r.total); ys.push(r.chartLimit); });
       var dataMin = Math.min.apply(null, ys), dataMax = Math.max.apply(null, ys);
       // snap range to whole-thousand ticks
       var range = (dataMax - dataMin) || 1;
@@ -1757,7 +1764,7 @@
       }
       box.innerHTML =
         '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img">' + grid + zero +
-        '<path d="' + d("limit") + '" fill="none" stroke="#b3392f" stroke-width="2" stroke-dasharray="5 4"/>' +
+        '<path d="' + d("chartLimit") + '" fill="none" stroke="#b3392f" stroke-width="2" stroke-dasharray="5 4"/>' +
         '<path d="' + d("total") + '" fill="none" stroke-width="2.4" style="stroke:var(--accent)"/>' +
         labels + xl +
         '<text x="' + (mL + pw / 2) + '" y="' + (H - 1) + '" text-anchor="middle" font-size="9" fill="var(--faint)">累计交易笔数</text>' +
@@ -1830,35 +1837,56 @@
     function renderHistogram() {
       var box = document.getElementById("dash-hist");
       var ex = dashEx || [];
-      var sel = '<div class="hist__head"><span class="hist__title">盈亏分类统计 · Win / loss breakdown</span>' +
-        '<select id="hist-dim">' + HIST_DIMS.map(function (d) {
-          return '<option value="' + d.k + '"' + (d.k === histDim ? ' selected' : '') + '>' + d.label + '</option>';
-        }).join('') + '</select></div>';
-      // per category: winning vs losing trade counts (break-even ignored in W/L)
+      var head = '<div class="hist__head"><span class="hist__title">盈亏分类统计 · Profit / loss by category</span>' +
+        '<span class="hist__ctrls">' +
+        '<select id="hist-dim">' + HIST_DIMS.map(function (d) { return '<option value="' + d.k + '"' + (d.k === histDim ? ' selected' : '') + '>' + d.label + '</option>'; }).join('') + '</select>' +
+        '<select id="hist-metric"><option value="count"' + (histMetric === "count" ? ' selected' : '') + '>笔数 Count</option>' +
+        '<option value="amount"' + (histMetric === "amount" ? ' selected' : '') + '>金额 Amount</option></select></span></div>';
+
+      // per category: winning vs losing trade counts AND gross profit / loss
       var cat = {};
       ex.forEach(function (e) {
         var v = e[histDim] || "—";
-        var c = cat[v] || (cat[v] = { win: 0, loss: 0 });
-        var p = e.pnl || 0;
-        if (p > 0) c.win++; else if (p < 0) c.loss++;
+        var c = cat[v] || (cat[v] = { win: 0, loss: 0, gw: 0, gl: 0 });
+        var p = num(e.pnl) || 0;
+        if (p > 0) { c.win++; c.gw += p; } else if (p < 0) { c.loss++; c.gl += Math.abs(p); }
       });
-      var keys = Object.keys(cat).sort(function (a, b) { return (cat[b].win + cat[b].loss) - (cat[a].win + cat[a].loss); });
-      var max = 0;
-      keys.forEach(function (k) { max = Math.max(max, cat[k].win + cat[k].loss); });
-      var bars = keys.map(function (k) {
-        var c = cat[k], total = c.win + c.loss;
-        var scale = max ? total / max : 0;            // bar length vs busiest category
-        var winW = total ? (c.win / total) * scale * 100 : 0;
-        var lossW = total ? (c.loss / total) * scale * 100 : 0;
-        var wr = total ? Math.round(c.win / total * 100) : 0;
-        return '<div class="histrow"><span class="histrow__lab">' + k + '</span>' +
-          '<span class="histrow__bar"><span class="win" style="width:' + winW.toFixed(1) + '%"></span>' +
-          '<span class="loss" style="width:' + lossW.toFixed(1) + '%"></span></span>' +
-          '<span class="histrow__n"><b>' + c.win + '</b>赢 / <b>' + c.loss + '</b>亏 · ' + wr + '%</span></div>';
-      }).join('');
-      if (!keys.length) bars = '<div class="empty">无数据</div>';
-      box.innerHTML = sel + '<div class="histbars">' + bars + '</div>';
+      function gVal(k) { return histMetric === "amount" ? cat[k].gw : cat[k].win; }   // green
+      function rVal(k) { return histMetric === "amount" ? cat[k].gl : cat[k].loss; }  // red
+      function fmtV(v) { return histMetric === "amount" ? fmtAxis(v) : String(Math.round(v)); }
+      var keys = Object.keys(cat).sort(function (a, b) { return (gVal(b) + rVal(b)) - (gVal(a) + rVal(a)); });
+      var maxVal = 0; keys.forEach(function (k) { maxVal = Math.max(maxVal, gVal(k), rVal(k)); });
+
+      var content;
+      if (!keys.length || maxVal <= 0) { content = '<div class="empty">无数据</div>'; }
+      else {
+        var W = 640, H = 300, mL = 58, mR = 12, mT = 14, mB = 54;
+        var pw = W - mL - mR, ph = H - mT - mB, nC = keys.length;
+        var gW = pw / nC, barW = Math.min(36, gW * 0.3);
+        var step = niceNum(maxVal / 4), top = Math.ceil(maxVal / step) * step;
+        var Y = function (v) { return mT + ph - (v / top) * ph; };
+        var grid = "", labels = "";
+        for (var val = 0; val <= top + 1e-6; val += step) {
+          var yy = Y(val);
+          grid += '<line x1="' + mL + '" y1="' + yy.toFixed(1) + '" x2="' + (W - mR) + '" y2="' + yy.toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
+          labels += '<text x="' + (mL - 6) + '" y="' + (yy + 3).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--faint)">' + fmtV(val) + '</text>';
+        }
+        var bars = "", xl = "";
+        keys.forEach(function (k, i) {
+          var cx = mL + i * gW + gW / 2;
+          var g = gVal(k), r = rVal(k);
+          var gX = cx - barW - 2, rX = cx + 2;
+          bars += '<rect x="' + gX.toFixed(1) + '" y="' + Y(g).toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + Math.max(0, (g / top) * ph).toFixed(1) + '" fill="#1f8f4e"><title>' + k + ' · 盈利 ' + fmtV(g) + '</title></rect>';
+          bars += '<rect x="' + rX.toFixed(1) + '" y="' + Y(r).toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + Math.max(0, (r / top) * ph).toFixed(1) + '" fill="#b3392f"><title>' + k + ' · 亏损 ' + fmtV(r) + '</title></rect>';
+          xl += '<text x="' + cx.toFixed(1) + '" y="' + (mT + ph + 16) + '" text-anchor="middle" font-size="9" fill="var(--muted)"><title>' + k + '</title>' + shortLab(k) + '</text>';
+        });
+        var axis = '<line x1="' + mL + '" y1="' + (mT + ph) + '" x2="' + (W - mR) + '" y2="' + (mT + ph) + '" stroke="var(--border-strong)" stroke-width="1"/>';
+        content = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img">' + grid + bars + axis + labels + xl + '</svg>' +
+          '<div class="hist__legend"><span><i class="sw" style="background:#1f8f4e"></i>盈利 Profit</span><span><i class="sw" style="background:#b3392f"></i>亏损 Loss</span></div>';
+      }
+      box.innerHTML = head + content;
       document.getElementById("hist-dim").addEventListener("change", function () { histDim = this.value; renderHistogram(); });
+      document.getElementById("hist-metric").addEventListener("change", function () { histMetric = this.value; renderHistogram(); });
     }
 
     // ---------- ledger ----------
