@@ -1576,7 +1576,7 @@
     var dashCal = document.getElementById("dash-cal");
     var dashTable = document.getElementById("dash-table");
     var dashAcctLine = document.getElementById("dash-acctline");
-    var dashMonthKey = null, dashMonthsCache = [], dashEx = [], histDim = "instr", histMetric = "count";
+    var dashMonthKey = null, dashMonthsCache = [], dashEx = [], dashRows = [], histDim = "instr", histMetric = "count", chartLimitMode = "hwm";
     var HIST_DIMS = [
       { k: "instr", label: "商品 Instrument" },
       { k: "dir", label: "方向 Direction" },
@@ -1684,6 +1684,7 @@
       var ex = executionsFor(dashAcctSel.value);
       dashEx = ex;
       var rows = computeRows(ex, acc);
+      dashRows = rows;
       dashAcctLine.textContent = acc
         ? (acc.size / 1000) + "k · " + (acc.stage || "") + " · 初始 " + money(acc.initialBalance) + " · 最大回撤 " + money(acc.maxDrawdown) + " · " + acc.drawdownMode
         : "";
@@ -1737,9 +1738,10 @@
         box.innerHTML = '<div class="chart__note">该账户交易满 6 笔后显示曲线（当前 ' + rows.length + ' 笔）</div>';
         return;
       }
+      var limKey = chartLimitMode === "rule" ? "limit" : "chartLimit";
       var W = 640, H = 260, mL = 78, mR = 14, mT = 14, mB = 30;
       var pw = W - mL - mR, ph = H - mT - mB, n = rows.length;
-      var ys = []; rows.forEach(function (r) { ys.push(r.total); ys.push(r.chartLimit); });
+      var ys = []; rows.forEach(function (r) { ys.push(r.total); ys.push(r[limKey]); });
       var dataMin = Math.min.apply(null, ys), dataMax = Math.max.apply(null, ys);
       // snap range to whole-thousand ticks
       var range = (dataMax - dataMin) || 1;
@@ -1762,15 +1764,19 @@
         var idx = Math.round(k / XT * (n - 1)), xx = X(idx);
         xl += '<text x="' + xx.toFixed(1) + '" y="' + (H - 12) + '" text-anchor="middle" font-size="9" fill="var(--faint)">' + (idx + 1) + '</text>';
       }
+      var methodLab = chartLimitMode === "rule" ? "账户规则 Account rule" : "逐笔水位线 Trailing HWM";
       box.innerHTML =
         '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img">' + grid + zero +
-        '<path d="' + d("chartLimit") + '" fill="none" stroke="#b3392f" stroke-width="2" stroke-dasharray="5 4"/>' +
+        '<path d="' + d(limKey) + '" fill="none" stroke="#b3392f" stroke-width="2" stroke-dasharray="5 4"/>' +
         '<path d="' + d("total") + '" fill="none" stroke-width="2.4" style="stroke:var(--accent)"/>' +
         labels + xl +
         '<text x="' + (mL + pw / 2) + '" y="' + (H - 1) + '" text-anchor="middle" font-size="9" fill="var(--faint)">累计交易笔数</text>' +
         '</svg>' +
         '<div class="chart__legend"><span><i style="border-color:var(--accent)"></i>总累计盈亏</span>' +
-        '<span><i style="border-color:#b3392f"></i>最大亏损限制</span></div>';
+        '<span><i style="border-color:#b3392f"></i>最大亏损限制 · ' + methodLab + '</span>' +
+        '<button id="lim-toggle" class="btn btn--sm" type="button">切换算法 Switch</button></div>';
+      var lt = document.getElementById("lim-toggle");
+      if (lt) lt.addEventListener("click", function () { chartLimitMode = (chartLimitMode === "hwm" ? "rule" : "hwm"); renderChart(dashRows); });
     }
     function renderCalendar(ex) {
       var months = dataMonths(ex);
@@ -1841,9 +1847,9 @@
         '<span class="hist__ctrls">' +
         '<select id="hist-dim">' + HIST_DIMS.map(function (d) { return '<option value="' + d.k + '"' + (d.k === histDim ? ' selected' : '') + '>' + d.label + '</option>'; }).join('') + '</select>' +
         '<select id="hist-metric"><option value="count"' + (histMetric === "count" ? ' selected' : '') + '>笔数 Count</option>' +
-        '<option value="amount"' + (histMetric === "amount" ? ' selected' : '') + '>金额 Amount</option></select></span></div>';
+        '<option value="amount"' + (histMetric === "amount" ? ' selected' : '') + '>金额 Amount</option>' +
+        '<option value="net"' + (histMetric === "net" ? ' selected' : '') + '>净盈亏 Net</option></select></span></div>';
 
-      // per category: winning vs losing trade counts AND gross profit / loss
       var cat = {};
       ex.forEach(function (e) {
         var v = e[histDim] || "—";
@@ -1851,38 +1857,72 @@
         var p = num(e.pnl) || 0;
         if (p > 0) { c.win++; c.gw += p; } else if (p < 0) { c.loss++; c.gl += Math.abs(p); }
       });
-      function gVal(k) { return histMetric === "amount" ? cat[k].gw : cat[k].win; }   // green
-      function rVal(k) { return histMetric === "amount" ? cat[k].gl : cat[k].loss; }  // red
-      function fmtV(v) { return histMetric === "amount" ? fmtAxis(v) : String(Math.round(v)); }
-      var keys = Object.keys(cat).sort(function (a, b) { return (gVal(b) + rVal(b)) - (gVal(a) + rVal(a)); });
-      var maxVal = 0; keys.forEach(function (k) { maxVal = Math.max(maxVal, gVal(k), rVal(k)); });
-
+      var keysAll = Object.keys(cat);
+      var W = 640, H = 300, mL = 58, mR = 12, mT = 14, mB = 54, pw = W - mL - mR, ph = H - mT - mB;
       var content;
-      if (!keys.length || maxVal <= 0) { content = '<div class="empty">无数据</div>'; }
-      else {
-        var W = 640, H = 300, mL = 58, mR = 12, mT = 14, mB = 54;
-        var pw = W - mL - mR, ph = H - mT - mB, nC = keys.length;
-        var gW = pw / nC, barW = Math.min(36, gW * 0.3);
-        var step = niceNum(maxVal / 4), top = Math.ceil(maxVal / step) * step;
-        var Y = function (v) { return mT + ph - (v / top) * ph; };
-        var grid = "", labels = "";
-        for (var val = 0; val <= top + 1e-6; val += step) {
-          var yy = Y(val);
-          grid += '<line x1="' + mL + '" y1="' + yy.toFixed(1) + '" x2="' + (W - mR) + '" y2="' + yy.toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
-          labels += '<text x="' + (mL - 6) + '" y="' + (yy + 3).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--faint)">' + fmtV(val) + '</text>';
+
+      if (!keysAll.length) {
+        content = '<div class="empty">无数据</div>';
+      } else if (histMetric === "net") {
+        // one merged bar per category = net P&L (gross profit − gross loss), above/below a zero baseline
+        var nets = {}; keysAll.forEach(function (k) { nets[k] = cat[k].gw - cat[k].gl; });
+        var keys = keysAll.slice().sort(function (a, b) { return nets[b] - nets[a]; });
+        var vmax = 0, vmin = 0; keys.forEach(function (k) { vmax = Math.max(vmax, nets[k]); vmin = Math.min(vmin, nets[k]); });
+        if (vmax === 0 && vmin === 0) { content = '<div class="empty">无数据</div>'; }
+        else {
+          var nC = keys.length, gW = pw / nC, barW = Math.min(46, gW * 0.5);
+          var range = (vmax - vmin) || 1, step = niceNum(range / 4);
+          var top = Math.ceil(vmax / step) * step, bot = Math.floor(vmin / step) * step;
+          if (top === bot) top = bot + step;
+          var Y = function (v) { return mT + (1 - (v - bot) / (top - bot)) * ph; };
+          var grid = "", labels = "";
+          for (var val = bot; val <= top + 1e-6; val += step) {
+            var yy = Y(val);
+            grid += '<line x1="' + mL + '" y1="' + yy.toFixed(1) + '" x2="' + (W - mR) + '" y2="' + yy.toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
+            labels += '<text x="' + (mL - 6) + '" y="' + (yy + 3).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--faint)">' + fmtAxis(val) + '</text>';
+          }
+          var zeroY = Y(0);
+          var zline = '<line x1="' + mL + '" y1="' + zeroY.toFixed(1) + '" x2="' + (W - mR) + '" y2="' + zeroY.toFixed(1) + '" stroke="var(--border-strong)" stroke-width="1"/>';
+          var bars = "", xl = "";
+          keys.forEach(function (k, i) {
+            var cx = mL + i * gW + gW / 2, v = nets[k], yv = Y(v);
+            var yTop = Math.min(zeroY, yv), hh = Math.abs(yv - zeroY), col = v >= 0 ? "#1f8f4e" : "#b3392f";
+            bars += '<rect x="' + (cx - barW / 2).toFixed(1) + '" y="' + yTop.toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + Math.max(0, hh).toFixed(1) + '" fill="' + col + '"><title>' + k + ' · 净盈亏 ' + (v >= 0 ? "+" : "−") + fmtAxis(Math.abs(v)) + '</title></rect>';
+            xl += '<text x="' + cx.toFixed(1) + '" y="' + (mT + ph + 16) + '" text-anchor="middle" font-size="9" fill="var(--muted)"><title>' + k + '</title>' + shortLab(k) + '</text>';
+          });
+          content = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img">' + grid + bars + zline + labels + xl + '</svg>' +
+            '<div class="hist__legend"><span><i class="sw" style="background:#1f8f4e"></i>净盈利 Net +</span><span><i class="sw" style="background:#b3392f"></i>净亏损 Net −</span></div>';
         }
-        var bars = "", xl = "";
-        keys.forEach(function (k, i) {
-          var cx = mL + i * gW + gW / 2;
-          var g = gVal(k), r = rVal(k);
-          var gX = cx - barW - 2, rX = cx + 2;
-          bars += '<rect x="' + gX.toFixed(1) + '" y="' + Y(g).toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + Math.max(0, (g / top) * ph).toFixed(1) + '" fill="#1f8f4e"><title>' + k + ' · 盈利 ' + fmtV(g) + '</title></rect>';
-          bars += '<rect x="' + rX.toFixed(1) + '" y="' + Y(r).toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + Math.max(0, (r / top) * ph).toFixed(1) + '" fill="#b3392f"><title>' + k + ' · 亏损 ' + fmtV(r) + '</title></rect>';
-          xl += '<text x="' + cx.toFixed(1) + '" y="' + (mT + ph + 16) + '" text-anchor="middle" font-size="9" fill="var(--muted)"><title>' + k + '</title>' + shortLab(k) + '</text>';
-        });
-        var axis = '<line x1="' + mL + '" y1="' + (mT + ph) + '" x2="' + (W - mR) + '" y2="' + (mT + ph) + '" stroke="var(--border-strong)" stroke-width="1"/>';
-        content = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img">' + grid + bars + axis + labels + xl + '</svg>' +
-          '<div class="hist__legend"><span><i class="sw" style="background:#1f8f4e"></i>盈利 Profit</span><span><i class="sw" style="background:#b3392f"></i>亏损 Loss</span></div>';
+      } else {
+        // grouped two bars: count (trades) or gross amount (USD)
+        var amount = histMetric === "amount";
+        var gVal = function (k) { return amount ? cat[k].gw : cat[k].win; };
+        var rVal = function (k) { return amount ? cat[k].gl : cat[k].loss; };
+        var fmtV = function (v) { return amount ? fmtAxis(v) : String(Math.round(v)); };
+        var keys = keysAll.slice().sort(function (a, b) { return (gVal(b) + rVal(b)) - (gVal(a) + rVal(a)); });
+        var maxVal = 0; keys.forEach(function (k) { maxVal = Math.max(maxVal, gVal(k), rVal(k)); });
+        if (maxVal <= 0) { content = '<div class="empty">无数据</div>'; }
+        else {
+          var nC = keys.length, gW = pw / nC, barW = Math.min(36, gW * 0.3);
+          var step = niceNum(maxVal / 4), top = Math.ceil(maxVal / step) * step;
+          var Y = function (v) { return mT + ph - (v / top) * ph; };
+          var grid = "", labels = "";
+          for (var val = 0; val <= top + 1e-6; val += step) {
+            var yy = Y(val);
+            grid += '<line x1="' + mL + '" y1="' + yy.toFixed(1) + '" x2="' + (W - mR) + '" y2="' + yy.toFixed(1) + '" stroke="var(--border)" stroke-width="1"/>';
+            labels += '<text x="' + (mL - 6) + '" y="' + (yy + 3).toFixed(1) + '" text-anchor="end" font-size="9" fill="var(--faint)">' + fmtV(val) + '</text>';
+          }
+          var bars = "", xl = "";
+          keys.forEach(function (k, i) {
+            var cx = mL + i * gW + gW / 2, g = gVal(k), r = rVal(k);
+            bars += '<rect x="' + (cx - barW - 2).toFixed(1) + '" y="' + Y(g).toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + Math.max(0, (g / top) * ph).toFixed(1) + '" fill="#1f8f4e"><title>' + k + ' · 盈利 ' + fmtV(g) + '</title></rect>';
+            bars += '<rect x="' + (cx + 2).toFixed(1) + '" y="' + Y(r).toFixed(1) + '" width="' + barW.toFixed(1) + '" height="' + Math.max(0, (r / top) * ph).toFixed(1) + '" fill="#b3392f"><title>' + k + ' · 亏损 ' + fmtV(r) + '</title></rect>';
+            xl += '<text x="' + cx.toFixed(1) + '" y="' + (mT + ph + 16) + '" text-anchor="middle" font-size="9" fill="var(--muted)"><title>' + k + '</title>' + shortLab(k) + '</text>';
+          });
+          var axis = '<line x1="' + mL + '" y1="' + (mT + ph) + '" x2="' + (W - mR) + '" y2="' + (mT + ph) + '" stroke="var(--border-strong)" stroke-width="1"/>';
+          content = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img">' + grid + bars + axis + labels + xl + '</svg>' +
+            '<div class="hist__legend"><span><i class="sw" style="background:#1f8f4e"></i>盈利 Profit</span><span><i class="sw" style="background:#b3392f"></i>亏损 Loss</span></div>';
+        }
       }
       box.innerHTML = head + content;
       document.getElementById("hist-dim").addEventListener("change", function () { histDim = this.value; renderHistogram(); });
