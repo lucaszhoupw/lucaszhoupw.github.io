@@ -440,19 +440,41 @@
   function initSchedule() {
     var list = document.getElementById("sched-list");
     if (!list) return;
+    function parseYMD(s) {
+      if (!s) return null;
+      var p = String(s).split("-");
+      if (p.length !== 3) return null;
+      var d = new Date(+p[0], +p[1] - 1, +p[2]);
+      return isNaN(d.getTime()) ? null : d;
+    }
     fetch("schedule.json?t=" + Date.now(), { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (data) {
         if (!data || !Array.isArray(data.items)) return; // network fail -> keep static fallback
+        var today = new Date(); today.setHours(0, 0, 0, 0);
         list.innerHTML = "";
+        var shown = 0;
         data.items.forEach(function (it) {
-          var li = document.createElement("li"); li.className = "sched__item";
+          // expiry is judged by the item's end date (or start if no end)
+          var endD = parseYMD(it.end || it.start), expired = false;
+          if (endD) {
+            var daysPast = Math.floor((today - endD) / 86400000);
+            if (daysPast >= 7) return;          // ≥7 days old: hide entirely
+            if (daysPast >= 2) expired = true;  // 2–6 days old: dim as expired
+            // ≤1 day old (or still upcoming/ongoing): show normally
+          }
+          var li = document.createElement("li"); li.className = "sched__item" + (expired ? " sched__item--expired" : "");
           var d = document.createElement("div"); d.className = "sched__date";
           d.setAttribute("data-en", it.dateEn || ""); d.setAttribute("data-zh", it.dateZh || it.dateEn || "");
           var p = document.createElement("div"); p.className = "sched__desc";
           p.setAttribute("data-en", it.descEn || ""); p.setAttribute("data-zh", it.descZh || it.descEn || "");
-          li.appendChild(d); li.appendChild(p); list.appendChild(li);
+          li.appendChild(d); li.appendChild(p); list.appendChild(li); shown++;
         });
+        if (!shown) {
+          var li = document.createElement("li"); li.className = "sched__item sched__empty";
+          li.setAttribute("data-en", "No recent schedule."); li.setAttribute("data-zh", "暂无近期日程。");
+          list.appendChild(li);
+        }
         var lang = document.documentElement.getAttribute("lang") === "zh" ? "zh" : "en";
         list.querySelectorAll("[data-en]").forEach(function (el) {
           el.textContent = el.getAttribute(lang === "zh" ? "data-zh" : "data-en") || "";
