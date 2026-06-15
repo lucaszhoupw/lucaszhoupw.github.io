@@ -873,6 +873,18 @@ body.modal-open { overflow: hidden; }
   font-size: 0.95rem;
   line-height: 1.55;
 }
+/* expired items (1–6 days past): dimmed grey */
+.sched__item--expired { opacity: 0.5; }
+.sched__item--expired::before { background: var(--muted); }
+.sched__item--expired .sched__date { color: var(--muted); }
+.sched__item--expired .sched__desc { color: var(--muted); }
+.sched__empty {
+  border-left: 0;
+  padding-left: 0;
+  color: var(--faint);
+  font-style: italic;
+}
+.sched__empty::before { display: none; }
 
 /* Language-variety list (Chinese modal) */
 .lang-list { list-style: none; margin: 2px 0 0; padding: 0; }
