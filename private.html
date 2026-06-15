@@ -155,6 +155,11 @@
   .card__head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; min-height: 26px; }
   .card__date { font-weight: 700; color: var(--text); font-size: 1rem; }
   .card__chip { font-size: 0.78rem; padding: 2px 9px; border-radius: 999px; background: var(--accent-tint); color: var(--accent-strong); font-weight: 700; }
+  .card__viol { font-size: 0.72rem; padding: 2px 9px; border-radius: 999px; font-weight: 700; }
+  .viol-yes { background: rgba(179,57,47,.14); color: #b3392f; }
+  .viol-no { background: rgba(31,143,78,.14); color: #1f8f4e; }
+  .cal__viol { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .cal__viol--yes { background: #b3392f; } .cal__viol--no { background: #1f8f4e; }
   .card__acct { font-size: 0.8rem; color: var(--muted); }
   .card__count { font-size: 0.8rem; color: var(--muted); }
   .card__total { margin-left: auto; font-size: 0.86rem; color: var(--muted); }
@@ -171,7 +176,7 @@
   .trow__sig { font-weight: 700; color: var(--text); }
   .tag { font-size: 0.74rem; padding: 1px 8px; border-radius: 999px; background: var(--accent-tint); color: var(--accent-strong); }
   .grade { font-weight: 700; }
-  .grade-A { color: #1f8f4e; } .grade-B { color: #b8860b; } .grade-C { color: #b3392f; }
+  .grade-A { color: #1f8f4e; } .grade-B { color: #b8860b; } .grade-C { color: #b3392f; } .grade-D { color: #6d214f; }
   .trow__nums { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; font-size: 0.82rem; color: var(--muted); }
   .subrow { font-size: 0.76rem; color: var(--muted); margin-top: 5px; padding: 3px 0 3px 18px; display: flex; flex-wrap: wrap; gap: 10px; position: relative; }
   .subrow::before { content: "↳"; position: absolute; left: 3px; top: 3px; color: var(--faint); }
@@ -279,7 +284,7 @@
   .cal__cell { min-height: 62px; border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px; }
   .cal__cell.empty { border: none; }
   .cal__cell.has { background: var(--accent-tint); }
-  .cal__day { font-size: 0.72rem; font-weight: 700; color: var(--muted); }
+  .cal__day { font-size: 0.72rem; font-weight: 700; color: var(--muted); display: flex; align-items: center; justify-content: space-between; }
   .cal__pnl { font-size: 0.74rem; font-weight: 700; margin-top: 4px; }
   .cal__cnt { font-size: 0.66rem; color: var(--faint); }
 
@@ -358,6 +363,10 @@
         <div class="field">
           <label for="f_balance">Balance / 账户余额 ($)</label>
           <input id="f_balance" type="text" inputmode="decimal" placeholder="closing balance" />
+        </div>
+        <div class="field">
+          <label for="f_viol">违规/赌博 Violation</label>
+          <select id="f_viol"><option value="0">0 · 否 No</option><option value="1">1 · 是 Yes</option></select>
         </div>
       </div>
 
@@ -883,7 +892,7 @@
           '<div class="field"><label>盈亏R / R-multiple</label><input class="t-r" type="text" readonly /></div>' +
           '<div class="field"><label>点数 / Points</label><input class="t-points" type="text" readonly /></div>' +
           '<div class="field"><label>评分 / Grade</label><select class="t-grade">' +
-            optList(["A", "B", "C"], data.grade, false) + '</select></div>' +
+            optList(["A", "B", "C", "D"], data.grade, false) + '</select></div>' +
         '</div>' +
         '<div class="t-err err-line" hidden>净盈亏不合法：4×(净盈亏+手续费)÷每点价值 不是整数（未落在有效跳动点上）</div>' +
         '<div class="subs"></div>';
@@ -1111,6 +1120,7 @@
       var dt0 = entry ? (entry.dayType || dayTypes()[0]) : dayTypes()[0];
       document.getElementById("f_daytype").innerHTML = dayTypeOptions(dt0);
       document.getElementById("f_account").innerHTML = accountOptions(entry ? (entry.account || "") : "");
+      document.getElementById("f_viol").value = (entry && entry.violation) ? "1" : "0";
       balanceInput.value = (entry && entry.balance != null) ? moneySigned(entry.balance) : "";
       TRADES.forEach(function (b) { b.el.remove(); }); TRADES = [];
       tradesEl.innerHTML = "";
@@ -1159,6 +1169,7 @@
           tradeCount: TRADES.length,
           account: document.getElementById("f_account").value,
           balance: num(balanceInput.value),
+          violation: document.getElementById("f_viol").value === "1" ? 1 : 0,
           trades: TRADES.map(function (b) { return b.read(); }),
           plan: { text: plan.text, images: (plan.kept || []).concat(planImg.refs) },
           analysis: { text: analysis.text, images: (analysis.kept || []).concat(anaImg.refs) },
@@ -1326,10 +1337,15 @@
         // --- summary head (always visible) ---
         var head = document.createElement("div"); head.className = "card__head";
         head.innerHTML = '<span class="card__date"></span><span class="card__chip"></span>' +
+          '<span class="card__viol"></span>' +
           '<span class="card__acct"></span><span class="card__count"></span>' +
           '<span class="card__total"></span><span class="card__bal"></span>';
         head.querySelector(".card__date").textContent = en.date || "—";
         head.querySelector(".card__chip").textContent = en.dayType || "";
+        var viol = en.violation ? 1 : 0;
+        var vEl = head.querySelector(".card__viol");
+        vEl.textContent = viol ? "违规 1" : "合规 0";
+        vEl.className = "card__viol " + (viol ? "viol-yes" : "viol-no");
         head.querySelector(".card__acct").textContent = en.account || "";
         head.querySelector(".card__count").textContent = (en.tradeCount || 0) + " 笔";
         var totalPnl = (en.trades || []).reduce(function (a, t) { return a + (num(t.pnl) || 0); }, 0);
@@ -1787,6 +1803,8 @@
       var year = parseInt(dashMonthKey.slice(0, 4), 10), month = parseInt(dashMonthKey.slice(5, 7), 10) - 1;
       var byDate = {};
       ex.forEach(function (e) { var m = byDate[e.date] || (byDate[e.date] = { pnl: 0, count: 0 }); m.pnl += (e.pnl || 0); m.count++; });
+      var acctName = dashAcctSel.value, violByDate = {};
+      journal.entries.forEach(function (en) { if (en.account === acctName && en.date) violByDate[en.date] = en.violation ? 1 : 0; });
       var mn = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
       var prevDis = idx === 0 ? " disabled" : "", nextDis = idx === months.length - 1 ? " disabled" : "";
       var html = '<div class="cal__nav"><button class="btn btn--sm" id="cal-prev" type="button"' + prevDis + '>‹</button>' +
@@ -1799,12 +1817,14 @@
       for (var dnum = 1; dnum <= daysInMonth; dnum++) {
         var ds = year + "-" + pad2(month + 1) + "-" + pad2(dnum);
         var m = byDate[ds];
+        var vdot = (violByDate[ds] !== undefined) ? '<span class="cal__viol cal__viol--' + (violByDate[ds] ? "yes" : "no") + '" title="' + (violByDate[ds] ? "违规 violation" : "合规 ok") + '"></span>' : "";
+        var dayHtml = '<div class="cal__day"><span>' + dnum + '</span>' + vdot + '</div>';
         if (m) {
-          html += '<div class="cal__cell has"><div class="cal__day">' + dnum + '</div>' +
+          html += '<div class="cal__cell has">' + dayHtml +
             '<div class="cal__pnl ' + (m.pnl >= 0 ? "up" : "down") + '">' + (m.pnl >= 0 ? "+" : "−") + money(m.pnl) + '</div>' +
             '<div class="cal__cnt">' + m.count + ' 笔</div></div>';
         } else {
-          html += '<div class="cal__cell"><div class="cal__day">' + dnum + '</div></div>';
+          html += '<div class="cal__cell' + (vdot ? " has" : "") + '">' + dayHtml + '</div>';
         }
       }
       html += '</div>';
@@ -2154,7 +2174,7 @@
       L.push("- `pnl`: net profit/loss in USD, already net of commission. `commission`: total commission USD.");
       L.push("- `risk`: planned USD risk. `R`: R-multiple = pnl / risk.");
       L.push("- `points`: per-contract points captured = (pnl + commission) / pointValue / size.");
-      L.push("- `grade`: trader's self-rating of execution quality, A (best) … C.");
+      L.push("- `grade`: trader's self-rating of execution quality, A (best) … D (worst).");
       L.push("- `note`: short per-trade comment.");
       L.push("- A **sub-account** line is the same trade copied into another funded account: size = main size × multiplier, pnl entered manually (slippage differs).");
       L.push("");
@@ -2163,7 +2183,7 @@
       L.push("- `maxLossLimit`: the trailing blow-up line. It ratchets UP with profit and never down. Mode **Intraday** = rises with each new equity high; **EOD** = updates only at each day's close.");
       L.push("- `safety` = equity − maxLossLimit = USD that can still be lost before the account blows.");
       L.push("");
-      L.push("**Daily fields** — `dayType`: trader's classification of the day's market character (e.g. 趋势日 trend day, 区间日 range day, 趋势反转日 trend-reversal day, 数据日 news/data day). `balance`: recorded closing account balance. Narrative: 盘前计划 (pre-market plan) · 行情分析及交易 (analysis & execution) · 盘中心理及总结 (psychology & review).");
+      L.push("**Daily fields** — `dayType`: trader's classification of the day's market character (e.g. 趋势日 trend day, 区间日 range day, 趋势反转日 trend-reversal day, 数据日 news/data day). `balance`: recorded closing account balance. `violation`: 1 if the trader broke their rules or gambled that day, else 0. Narrative: 盘前计划 (pre-market plan) · 行情分析及交易 (analysis & execution) · 盘中心理及总结 (psychology & review).");
       L.push("");
 
       L.push("## Account: " + account);
@@ -2217,7 +2237,7 @@
       entries.forEach(function (en) {
         var dayPnl = (en.trades || []).reduce(function (a, t) { return a + (num(t.pnl) || 0); }, 0);
         var hasPnl = (en.trades || []).some(function (t) { return num(t.pnl) != null; });
-        L.push("### " + (en.date || "—") + " · " + (en.dayType || "—") + (en.balance != null ? " · balance " + sgn$(en.balance) : "") + (hasPnl ? " · day P&L " + sgn$(dayPnl) : "") + (en.tradeCount != null ? " · " + en.tradeCount + " trade(s)" : ""));
+        L.push("### " + (en.date || "—") + " · " + (en.dayType || "—") + (en.balance != null ? " · balance " + sgn$(en.balance) : "") + (hasPnl ? " · day P&L " + sgn$(dayPnl) : "") + (en.tradeCount != null ? " · " + en.tradeCount + " trade(s)" : "") + " · violation " + (en.violation ? 1 : 0));
         if (en.trades && en.trades.length) {
           L.push("");
           L.push("**Trades**");
