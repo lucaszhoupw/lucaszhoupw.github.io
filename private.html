@@ -115,11 +115,21 @@
     border: 1px solid var(--border); border-radius: 12px; padding: 11px;
     background: var(--bg); position: relative;
   }
-  .trade__hd { display: flex; align-items: center; justify-content: space-between; margin: 0 0 8px; }
+  .trade__hd { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 8px; }
   .trade__no { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
   .trade__btns { display: flex; gap: 6px; }
+  .t-scalewrap { display: inline-flex; align-items: center; gap: 5px; font-size: 0.74rem; color: var(--muted); cursor: pointer; margin-left: auto; }
   .signal-row { display: flex; gap: 6px; align-items: flex-end; }
   .signal-row select { flex: 1; }
+
+  /* scale-out batches */
+  .batches { margin-top: 10px; border: 1px dashed var(--border-strong); border-radius: 10px; padding: 10px 12px; background: var(--accent-tint); }
+  .batches__h { font-size: 0.7rem; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
+  .batchrow { display: grid; grid-template-columns: 72px 1fr 1.2fr auto; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .batchrow input { font-family: inherit; font-size: 0.84rem; padding: 6px 8px; border: 1px solid var(--border-strong); border-radius: 7px; background: var(--surface); color: var(--text); }
+  .tag-scale { background: var(--accent); color: #fff; }
+  .trow__exits { font-size: 0.78rem; color: var(--muted); margin-top: 5px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .trow__exits-h { font-weight: 700; color: var(--faint); }
 
   /* sub-accounts (compact) */
   .subs { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
@@ -872,6 +882,7 @@
       el.className = "trade";
       el.innerHTML =
         '<div class="trade__hd"><span class="trade__no"></span>' +
+          '<label class="t-scalewrap"><input type="checkbox" class="t-scale" />分批止盈 Scale-out</label>' +
           '<div class="trade__btns">' +
             '<button class="btn btn--sm t-copy" type="button" title="复制为从账户">复制</button>' +
             '<button class="btn btn--sm t-del" type="button">删除</button>' +
@@ -894,6 +905,7 @@
           '<div class="field"><label>评分 / Grade</label><select class="t-grade">' +
             optList(["A", "B", "C", "D"], data.grade, false) + '</select></div>' +
         '</div>' +
+        '<div class="batches" hidden><div class="batches__h">分批止盈明细 · Scale-out（每批：手数 + 该批净盈亏；总手数与总净盈亏自动汇总）</div><div class="b-list"></div><button class="btn btn--sm b-add" type="button">+ 添加一批</button></div>' +
         '<div class="t-err err-line" hidden>净盈亏不合法：4×(净盈亏+手续费)÷每点价值 不是整数（未落在有效跳动点上）</div>' +
         '<div class="subs"></div>';
 
@@ -901,7 +913,8 @@
       var instr = $(".t-instr"), size = $(".t-size"), comm = $(".t-comm"),
           pnl = $(".t-pnl"), risk = $(".t-risk"), rOut = $(".t-r"), pointsOut = $(".t-points"),
           errLine = $(".t-err"), subsWrap = $(".subs");
-      var subBlocks = [];
+      var scaleCb = $(".t-scale"), batchesEl = $(".batches"), batchesList = $(".b-list");
+      var subBlocks = [], batchRows = [], scaled = false;
 
       function calcComm() { comm.value = money(commRate(instr.value) * (parseFloat(size.value) || 0)); }
       function gross() { // (pnl + commission) — gross before commission
@@ -922,6 +935,48 @@
       }
       function recalcSubs() { subBlocks.forEach(function (s) { s.recalc(); }); }
 
+      // --- scale-out (partial take-profit) batches ---
+      function recalcBatches() {
+        if (!scaled) return;
+        var totS = 0, totP = 0, hasS = false, hasP = false;
+        batchRows.forEach(function (b) {
+          var s = num(b.size.value), p = num(b.pnl.value);
+          if (s !== null) { totS += s; hasS = true; }
+          if (p !== null) { totP += p; hasP = true; }
+        });
+        size.value = hasS ? totS : "";
+        pnl.value = hasP ? moneySigned(totP) : "";
+        calcComm(); calcPoints(); calcR(); recalcSubs();
+      }
+      function addBatch(bd) {
+        bd = bd || {};
+        var row = document.createElement("div"); row.className = "batchrow";
+        row.innerHTML = '<input class="b-size" type="number" min="1" step="1" placeholder="手数" />' +
+          '<input class="b-pnl" type="text" inputmode="decimal" placeholder="净盈亏" />' +
+          '<input class="b-note" type="text" placeholder="备注/价位（可选）" />' +
+          '<button class="btn btn--sm b-del" type="button" title="删除该批">×</button>';
+        var bsize = row.querySelector(".b-size"), bpnl = row.querySelector(".b-pnl"), bnote = row.querySelector(".b-note");
+        if (bd.size != null) bsize.value = bd.size;
+        attachMoney(bpnl, recalcBatches);
+        if (bd.pnl != null) bpnl.value = moneySigned(bd.pnl);
+        if (bd.note) bnote.value = bd.note;
+        bsize.addEventListener("input", recalcBatches);
+        var b = { size: bsize, pnl: bpnl, note: bnote, el: row };
+        row.querySelector(".b-del").addEventListener("click", function () {
+          var i = batchRows.indexOf(b); if (i >= 0) batchRows.splice(i, 1); row.remove(); recalcBatches();
+        });
+        batchRows.push(b);
+        batchesList.appendChild(row);
+      }
+      function setScaled(on) {
+        scaled = on; scaleCb.checked = on; batchesEl.hidden = !on;
+        size.readOnly = on; pnl.readOnly = on;
+        if (on && !batchRows.length) addBatch();
+        if (on) recalcBatches();
+      }
+      scaleCb.addEventListener("change", function () { setScaled(scaleCb.checked); });
+      $(".b-add").addEventListener("click", function () { addBatch(); recalcBatches(); });
+
       instr.addEventListener("change", function () { calcComm(); calcPoints(); recalcSubs(); });
       size.addEventListener("input", function () { calcComm(); calcPoints(); recalcSubs(); });
       attachMoney(pnl, function () { calcR(); calcPoints(); });
@@ -933,6 +988,7 @@
       if (data.pnl != null) pnl.value = moneySigned(data.pnl);
       if (data.risk != null) risk.value = moneySigned(data.risk);
       calcComm(); calcR(); calcPoints();
+      if (data.exits && data.exits.length) { data.exits.forEach(function (bd) { addBatch(bd); }); setScaled(true); }
 
       function mainVals() {
         return {
@@ -1031,7 +1087,7 @@
           var p = num(pnl.value), rk = num(risk.value), sz = num(size.value);
           var g = (p === null) ? null : p + (num(comm.value) || 0);
           var pv = pointValue(instr.value);
-          return {
+          var obj = {
             signal: $(".t-signal").value, order: $(".t-order").value, dir: $(".t-dir").value,
             instr: instr.value,
             size: sz,
@@ -1044,6 +1100,10 @@
             note: block.note,
             subs: subBlocks.map(function (s) { return s.read(); })
           };
+          if (scaled && batchRows.length) {
+            obj.exits = batchRows.map(function (b) { return { size: num(b.size.value), pnl: num(b.pnl.value), note: b.note.value || "" }; });
+          }
+          return obj;
         }
       };
       TRADES.push(block);
@@ -1375,6 +1435,11 @@
           top.children[2].textContent = t.dir || "";
           top.children[3].textContent = t.order || "";
           top.querySelector(".grade").textContent = t.grade ? "评分 " + t.grade : "";
+          if (t.exits && t.exits.length) {
+            var stag = document.createElement("span"); stag.className = "tag tag-scale";
+            stag.textContent = "分批 ×" + t.exits.length;
+            top.insertBefore(stag, top.querySelector(".grade"));
+          }
           row.appendChild(top);
 
           var nums = document.createElement("div"); nums.className = "trow__nums";
@@ -1403,6 +1468,16 @@
             sr.innerHTML = parts.map(function (x) { return "<span>" + x + "</span>"; }).join("");
             row.appendChild(sr);
           });
+
+          if (t.exits && t.exits.length) {
+            var ex = document.createElement("div"); ex.className = "trow__exits";
+            var eparts = t.exits.map(function (b, bi) {
+              var bs = num(b.size), bp = num(b.pnl);
+              return "批" + (bi + 1) + " " + (bs === null ? "—" : bs) + "手 " + (bp === null ? "" : signedMoney(bp)) + (b.note ? "（" + b.note + "）" : "");
+            });
+            ex.innerHTML = '<span class="trow__exits-h">分批止盈：</span>' + eparts.map(function (x) { return "<span>" + x + "</span>"; }).join(" · ");
+            row.appendChild(ex);
+          }
 
           if (t.note) {
             var nt = document.createElement("div"); nt.className = "trow__note";
@@ -2177,6 +2252,7 @@
       L.push("- `grade`: trader's self-rating of execution quality, A (best) … D (worst).");
       L.push("- `note`: short per-trade comment.");
       L.push("- A **sub-account** line is the same trade copied into another funded account: size = main size × multiplier, pnl entered manually (slippage differs).");
+      L.push("- A **scale-out** line lists partial take-profit batches; the trade's size and net P&L are the sum of its batches. It is still one trade for all statistics.");
       L.push("");
       L.push("**Account-level running risk (computed)**");
       L.push("- `equity` = initialBalance + cumulative net P&L.");
@@ -2243,6 +2319,7 @@
           L.push("**Trades**");
           en.trades.forEach(function (t, ti) {
             L.push((ti + 1) + ". " + [t.instr || "—", t.dir || "—", "signal " + (t.signal || "—"), "order " + (t.order || "—"), "size " + (t.size == null ? "—" : t.size), "P&L " + sgn$(t.pnl), "R " + sgnR(t.r), "points " + sgnPt(t.points), "comm $" + (num(t.comm) || 0).toFixed(2), "grade " + (t.grade || "—")].join(" · "));
+            if (t.exits && t.exits.length) L.push("   - scale-out (" + t.exits.length + " batches): " + t.exits.map(function (b, bi) { return "#" + (bi + 1) + " " + (num(b.size) == null ? "?" : num(b.size)) + " lot, P&L " + sgn$(b.pnl) + (b.note ? " (" + cell(b.note) + ")" : ""); }).join("; "));
             if (t.note) L.push("   - note: " + cell(t.note));
             (t.subs || []).forEach(function (s) {
               L.push("   - sub-account " + (s.account || "—") + " ×" + (s.multiplier == null ? "?" : s.multiplier) + " · size " + (s.size == null ? "—" : s.size) + " · P&L " + sgn$(s.pnl) + " · R " + sgnR(s.r) + " · points " + sgnPt(s.points));
