@@ -70,6 +70,9 @@
   .set-pane { display: none; }
   .set-pane.is-active { display: block; }
   .set-pane h3 { font-size: 0.84rem; color: var(--muted); margin: 0 0 8px; }
+  .set-defacct { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .set-defacct label { font-size: 0.78rem; font-weight: 700; color: var(--muted); }
+  .set-defacct select { font-family: inherit; font-size: 0.86rem; padding: 6px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); }
   .set-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; }
   .set-grid > div { min-width: 0; }
   @media (max-width: 580px) {
@@ -287,6 +290,9 @@
   .dash__bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 6px 0 18px; }
   .dash__bar select { font-family: inherit; font-size: 0.9rem; padding: 7px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
   .dash__acctline { font-size: 0.8rem; color: var(--muted); }
+  .cal__bar { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .cal__all { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: var(--muted); cursor: pointer; }
+  .cal__allnote { font-size: 0.74rem; color: var(--faint); }
   .cal__nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 10px; }
   .cal__label { font-weight: 700; color: var(--text); min-width: 130px; text-align: center; }
   .cal__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
@@ -466,6 +472,10 @@
         </nav>
         <div class="set-panes">
           <div class="set-pane is-active" data-pane="accounts">
+            <div class="set-defacct">
+              <label for="set-default-acct">默认账户 Default account</label>
+              <select id="set-default-acct"></select>
+            </div>
             <h3>Accounts</h3>
             <div id="set-accounts"></div>
             <button id="set-account-add" class="btn btn--sm" type="button" style="margin-top:8px">+ Add account</button>
@@ -568,7 +578,7 @@
     var SECS = {};     // open-form image sections
 
     var ACCOUNT_SIZES = [25000, 50000, 100000, 150000];
-    var DEFAULT_ACCT = { size: 50000, initialBalance: 0, maxDrawdown: 2000, drawdownMode: "Intraday", stage: "Evaluation" };
+    var DEFAULT_ACCT = { size: 50000, initialBalance: 0, maxDrawdown: 2000, drawdownMode: "Intraday", stage: "Evaluation", status: "ongoing" };
 
     function signals() { return (journal.config && journal.config.signals) || DEFAULT_SIGNALS; }
     function dayTypes() { return (journal.config && journal.config.dayTypes) || DEFAULT_DAYTYPES; }
@@ -577,6 +587,8 @@
     function orders() { return DEFAULT_ORDERS; } // fixed order types: stop / limit / market
     function accounts() { return (journal.config && journal.config.accounts) || []; }
     function accountNames() { return accounts().map(function (a) { return a.name; }).filter(Boolean); }
+    function defaultAccount() { return (journal.config && journal.config.defaultAccount) || ""; }
+    function accountSelectable(name) { var a = accountByName(name); return !a || (a.status !== "breached" && a.status !== "passed"); }
     function accountByName(name) {
       var a = accounts();
       for (var i = 0; i < a.length; i++) if (a[i].name === name) return a[i];
@@ -599,9 +611,11 @@
           initialBalance: a.initialBalance != null ? a.initialBalance : DEFAULT_ACCT.initialBalance,
           maxDrawdown: a.maxDrawdown != null ? a.maxDrawdown : DEFAULT_ACCT.maxDrawdown,
           drawdownMode: a.drawdownMode || DEFAULT_ACCT.drawdownMode,
-          stage: a.stage || DEFAULT_ACCT.stage
+          stage: a.stage || DEFAULT_ACCT.stage,
+          status: a.status || DEFAULT_ACCT.status
         };
       });
+      if (journal.config.defaultAccount == null) journal.config.defaultAccount = "";
     }
     function pointValue(instr) { return POINT_VALUE[instr] || 0; }
     function commRate(instr) { return (instr === "ES" || instr === "NQ") ? 3.5 : 1.0; }
@@ -779,12 +793,23 @@
     function signalOptions(sel) { return optList(signals(), sel, true); }
     function dayTypeOptions(sel) { return optList(dayTypes(), sel, true); }
     function orderOptions(sel) { return optList(orders(), sel, false); }
-    function accountOptions(sel) {
-      var s = accountNames();
-      if (sel && s.indexOf(sel) < 0) s = [sel].concat(s);
-      if (!s.length) return '<option value="">（在设置中添加账户）</option>';
-      return s.map(function (x) { return "<option" + (x === sel ? " selected" : "") + ">" + x + "</option>"; }).join("");
+    // build account <option>s; default account is listed first; `chosen` (or the
+    // default when none) is preselected. formOnly=true drops breached/passed
+    // accounts (keeping the currently-selected one for editing).
+    function accountOptionsBase(sel, formOnly) {
+      var names = accountNames();
+      if (formOnly) names = names.filter(function (n) { return accountSelectable(n) || n === sel; });
+      var def = defaultAccount();
+      var ordered = names.slice();
+      if (def && ordered.indexOf(def) >= 0) ordered = [def].concat(ordered.filter(function (n) { return n !== def; }));
+      var chosen = sel || def || "";
+      if (formOnly && chosen && chosen !== sel && !accountSelectable(chosen)) chosen = ""; // don't preselect a breached/passed default
+      if (chosen && ordered.indexOf(chosen) < 0) ordered = [chosen].concat(ordered);
+      if (!ordered.length) return '<option value="">（在设置中添加账户）</option>';
+      return ordered.map(function (x) { return "<option" + (x === chosen ? " selected" : "") + ">" + x + "</option>"; }).join("");
     }
+    function accountOptions(sel) { return accountOptionsBase(sel, false); }       // all accounts (dashboard, subs view)
+    function accountOptionsForm(sel) { return accountOptionsBase(sel, true); }     // entry form: selectable only
     function refreshSelects(cls, optFn) {
       document.querySelectorAll(cls).forEach(function (sel) {
         var cur = sel.value;
@@ -794,7 +819,15 @@
     }
     function refreshSignalSelects() { refreshSelects(".t-signal", signalOptions); }
     function refreshOrderSelects() { refreshSelects(".t-order", orderOptions); }
-    function refreshAccountSelects() { refreshSelects(".acct-select", accountOptions); }
+    function refreshAccountSelects() {
+      document.querySelectorAll(".acct-select").forEach(function (sel) {
+        var cur = sel.value;
+        // form selects (main account, sub account) get the selectable-only list
+        var formSel = sel.id === "f_account" || sel.classList.contains("s-account");
+        sel.innerHTML = (formSel ? accountOptionsForm : accountOptions)(cur);
+        if (cur) sel.value = cur;
+      });
+    }
     function refreshAllSelects() { refreshSignalSelects(); refreshAccountSelects(); }
 
     // ---------- image section component ----------
@@ -882,7 +915,7 @@
       el.className = "trade";
       el.innerHTML =
         '<div class="trade__hd"><span class="trade__no"></span>' +
-          '<label class="t-scalewrap"><input type="checkbox" class="t-scale" />分批止盈 Scale-out</label>' +
+          '<label class="t-scalewrap"><input type="checkbox" class="t-scale" />分批离场 Scale-out</label>' +
           '<div class="trade__btns">' +
             '<button class="btn btn--sm t-copy" type="button" title="复制为从账户">复制</button>' +
             '<button class="btn btn--sm t-del" type="button">删除</button>' +
@@ -905,7 +938,7 @@
           '<div class="field"><label>评分 / Grade</label><select class="t-grade">' +
             optList(["A", "B", "C", "D"], data.grade, false) + '</select></div>' +
         '</div>' +
-        '<div class="batches" hidden><div class="batches__h">分批止盈明细 · Scale-out（每批：手数 + 该批净盈亏；总手数与总净盈亏自动汇总）</div><div class="b-list"></div><button class="btn btn--sm b-add" type="button">+ 添加一批</button></div>' +
+        '<div class="batches" hidden><div class="batches__h">分批离场明细 · Scale-out（每批：手数 + 该批净盈亏；总手数与总净盈亏自动汇总）</div><div class="b-list"></div><button class="btn btn--sm b-add" type="button">+ 添加一批</button></div>' +
         '<div class="t-err err-line" hidden>净盈亏不合法：4×(净盈亏+手续费)÷每点价值 不是整数（未落在有效跳动点上）</div>' +
         '<div class="subs"></div>';
 
@@ -1007,7 +1040,7 @@
           '<div class="sub__hd"><span class="sub__t">从账户 · Sub-account</span>' +
             '<button class="btn btn--sm s-del" type="button">删除</button></div>' +
           '<div class="form__grid">' +
-            '<div class="field"><label>账户 / Account</label><select class="s-account acct-select">' + accountOptions(sd.account) + '</select></div>' +
+            '<div class="field"><label>账户 / Account</label><select class="s-account acct-select">' + accountOptionsForm(sd.account) + '</select></div>' +
             '<div class="field"><label>倍数 / Multiplier</label><input class="s-mult" type="number" step="any" value="' + (sd.multiplier != null ? sd.multiplier : 1) + '" /></div>' +
             '<div class="field"><label>实际手数 / Size</label><input class="s-size" type="text" readonly /></div>' +
             '<div class="field"><label>手续费 / Comm.</label><input class="s-comm" type="text" readonly /></div>' +
@@ -1179,7 +1212,7 @@
       document.getElementById("f_date").value = entry ? (entry.date || today) : today;
       var dt0 = entry ? (entry.dayType || dayTypes()[0]) : dayTypes()[0];
       document.getElementById("f_daytype").innerHTML = dayTypeOptions(dt0);
-      document.getElementById("f_account").innerHTML = accountOptions(entry ? (entry.account || "") : "");
+      document.getElementById("f_account").innerHTML = accountOptionsForm(entry ? (entry.account || "") : "");
       document.getElementById("f_viol").value = (entry && entry.violation) ? "1" : "0";
       balanceInput.value = (entry && entry.balance != null) ? moneySigned(entry.balance) : "";
       TRADES.forEach(function (b) { b.el.remove(); }); TRADES = [];
@@ -1475,7 +1508,7 @@
               var bs = num(b.size), bp = num(b.pnl);
               return "批" + (bi + 1) + " " + (bs === null ? "—" : bs) + "手 " + (bp === null ? "" : signedMoney(bp)) + (b.note ? "（" + b.note + "）" : "");
             });
-            ex.innerHTML = '<span class="trow__exits-h">分批止盈：</span>' + eparts.map(function (x) { return "<span>" + x + "</span>"; }).join(" · ");
+            ex.innerHTML = '<span class="trow__exits-h">分批离场：</span>' + eparts.map(function (x) { return "<span>" + x + "</span>"; }).join(" · ");
             row.appendChild(ex);
           }
 
@@ -1543,10 +1576,18 @@
         c.appendChild(x); container.appendChild(c);
       });
     }
+    function renderDefaultAccount() {
+      var sel = document.getElementById("set-default-acct");
+      if (!sel) return;
+      var names = accountNames(), def = defaultAccount();
+      sel.innerHTML = '<option value="">（无 None）</option>' +
+        names.map(function (n) { return '<option' + (n === def ? ' selected' : '') + '>' + n + '</option>'; }).join('');
+    }
     function renderAccounts() {
       var box = document.getElementById("set-accounts");
       box.innerHTML = "";
       var list = journal.config.accounts;
+      renderDefaultAccount();
       if (!list.length) { box.innerHTML = '<span class="chips-empty">（暂无账户，点击下方添加）</span>'; return; }
       list.forEach(function (acc, idx) {
         var row = document.createElement("div"); row.className = "acct-edit";
@@ -1562,18 +1603,21 @@
               ['Intraday', 'EOD'].map(function (m) { return '<option' + (m === acc.drawdownMode ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select></div>' +
             '<div><label>阶段 Stage</label><select class="a-stage">' +
               ['Evaluation', 'Funded'].map(function (m) { return '<option' + (m === acc.stage ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select></div>' +
+            '<div><label>状态 Status</label><select class="a-status">' +
+              ['ongoing', 'breached', 'passed'].map(function (m) { return '<option' + (m === acc.status ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select></div>' +
           '</div>';
         var q = function (c) { return row.querySelector(c); };
         q(".a-name").value = acc.name;
         q(".a-init").value = moneySigned(acc.initialBalance);
         q(".a-dd").value = moneySigned(acc.maxDrawdown);
         q(".a-name").addEventListener("input", function () { acc.name = q(".a-name").value; });
-        q(".a-name").addEventListener("change", refreshAccountSelects);
+        q(".a-name").addEventListener("change", function () { refreshAccountSelects(); renderDefaultAccount(); });
         q(".a-size").addEventListener("change", function () { acc.size = parseFloat(q(".a-size").value); });
         attachMoney(q(".a-init"), function () { acc.initialBalance = num(q(".a-init").value) || 0; });
         attachMoney(q(".a-dd"), function () { acc.maxDrawdown = num(q(".a-dd").value) || 0; });
         q(".a-mode").addEventListener("change", function () { acc.drawdownMode = q(".a-mode").value; });
         q(".a-stage").addEventListener("change", function () { acc.stage = q(".a-stage").value; });
+        q(".a-status").addEventListener("change", function () { acc.status = q(".a-status").value; refreshAccountSelects(); });
         q(".a-del").addEventListener("click", function () {
           journal.config.accounts.splice(idx, 1); renderAccounts(); refreshAccountSelects();
         });
@@ -1623,9 +1667,12 @@
       var n = journal.config.accounts.length + 1;
       journal.config.accounts.push({
         name: "账户" + n, size: DEFAULT_ACCT.size, initialBalance: DEFAULT_ACCT.initialBalance,
-        maxDrawdown: DEFAULT_ACCT.maxDrawdown, drawdownMode: DEFAULT_ACCT.drawdownMode, stage: DEFAULT_ACCT.stage
+        maxDrawdown: DEFAULT_ACCT.maxDrawdown, drawdownMode: DEFAULT_ACCT.drawdownMode, stage: DEFAULT_ACCT.stage, status: DEFAULT_ACCT.status
       });
       renderAccounts(); refreshAccountSelects();
+    });
+    document.getElementById("set-default-acct").addEventListener("change", function () {
+      ensureConfig(); journal.config.defaultAccount = this.value; refreshAccountSelects();
     });
     wireAdd("set-signal-in", "set-signal-add", "signals");
     wireAdd("set-daytype-in", "set-daytype-add", "dayTypes");
@@ -1667,7 +1714,7 @@
     var dashCal = document.getElementById("dash-cal");
     var dashTable = document.getElementById("dash-table");
     var dashAcctLine = document.getElementById("dash-acctline");
-    var dashMonthKey = null, dashMonthsCache = [], dashEx = [], dashRows = [], histDim = "instr", histMetric = "count", chartLimitMode = "hwm";
+    var dashMonthKey = null, dashMonthsCache = [], dashEx = [], dashRows = [], histDim = "instr", histMetric = "count", chartLimitMode = "hwm", calAllAccounts = false;
     var HIST_DIMS = [
       { k: "instr", label: "商品 Instrument" },
       { k: "dir", label: "方向 Direction" },
@@ -1720,6 +1767,19 @@
       ex.sort(function (a, b) { if (a.date !== b.date) return a.date < b.date ? -1 : 1; return (a.ts || 0) - (b.ts || 0); });
       return ex;
     }
+    // every execution across all accounts (for the combined calendar)
+    function allExecutions() {
+      var ex = [];
+      journal.entries.forEach(function (en) {
+        (en.trades || []).forEach(function (t) {
+          ex.push(mkExec(en, t));
+          (t.subs || []).forEach(function (s) { ex.push(mkExec(en, s)); });
+        });
+      });
+      ex.sort(function (a, b) { if (a.date !== b.date) return a.date < b.date ? -1 : 1; return (a.ts || 0) - (b.ts || 0); });
+      return ex;
+    }
+    function calendarExecutions() { return calAllAccounts ? allExecutions() : executionsFor(dashAcctSel.value); }
     // running cumulative + trailing-drawdown blowout line
     function computeRows(ex, acc) {
       var initBal = num(acc && acc.initialBalance) || 0;
@@ -1768,7 +1828,7 @@
       var idx = dashMonthsCache.indexOf(dashMonthKey), ni = idx + d;
       if (ni < 0 || ni >= dashMonthsCache.length) return;
       dashMonthKey = dashMonthsCache[ni];
-      renderCalendar(dashEx);
+      renderCalendar();
     }
     function renderDash() {
       var acc = accountByName(dashAcctSel.value);
@@ -1781,7 +1841,7 @@
         : "";
       renderStats(ex, rows, acc);
       renderChart(rows);
-      renderCalendar(ex);
+      renderCalendar();
       renderHistogram();
       renderTable(rows);
     }
@@ -1869,20 +1929,33 @@
       var lt = document.getElementById("lim-toggle");
       if (lt) lt.addEventListener("click", function () { chartLimitMode = (chartLimitMode === "hwm" ? "rule" : "hwm"); renderChart(dashRows); });
     }
-    function renderCalendar(ex) {
+    function renderCalendar() {
+      var ex = calendarExecutions();
       var months = dataMonths(ex);
       dashMonthsCache = months;
-      if (!months.length) { dashCal.innerHTML = ""; return; } // no data -> no calendar
+      // 总账户 toggle bar (always shown, sits beside the calendar)
+      var toggle = '<label class="cal__all"><input type="checkbox" id="cal-all"' + (calAllAccounts ? " checked" : "") + ' />总账户 All accounts</label>';
+      if (!months.length) {
+        dashCal.innerHTML = '<div class="cal__bar">' + toggle + '</div><div class="empty">暂无交易记录</div>';
+        document.getElementById("cal-all").addEventListener("change", function () { calAllAccounts = this.checked; renderCalendar(); });
+        return;
+      }
       if (months.indexOf(dashMonthKey) < 0) dashMonthKey = months[months.length - 1];
       var idx = months.indexOf(dashMonthKey);
       var year = parseInt(dashMonthKey.slice(0, 4), 10), month = parseInt(dashMonthKey.slice(5, 7), 10) - 1;
       var byDate = {};
       ex.forEach(function (e) { var m = byDate[e.date] || (byDate[e.date] = { pnl: 0, count: 0 }); m.pnl += (e.pnl || 0); m.count++; });
+      // violation: single account -> that account's entry; 总账户 -> 1 if ANY account violated that day
       var acctName = dashAcctSel.value, violByDate = {};
-      journal.entries.forEach(function (en) { if (en.account === acctName && en.date) violByDate[en.date] = en.violation ? 1 : 0; });
+      journal.entries.forEach(function (en) {
+        if (!en.date) return;
+        if (calAllAccounts) { violByDate[en.date] = (violByDate[en.date] ? 1 : 0) || (en.violation ? 1 : 0); }
+        else if (en.account === acctName) { violByDate[en.date] = en.violation ? 1 : 0; }
+      });
       var mn = ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
       var prevDis = idx === 0 ? " disabled" : "", nextDis = idx === months.length - 1 ? " disabled" : "";
-      var html = '<div class="cal__nav"><button class="btn btn--sm" id="cal-prev" type="button"' + prevDis + '>‹</button>' +
+      var html = '<div class="cal__bar">' + toggle + (calAllAccounts ? '<span class="cal__allnote">合并所有账户的盈亏与违规</span>' : '') + '</div>' +
+        '<div class="cal__nav"><button class="btn btn--sm" id="cal-prev" type="button"' + prevDis + '>‹</button>' +
         '<span class="cal__label">' + year + " 年 " + mn[month] + '</span>' +
         '<button class="btn btn--sm" id="cal-next" type="button"' + nextDis + '>›</button></div><div class="cal__grid">';
       ["日","一","二","三","四","五","六"].forEach(function (d) { html += '<div class="cal__dow">' + d + '</div>'; });
@@ -1904,6 +1977,7 @@
       }
       html += '</div>';
       dashCal.innerHTML = html;
+      document.getElementById("cal-all").addEventListener("change", function () { calAllAccounts = this.checked; renderCalendar(); });
       document.getElementById("cal-prev").addEventListener("click", function () { shiftMonth(-1); });
       document.getElementById("cal-next").addEventListener("click", function () { shiftMonth(1); });
     }
