@@ -173,6 +173,8 @@
   .viol-no { background: rgba(31,143,78,.14); color: #1f8f4e; }
   .cal__viol { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
   .cal__viol--yes { background: #b3392f; } .cal__viol--no { background: #1f8f4e; }
+  .cal__cell--today { box-shadow: inset 0 0 0 2px var(--accent); }
+  .btn--dirty { background: var(--accent); color: #fff; border-color: transparent; }
   .card__acct { font-size: 0.8rem; color: var(--muted); }
   .card__count { font-size: 0.8rem; color: var(--muted); }
   .card__total { margin-left: auto; font-size: 0.86rem; color: var(--muted); }
@@ -290,6 +292,10 @@
   .dash__bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 6px 0 18px; }
   .dash__bar select { font-family: inherit; font-size: 0.9rem; padding: 7px 12px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); }
   .dash__acctline { font-size: 0.8rem; color: var(--muted); }
+  .acct-status { font-size: 0.66rem; font-weight: 700; padding: 1px 8px; border-radius: 999px; margin-right: 7px; text-transform: capitalize; }
+  .acct-status--ongoing { background: rgba(31,143,78,.14); color: #1f8f4e; }
+  .acct-status--breached { background: rgba(179,57,47,.16); color: #b3392f; }
+  .acct-status--passed { background: var(--accent-tint); color: var(--accent-strong); }
   .cal__bar { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
   .cal__all { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: var(--muted); cursor: pointer; }
   .cal__allnote { font-size: 0.74rem; color: var(--faint); }
@@ -574,6 +580,13 @@
     var SESSION_SALT = null; // one salt for the whole account -> key derived once
     var journal = { entries: [], config: {} };
     var journalSha = null; // last known sha of journal.enc (kept fresh from PUT responses)
+    var configDirty = false; // settings changed but not yet committed to the repo
+    function markDirty() { configDirty = true; updateDirtyUI(); }
+    function updateDirtyUI() {
+      var b = document.getElementById("sheet-save"); if (!b) return;
+      b.classList.toggle("btn--dirty", configDirty);
+      b.textContent = configDirty ? "● Save to repo" : "Save to repo";
+    }
     var TRADES = [];   // open-form trade blocks: {el, read()}
     var SECS = {};     // open-form image sections
 
@@ -698,6 +711,7 @@
         try {
           var res = await ghPut(JOURNAL, b64, message, token, sha);
           journalSha = (res && res.content && res.content.sha) ? res.content.sha : null;
+          configDirty = false; updateDirtyUI();
           return res;
         } catch (e) {
           var conflict = /commit 409|commit 422/.test(e.message || "");
@@ -821,6 +835,7 @@
     function refreshOrderSelects() { refreshSelects(".t-order", orderOptions); }
     function refreshAccountSelects() {
       document.querySelectorAll(".acct-select").forEach(function (sel) {
+        if (sel.id === "ex-acct") return; // managed by fillExportAccounts (keeps the All-accounts option)
         var cur = sel.value;
         // form selects (main account, sub account) get the selectable-only list
         var formSel = sel.id === "f_account" || sel.classList.contains("s-account");
@@ -1164,7 +1179,7 @@
       if (!name) return;
       name = name.trim(); if (!name) return;
       ensureConfig();
-      if (signals().indexOf(name) < 0) journal.config.signals.push(name);
+      if (signals().indexOf(name) < 0) { journal.config.signals.push(name); markDirty(); }
       refreshSignalSelects();
       if (selectToSet) selectToSet.value = name;
     }
@@ -1571,7 +1586,7 @@
           var a = journal.config[key];
           if (minOne && a.length <= 1) { window.alert("至少保留一个。"); return; }
           var i = a.indexOf(name); if (i >= 0) a.splice(i, 1);
-          renderSettings(); refreshAllSelects();
+          renderSettings(); refreshAllSelects(); markDirty();
         });
         c.appendChild(x); container.appendChild(c);
       });
@@ -1610,16 +1625,16 @@
         q(".a-name").value = acc.name;
         q(".a-init").value = moneySigned(acc.initialBalance);
         q(".a-dd").value = moneySigned(acc.maxDrawdown);
-        q(".a-name").addEventListener("input", function () { acc.name = q(".a-name").value; });
+        q(".a-name").addEventListener("input", function () { acc.name = q(".a-name").value; markDirty(); });
         q(".a-name").addEventListener("change", function () { refreshAccountSelects(); renderDefaultAccount(); });
-        q(".a-size").addEventListener("change", function () { acc.size = parseFloat(q(".a-size").value); });
-        attachMoney(q(".a-init"), function () { acc.initialBalance = num(q(".a-init").value) || 0; });
-        attachMoney(q(".a-dd"), function () { acc.maxDrawdown = num(q(".a-dd").value) || 0; });
-        q(".a-mode").addEventListener("change", function () { acc.drawdownMode = q(".a-mode").value; });
-        q(".a-stage").addEventListener("change", function () { acc.stage = q(".a-stage").value; });
-        q(".a-status").addEventListener("change", function () { acc.status = q(".a-status").value; refreshAccountSelects(); });
+        q(".a-size").addEventListener("change", function () { acc.size = parseFloat(q(".a-size").value); markDirty(); });
+        attachMoney(q(".a-init"), function () { acc.initialBalance = num(q(".a-init").value) || 0; markDirty(); });
+        attachMoney(q(".a-dd"), function () { acc.maxDrawdown = num(q(".a-dd").value) || 0; markDirty(); });
+        q(".a-mode").addEventListener("change", function () { acc.drawdownMode = q(".a-mode").value; markDirty(); });
+        q(".a-stage").addEventListener("change", function () { acc.stage = q(".a-stage").value; markDirty(); });
+        q(".a-status").addEventListener("change", function () { acc.status = q(".a-status").value; refreshAccountSelects(); markDirty(); });
         q(".a-del").addEventListener("click", function () {
-          journal.config.accounts.splice(idx, 1); renderAccounts(); refreshAccountSelects();
+          journal.config.accounts.splice(idx, 1); renderAccounts(); refreshAccountSelects(); markDirty();
         });
         box.appendChild(row);
       });
@@ -1645,14 +1660,18 @@
       fillExportAccounts();
       document.getElementById("sheet-msg").textContent = "";
       setActiveTab("accounts");
+      updateDirtyUI();
       sheet.hidden = false;
     }
+    window.addEventListener("beforeunload", function (e) {
+      if (configDirty) { e.preventDefault(); e.returnValue = ""; return ""; }
+    });
     function openTokenHelp() { openSettings(); setActiveTab("system"); }
     function addToList(key, val) {
       val = (val || "").trim(); if (!val) return;
       ensureConfig();
       if (journal.config[key].indexOf(val) < 0) journal.config[key].push(val);
-      renderSettings(); refreshAllSelects();
+      renderSettings(); refreshAllSelects(); markDirty();
     }
     function wireAdd(inputId, btnId, key) {
       document.getElementById(btnId).addEventListener("click", function () {
@@ -1669,10 +1688,10 @@
         name: "账户" + n, size: DEFAULT_ACCT.size, initialBalance: DEFAULT_ACCT.initialBalance,
         maxDrawdown: DEFAULT_ACCT.maxDrawdown, drawdownMode: DEFAULT_ACCT.drawdownMode, stage: DEFAULT_ACCT.stage, status: DEFAULT_ACCT.status
       });
-      renderAccounts(); refreshAccountSelects();
+      renderAccounts(); refreshAccountSelects(); markDirty();
     });
     document.getElementById("set-default-acct").addEventListener("change", function () {
-      ensureConfig(); journal.config.defaultAccount = this.value; refreshAccountSelects();
+      ensureConfig(); journal.config.defaultAccount = this.value; refreshAccountSelects(); markDirty();
     });
     wireAdd("set-signal-in", "set-signal-add", "signals");
     wireAdd("set-daytype-in", "set-daytype-add", "dayTypes");
@@ -1745,13 +1764,15 @@
     }
 
     function pad2(n) { return (n < 10 ? "0" : "") + n; }
+    function localToday() { var d = new Date(); return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
     function mkExec(en, src) {
       var sz = num(src.size), p = num(src.pnl), cm = num(src.comm), rk = num(src.risk), pv = pointValue(src.instr);
       var pts = (p === null || !pv || !sz) ? null : (p + (cm || 0)) / pv / sz;
       var r = (p === null || rk === null || rk === 0) ? null : p / rk;
       return {
         date: en.date, ts: en.ts, instr: src.instr, size: sz, pnl: p, comm: cm, risk: rk, r: r, points: pts,
-        signal: src.signal, order: src.order, dir: src.dir, grade: src.grade
+        signal: src.signal, order: src.order, dir: src.dir, grade: src.grade,
+        account: (src.account != null ? src.account : en.account)
       };
     }
     function executionsFor(name) {
@@ -1836,8 +1857,9 @@
       dashEx = ex;
       var rows = computeRows(ex, acc);
       dashRows = rows;
-      dashAcctLine.textContent = acc
-        ? (acc.size / 1000) + "k · " + (acc.stage || "") + " · 初始 " + money(acc.initialBalance) + " · 最大回撤 " + money(acc.maxDrawdown) + " · " + acc.drawdownMode
+      dashAcctLine.innerHTML = acc
+        ? '<span class="acct-status acct-status--' + (acc.status || "ongoing") + '">' + (acc.status || "ongoing") + '</span>' +
+          (acc.size / 1000) + "k · " + (acc.stage || "") + " · 初始 " + money(acc.initialBalance) + " · 最大回撤 " + money(acc.maxDrawdown) + " · " + acc.drawdownMode
         : "";
       renderStats(ex, rows, acc);
       renderChart(rows);
@@ -1965,14 +1987,15 @@
       for (var dnum = 1; dnum <= daysInMonth; dnum++) {
         var ds = year + "-" + pad2(month + 1) + "-" + pad2(dnum);
         var m = byDate[ds];
+        var todayCls = (ds === localToday()) ? " cal__cell--today" : "";
         var vdot = (violByDate[ds] !== undefined) ? '<span class="cal__viol cal__viol--' + (violByDate[ds] ? "yes" : "no") + '" title="' + (violByDate[ds] ? "违规 violation" : "合规 ok") + '"></span>' : "";
         var dayHtml = '<div class="cal__day"><span>' + dnum + '</span>' + vdot + '</div>';
         if (m) {
-          html += '<div class="cal__cell has">' + dayHtml +
+          html += '<div class="cal__cell has' + todayCls + '">' + dayHtml +
             '<div class="cal__pnl ' + (m.pnl >= 0 ? "up" : "down") + '">' + (m.pnl >= 0 ? "+" : "−") + money(m.pnl) + '</div>' +
             '<div class="cal__cnt">' + m.count + ' 笔</div></div>';
         } else {
-          html += '<div class="cal__cell' + (vdot ? " has" : "") + '">' + dayHtml + '</div>';
+          html += '<div class="cal__cell' + (vdot ? " has" : "") + todayCls + '">' + dayHtml + '</div>';
         }
       }
       html += '</div>';
@@ -2278,7 +2301,10 @@
 
     // ---------- export (Markdown) — lives in the Settings "Export" tab ----------
     var exAcct = document.getElementById("ex-acct"), exFrom = document.getElementById("ex-from"), exTo = document.getElementById("ex-to"), exOut = document.getElementById("ex-out"), exMsg = document.getElementById("ex-msg");
-    function fillExportAccounts() { exAcct.innerHTML = accountOptions(exAcct.value || ""); }
+    function fillExportAccounts() {
+      var cur = exAcct.value || "";
+      exAcct.innerHTML = '<option value="__ALL__"' + (cur === "__ALL__" ? " selected" : "") + ">（全部账户 All accounts）</option>" + accountOptions(cur === "__ALL__" ? "" : cur);
+    }
 
     function n2(v) { v = num(v); return v == null ? "" : v.toFixed(2); }
     function sgn$(v) { v = num(v); if (v == null) return "—"; return (v >= 0 ? "+$" : "-$") + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
@@ -2418,11 +2444,88 @@
       return L.join("\n");
     }
 
+    function buildExportAll(from, to) {
+      function inR(d) { return (!from || d >= from) && (!to || d <= to); }
+      var ex = allExecutions().filter(function (e) { return inR(e.date); });
+      var n = ex.length, wins = 0, net = 0, comm = 0, gw = 0, gl = 0, pts = 0, rs = [], best = null, worst = null;
+      ex.forEach(function (e) {
+        var p = num(e.pnl) || 0; net += p; comm += (num(e.comm) || 0); pts += (num(e.points) || 0);
+        if (p > 0) { wins++; gw += p; } else if (p < 0) { gl += Math.abs(p); }
+        if (e.r != null) rs.push(e.r);
+        if (best == null || p > best) best = p; if (worst == null || p < worst) worst = p;
+      });
+      var winRate = n ? wins / n * 100 : 0, pf = gl ? gw / gl : (gw > 0 ? Infinity : null);
+      var avgR = rs.length ? rs.reduce(function (a, v) { return a + v; }, 0) / rs.length : null;
+      var L = [];
+      L.push("# Trading Journal Export — All accounts combined");
+      L.push("");
+      L.push("> Generated " + new Date().toISOString() + " · Currency: USD · CME futures (ES/NQ/MES/MNQ). Combined view across every account; per-account trailing drawdown / safety is omitted (no single rule applies).");
+      L.push("");
+      L.push("## Fields");
+      L.push("- instrument ES/NQ/MES/MNQ; direction long/short; size = contracts; signal = setup; order = stop/limit/market.");
+      L.push("- pnl = net USD (after commission); commission USD; risk = planned USD; R = pnl/risk; points per contract = (pnl+commission)/pointValue/size (ES 50 / NQ 20 / MES 5 / MNQ 2); grade A(best)…D.");
+      L.push("- account = the account each execution belongs to (main account, or the sub-account for copy-trades). violation = 1 if that day broke rules / gambled.");
+      L.push("");
+      L.push("## Accounts");
+      accounts().forEach(function (a) { L.push("- " + a.name + ": " + (a.size / 1000) + "k, " + (a.stage || "") + ", status " + (a.status || "ongoing") + ", init " + sgn$(a.initialBalance) + ", maxDD " + sgn$(a.maxDrawdown) + ", " + a.drawdownMode); });
+      L.push("");
+      L.push("## Period");
+      L.push("From " + (from || "(beginning)") + " to " + (to || "(latest)") + ".");
+      L.push("");
+      L.push("## Summary (all accounts)");
+      L.push("- Trades: " + n);
+      L.push("- Win rate: " + winRate.toFixed(1) + "% (" + wins + "/" + n + ")");
+      L.push("- Net P&L: " + sgn$(net));
+      L.push("- Average P&L per trade: " + (n ? sgn$(net / n) : "—"));
+      L.push("- Average R: " + (avgR == null ? "—" : sgnR(avgR)));
+      L.push("- Profit factor: " + (pf == null ? "—" : (pf === Infinity ? "∞ (no losses)" : pf.toFixed(2))));
+      L.push("- Total commission: $" + comm.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      L.push("- Total points: " + sgnPt(pts));
+      L.push("- Best / worst trade: " + sgn$(best) + " / " + sgn$(worst));
+      L.push("");
+      L.push("## Executions");
+      L.push("| Date | Account | Instr | Dir | Signal | Order | Size | PnL | R | Points | Comm | Grade |");
+      L.push("|---|---|---|---|---|---|---|---|---|---|---|---|");
+      if (!ex.length) L.push("| (no trades in range) |  |  |  |  |  |  |  |  |  |  |  |");
+      ex.forEach(function (e) {
+        L.push("| " + [e.date, cell(e.account), e.instr || "", e.dir || "", cell(e.signal), e.order || "", (e.size == null ? "" : e.size), n2(e.pnl), n2(e.r), n2(e.points), n2(e.comm), e.grade || ""].join(" | ") + " |");
+      });
+      L.push("");
+      var entries = journal.entries.filter(function (en) { return inR(en.date); })
+        .sort(function (a, b) { if (a.date !== b.date) return a.date < b.date ? -1 : 1; return (a.ts || 0) - (b.ts || 0); });
+      L.push("## Daily records (all accounts)");
+      L.push("");
+      if (!entries.length) L.push("_(no daily records in range)_");
+      entries.forEach(function (en) {
+        var dayPnl = (en.trades || []).reduce(function (a, t) { return a + (num(t.pnl) || 0); }, 0);
+        var hasPnl = (en.trades || []).some(function (t) { return num(t.pnl) != null; });
+        L.push("### " + (en.date || "—") + " · " + (en.account || "—") + " · " + (en.dayType || "—") + (en.balance != null ? " · balance " + sgn$(en.balance) : "") + (hasPnl ? " · day P&L " + sgn$(dayPnl) : "") + " · violation " + (en.violation ? 1 : 0));
+        if (en.trades && en.trades.length) {
+          L.push(""); L.push("**Trades**");
+          en.trades.forEach(function (t, ti) {
+            L.push((ti + 1) + ". " + [t.instr || "—", t.dir || "—", "signal " + (t.signal || "—"), "order " + (t.order || "—"), "size " + (t.size == null ? "—" : t.size), "P&L " + sgn$(t.pnl), "R " + sgnR(t.r), "points " + sgnPt(t.points), "grade " + (t.grade || "—")].join(" · "));
+            if (t.exits && t.exits.length) L.push("   - scale-out (" + t.exits.length + " batches): " + t.exits.map(function (b, bi) { return "#" + (bi + 1) + " " + (num(b.size) == null ? "?" : num(b.size)) + " lot, P&L " + sgn$(b.pnl) + (b.note ? " (" + cell(b.note) + ")" : ""); }).join("; "));
+            if (t.note) L.push("   - note: " + cell(t.note));
+            (t.subs || []).forEach(function (s) { L.push("   - sub-account " + (s.account || "—") + " ×" + (s.multiplier == null ? "?" : s.multiplier) + " · P&L " + sgn$(s.pnl) + " · R " + sgnR(s.r)); });
+          });
+        } else { L.push(""); L.push("_No trades (flat day)._"); }
+        [["盘前计划 / Pre-market plan", en.plan], ["行情分析及交易 / Analysis & execution", en.analysis], ["盘中心理及总结 / Psychology & review", en.psych]].forEach(function (pair) {
+          var sec = pair[1] || {};
+          L.push(""); L.push("**" + pair[0] + "**"); L.push(""); L.push(sec.text ? sec.text : "_(none)_");
+          if (sec.images && sec.images.length) L.push("_[" + sec.images.length + " screenshot(s) attached — not included]_");
+        });
+        L.push("");
+      });
+      return L.join("\n");
+    }
+
     document.getElementById("ex-gen").addEventListener("click", function () {
       var acct = exAcct.value;
       if (!acct) { exMsg.textContent = "请先在设置里添加账户。"; return; }
-      try { exOut.value = buildExport(acct, exFrom.value || "", exTo.value || ""); exMsg.textContent = "已生成 ✓"; }
-      catch (e) { exMsg.textContent = "失败：" + (e && e.message ? e.message : "error"); }
+      try {
+        exOut.value = (acct === "__ALL__") ? buildExportAll(exFrom.value || "", exTo.value || "") : buildExport(acct, exFrom.value || "", exTo.value || "");
+        exMsg.textContent = "已生成 ✓";
+      } catch (e) { exMsg.textContent = "失败：" + (e && e.message ? e.message : "error"); }
     });
     document.getElementById("ex-copy").addEventListener("click", function () {
       if (!exOut.value) { exMsg.textContent = "请先生成。"; return; }
@@ -2433,7 +2536,8 @@
     });
     document.getElementById("ex-dl").addEventListener("click", function () {
       if (!exOut.value) { exMsg.textContent = "请先生成。"; return; }
-      var name = (exAcct.value || "account") + "_" + (exFrom.value || "all") + "_" + (exTo.value || "all") + ".md";
+      var who = exAcct.value === "__ALL__" ? "all-accounts" : (exAcct.value || "account");
+      var name = who + "_" + (exFrom.value || "all") + "_" + (exTo.value || "all") + ".md";
       var blob = new Blob([exOut.value], { type: "text/markdown" });
       var url = URL.createObjectURL(blob), a = document.createElement("a");
       a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
