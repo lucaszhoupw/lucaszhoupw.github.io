@@ -360,10 +360,11 @@
     var calEl = document.getElementById("cal");
     function initMonth() {
       var ds = schedule().map(function (s) { return s.start; }).filter(Boolean).sort();
-      var ref = ds.length ? ds[ds.length - 1] : new Date().toISOString().slice(0, 10);
+      var ref = ds.length ? ds[ds.length - 1] : ymd(new Date());
       calYear = parseInt(ref.slice(0, 4), 10); calMonth = parseInt(ref.slice(5, 7), 10) - 1;
     }
     function pad2(n) { return (n < 10 ? "0" : "") + n; }
+    function ymd(d) { return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); } // LOCAL date (avoids UTC off-by-one)
     function shiftMonth(d) { calMonth += d; if (calMonth < 0) { calMonth = 11; calYear--; } else if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); }
     function renderCalendar() {
       var byDate = {};
@@ -371,7 +372,7 @@
         if (!s.start) return;
         var d = new Date(s.start + "T00:00:00"), endD = new Date((s.end || s.start) + "T00:00:00"), guard = 0;
         if (isNaN(d) || isNaN(endD)) return;
-        while (d <= endD && guard < 400) { var ds = d.toISOString().slice(0, 10); (byDate[ds] || (byDate[ds] = [])).push(s); d.setDate(d.getDate() + 1); guard++; }
+        while (d <= endD && guard < 400) { var ds = ymd(d); (byDate[ds] || (byDate[ds] = [])).push(s); d.setDate(d.getDate() + 1); guard++; }
       });
       function title(s) { return (schedLabel(s) + " · " + schedDesc(s)).replace(/"/g, "'"); }
       var mn = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];

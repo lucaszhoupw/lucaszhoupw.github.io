@@ -602,6 +602,23 @@
     function accountNames() { return accounts().map(function (a) { return a.name; }).filter(Boolean); }
     function defaultAccount() { return (journal.config && journal.config.defaultAccount) || ""; }
     function accountSelectable(name) { var a = accountByName(name); return !a || (a.status !== "breached" && a.status !== "passed"); }
+    // how many day-records reference an account (as main account or via a sub-account)
+    function accountRefCount(name) {
+      var c = 0;
+      journal.entries.forEach(function (en) {
+        var hit = en.account === name;
+        if (!hit) (en.trades || []).forEach(function (t) { (t.subs || []).forEach(function (s) { if (s.account === name) hit = true; }); });
+        if (hit) c++;
+      });
+      return c;
+    }
+    function migrateAccountName(oldName, newName) {
+      journal.entries.forEach(function (en) {
+        if (en.account === oldName) en.account = newName;
+        (en.trades || []).forEach(function (t) { (t.subs || []).forEach(function (s) { if (s.account === oldName) s.account = newName; }); });
+      });
+      if (journal.config && journal.config.defaultAccount === oldName) journal.config.defaultAccount = newName;
+    }
     function accountByName(name) {
       var a = accounts();
       for (var i = 0; i < a.length; i++) if (a[i].name === name) return a[i];
@@ -1622,11 +1639,26 @@
               ['ongoing', 'breached', 'passed'].map(function (m) { return '<option' + (m === acc.status ? ' selected' : '') + '>' + m + '</option>'; }).join('') + '</select></div>' +
           '</div>';
         var q = function (c) { return row.querySelector(c); };
+        var origName = acc.name; // for rename detection / migration
         q(".a-name").value = acc.name;
         q(".a-init").value = moneySigned(acc.initialBalance);
         q(".a-dd").value = moneySigned(acc.maxDrawdown);
         q(".a-name").addEventListener("input", function () { acc.name = q(".a-name").value; markDirty(); });
-        q(".a-name").addEventListener("change", function () { refreshAccountSelects(); renderDefaultAccount(); });
+        q(".a-name").addEventListener("change", function () {
+          var newName = (acc.name || "").trim(); acc.name = newName; q(".a-name").value = newName;
+          if (newName !== origName && newName) {
+            var n = accountRefCount(origName);
+            if (n > 0) {
+              if (window.confirm("账户「" + origName + "」有 " + n + " 条历史记录。\n改名后它们会对不上。\n\n确定 = 同时把这些记录迁移到「" + newName + "」；\n取消 = 撤销本次改名。")) {
+                migrateAccountName(origName, newName); markDirty();
+              } else {
+                acc.name = origName; q(".a-name").value = origName; markDirty();
+              }
+            }
+          }
+          origName = acc.name;
+          refreshAccountSelects(); renderDefaultAccount();
+        });
         q(".a-size").addEventListener("change", function () { acc.size = parseFloat(q(".a-size").value); markDirty(); });
         attachMoney(q(".a-init"), function () { acc.initialBalance = num(q(".a-init").value) || 0; markDirty(); });
         attachMoney(q(".a-dd"), function () { acc.maxDrawdown = num(q(".a-dd").value) || 0; markDirty(); });
@@ -1634,6 +1666,8 @@
         q(".a-stage").addEventListener("change", function () { acc.stage = q(".a-stage").value; markDirty(); });
         q(".a-status").addEventListener("change", function () { acc.status = q(".a-status").value; refreshAccountSelects(); markDirty(); });
         q(".a-del").addEventListener("click", function () {
+          var n = accountRefCount(acc.name);
+          if (n > 0 && !window.confirm("账户「" + acc.name + "」有 " + n + " 条历史记录。\n删除账户不会删除这些记录，但它们将无法在 Dashboard 按账户查看（仍可在「全部账户」导出里看到）。\n\n确定删除该账户吗？")) return;
           journal.config.accounts.splice(idx, 1); renderAccounts(); refreshAccountSelects(); markDirty();
         });
         box.appendChild(row);
