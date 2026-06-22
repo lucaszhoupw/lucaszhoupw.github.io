@@ -56,12 +56,12 @@
     },
     {
       "id": "seed-summer",
-      "dateEn": "Jul 15 – 24",
-      "dateZh": "7 月 15 日 – 24 日",
+      "dateEn": "July 15 – 23",
+      "dateZh": "7 月 15 日 – 23 日",
       "descEn": "Summer term.",
       "descZh": "暑期学期。",
       "start": "2026-07-15",
-      "end": "2026-07-24"
+      "end": "2026-07-23"
     },
     {
       "id": "seed-vietnam",
