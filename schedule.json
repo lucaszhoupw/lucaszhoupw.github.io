@@ -71,6 +71,15 @@
       "descZh": "前往越南河内、岘港、胡志明市旅行。",
       "start": "2026-08-01",
       "end": "2026-08-10"
+    },
+    {
+      "id": "msuehogic7lb",
+      "dateEn": "August 25",
+      "dateZh": "8月25日",
+      "descEn": "Back to Beijing",
+      "descZh": "回到北京",
+      "start": "2026-08-25",
+      "end": "2026-08-25"
     }
   ]
 }
