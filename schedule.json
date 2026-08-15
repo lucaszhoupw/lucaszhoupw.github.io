@@ -80,6 +80,15 @@
       "descZh": "回到北京",
       "start": "2026-08-25",
       "end": "2026-08-25"
+    },
+    {
+      "id": "msueipk53b85",
+      "dateEn": "September 14",
+      "dateZh": "9月14日",
+      "descEn": "Semester begins",
+      "descZh": "秋季学期开学",
+      "start": "2026-09-14",
+      "end": "2026-09-14"
     }
   ]
 }
