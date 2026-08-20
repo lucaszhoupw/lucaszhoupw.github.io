@@ -102,40 +102,6 @@
     markActive();
   }
 
-  // Pick one of two portraits at random per visit (kept for the session),
-  // and let clicking the photo swap between them.
-  function initPortrait() {
-    var wrap = document.querySelector(".portrait-wrap");
-    if (!wrap) return;
-    var img = wrap.querySelector(".portrait");
-    var primary = img.getAttribute("src");
-    var alt = img.getAttribute("data-alt-src");
-    if (!alt) return;
-    var KEY = "plz-portrait";
-    var pa = new Image(); pa.src = primary;          // preload both for instant swaps
-    var pb = new Image(); pb.src = alt;
-
-    function apply(which) {
-      var isAlt = which === "alt";
-      img.setAttribute("src", isAlt ? alt : primary);
-      wrap.classList.toggle("show-alt", isAlt);      // switches the date colour
-    }
-
-    var stored = null;
-    try { stored = sessionStorage.getItem(KEY); } catch (e) {}
-    if (stored !== "primary" && stored !== "alt") {
-      stored = Math.random() < 0.5 ? "primary" : "alt";
-      try { sessionStorage.setItem(KEY, stored); } catch (e) {}
-    }
-    apply(stored);
-
-    img.addEventListener("click", function () {
-      var next = img.getAttribute("src") === alt ? "primary" : "alt";
-      apply(next);
-      try { sessionStorage.setItem(KEY, next); } catch (e) {}
-    });
-  }
-
   // Easter egg: in English, click the name to toggle the given-name spelling.
   function initNameEgg() {
     var name = document.querySelector(".side__name");
@@ -508,7 +474,6 @@
     initToggle();
     initScrollSpy();
     initPalette();
-    initPortrait();
     initNameEgg();
     initYearNav();
     initModals();

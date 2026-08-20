@@ -274,7 +274,6 @@ html[lang="zh"] .nav__link--caps {
   border-radius: 14px;
   border: 1px solid var(--border);
   box-shadow: 0 1px 0 var(--border), 0 16px 36px -24px rgba(20,30,25,.35);
-  cursor: pointer;
 }
 .portrait-date {
   position: absolute;
@@ -286,9 +285,6 @@ html[lang="zh"] .nav__link--caps {
   line-height: 1;
   pointer-events: none;
 }
-/* On the alternate (white-shirt) photo, use light grey instead of white */
-.portrait-wrap.show-alt .portrait-date { color: #b3b3b3; }
-
 .side__name {
   font-size: 1.62rem;
   line-height: 1.18;
@@ -552,8 +548,16 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
   background: var(--accent);
 }
 .link-entry__name {
+  display: block;
   font-weight: 700;
   font-size: 1.02rem;
+}
+.link-entry__alias {
+  display: block;
+  color: inherit;
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.35;
 }
 .link-entry__affil {
   display: block;
