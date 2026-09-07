@@ -28,7 +28,7 @@
 <meta property="og:url" content="https://lucaszhoupw.github.io/" />
 <meta property="og:image" content="https://lucaszhoupw.github.io/assets/portrait-danang.jpeg" />
 <meta name="twitter:card" content="summary_large_image" />
-<link rel="stylesheet" href="styles.css?v=19" />
+<link rel="stylesheet" href="styles.css?v=20" />
 </head>
 <body data-title-en="Peiwen (Lucas) Zhou" data-title-zh="周培文 · 个人主页">
 
@@ -172,7 +172,7 @@
           <div class="entry__line2" data-en="B.S. in Mathematics and Applied Mathematics, expected June 2028" data-zh="数学与应用数学专业（理学学士），预计 2028 年 6 月毕业">B.S. in Mathematics and Applied Mathematics, expected June 2028</div>
           <div class="entry__addr" data-en="17 E Tsinghua Rd, Beijing, China, 100083" data-zh="中国北京市海淀区清华东路 17 号">17 E Tsinghua Rd, Beijing, China, 100083</div>
           <div class="entry__meta" data-en="August 2023 – July 2024, September 2025 – Present" data-zh="2023年8月 – 2024年7月、2025年9月至今">August 2023 – July 2024, September 2025 – Present</div>
-          <div class="entry__line3" data-en="GPA 3.72 / 4.00" data-zh="GPA 3.72 / 4.00">GPA 3.72 / 4.00</div>
+          <div class="entry__line3 modal-trigger" data-modal="modal-cau-gpa" data-en="GPA 3.73 / 4.00" data-zh="GPA 3.73 / 4.00">GPA 3.73 / 4.00</div>
         </div>
         <div class="entry">
           <div class="entry__line1" data-en="University of Wisconsin–Madison" data-zh="威斯康星大学麦迪逊分校">University of Wisconsin–Madison</div>
@@ -191,6 +191,13 @@
       <!-- Certifications and Achievements -->
       <div class="cv-group">
         <h3 class="cv-group__head" data-en="Certifications and Achievements" data-zh="获奖与证书">Certifications and Achievements</h3>
+        <div class="entry">
+          <div class="entry__line1" data-en="Second Prize, 11th China University Life Sciences Competition" data-zh="第 11 届全国大学生生命科学竞赛（创新创业类）二等奖">Second Prize, 11th China University Life Sciences Competition</div>
+          <div class="entry__line3" data-en="China University Life Sciences Competition Organizing Committee" data-zh="全国大学生生命科学竞赛委员会">China University Life Sciences Competition Organizing Committee</div>
+          <div class="entry__line2 award-authors" data-html data-en="Awardees: Yuhan Yan, Weidong Tang, <span class=&quot;me&quot;>Peiwen Zhou</span>, Zimo Liu" data-zh="获奖学生：闫宇涵、唐卫东、<span class=&quot;me&quot;>周培文</span>、刘子墨">Awardees: Yuhan Yan, Weidong Tang, <span class="me">Peiwen Zhou</span>, Zimo Liu</div>
+          <div class="entry__line2" data-en="Advisor: Feifan Zhang" data-zh="指导老师：张非凡">Advisor: Feifan Zhang</div>
+          <div class="entry__meta" data-en="August 2026" data-zh="2026 年 8 月">August 2026</div>
+        </div>
         <div class="entry">
           <div class="entry__line1" data-en="First Prize, 36th Beijing College Mathematics Competition (Mathematics Major, Group A)" data-zh="北京市第 36 届大学生数学竞赛（数学专业甲组）一等奖">First Prize, 36th Beijing College Mathematics Competition (Mathematics Major, Group A)</div>
           <div class="entry__line3" data-en="Beijing Mathematical Society" data-zh="北京数学会">Beijing Mathematical Society</div>
@@ -259,6 +266,8 @@
           <span class="pill" data-en="Modern Algebra" data-zh="抽象代数">Modern Algebra</span>
           <span class="pill" data-en="Probability Theory" data-zh="概率论">Probability Theory</span>
           <span class="pill" data-en="Complex Analysis" data-zh="复变函数">Complex Analysis</span>
+          <span class="pill" data-en="Optimization" data-zh="优化">Optimization</span>
+          <span class="pill" data-en="Topology" data-zh="拓扑">Topology</span>
         </div>
       </div>
 
@@ -321,6 +330,18 @@
 </footer>
 
 <!-- ===================== SCORE MODALS ===================== -->
+<div class="modal" id="modal-cau-gpa">
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="cau-gpa-title">
+    <button class="modal__close" type="button" data-close aria-label="Close">&times;</button>
+    <h3 class="modal__title" id="cau-gpa-title" data-en="China Agricultural University" data-zh="中国农业大学">China Agricultural University</h3>
+    <dl class="score-list">
+      <div class="score-row score-row--total"><dt data-en="GPA" data-zh="GPA">GPA</dt><dd>3.73/4.00</dd></div>
+      <div class="score-row"><dt data-en="Rank" data-zh="排名">Rank</dt><dd>20/80</dd></div>
+    </dl>
+  </div>
+</div>
+
 <div class="modal" id="modal-gaokao">
   <div class="modal__backdrop" data-close></div>
   <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="gaokao-title">

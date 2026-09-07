@@ -482,6 +482,7 @@ html[lang="zh"] .cv-group__head { font-variant: normal; }
 .entry__addr { color: var(--faint); font-size: 0.82rem; }
 .entry__line3 { color: var(--muted); font-size: 0.9rem; }
 .entry__meta { color: var(--faint); font-size: 0.85rem; font-style: italic; }
+.award-authors .me { color: var(--accent); font-weight: 700; }
 
 /* Publications */
 .pub {
